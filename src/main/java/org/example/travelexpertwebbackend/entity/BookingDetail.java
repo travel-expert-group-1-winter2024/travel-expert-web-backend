@@ -8,7 +8,7 @@ import java.time.Instant;
 
 @Entity
 @Table(name = "bookingdetails")
-public class Bookingdetail {
+public class BookingDetail {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "bookingdetails_id_gen")
     @SequenceGenerator(name = "bookingdetails_id_gen", sequenceName = "bookingdetails_bookingdetailid_seq", initialValue = 1304, allocationSize = 1)

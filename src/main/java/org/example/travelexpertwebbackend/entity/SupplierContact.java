@@ -7,7 +7,7 @@ import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Table(name = "suppliercontacts")
-public class Suppliercontact {
+public class SupplierContact {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "suppliercontacts_id_gen")
     @SequenceGenerator(name = "suppliercontacts_id_gen", sequenceName = "supplierscontactid_seq", initialValue = 1160, allocationSize = 1)

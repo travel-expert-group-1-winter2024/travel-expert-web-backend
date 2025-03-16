@@ -24,7 +24,7 @@ public class Supplier {
 
     @OneToMany(mappedBy = "supplierid")
     @JsonManagedReference
-    private Set<Suppliercontact> suppliercontacts = new LinkedHashSet<>();
+    private Set<SupplierContact> suppliercontacts = new LinkedHashSet<>();
 
     public Integer getId() {
         return id;
@@ -50,11 +50,11 @@ public class Supplier {
         this.productsSuppliers = productsSuppliers;
     }
 
-    public Set<Suppliercontact> getSuppliercontacts() {
+    public Set<SupplierContact> getSuppliercontacts() {
         return suppliercontacts;
     }
 
-    public void setSuppliercontacts(Set<Suppliercontact> suppliercontacts) {
+    public void setSuppliercontacts(Set<SupplierContact> suppliercontacts) {
         this.suppliercontacts = suppliercontacts;
     }
 

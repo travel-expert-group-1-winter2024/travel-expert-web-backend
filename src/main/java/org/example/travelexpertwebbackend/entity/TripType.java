@@ -9,7 +9,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "triptypes")
-public class Triptype {
+public class TripType {
     @Id
     @Size(max = 1)
     @SequenceGenerator(name = "triptypes_id_gen", sequenceName = "suppliersid_seq", allocationSize = 1)

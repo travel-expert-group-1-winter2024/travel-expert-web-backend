@@ -35,14 +35,14 @@ public class Booking {
     @ManyToOne(fetch = FetchType.LAZY)
     @ColumnDefault("NULL")
     @JoinColumn(name = "triptypeid")
-    private org.example.travelexpertwebbackend.entity.Triptype triptypeid;
+    private TripType triptypeid;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "packageid")
     private org.example.travelexpertwebbackend.entity.Package packageid;
 
     @OneToMany(mappedBy = "bookingid")
-    private Set<Bookingdetail> bookingdetails = new LinkedHashSet<>();
+    private Set<BookingDetail> bookingdetails = new LinkedHashSet<>();
 
     public Integer getId() {
         return id;
@@ -84,11 +84,11 @@ public class Booking {
         this.customerid = customerid;
     }
 
-    public org.example.travelexpertwebbackend.entity.Triptype getTriptypeid() {
+    public TripType getTriptypeid() {
         return triptypeid;
     }
 
-    public void setTriptypeid(org.example.travelexpertwebbackend.entity.Triptype triptypeid) {
+    public void setTriptypeid(TripType triptypeid) {
         this.triptypeid = triptypeid;
     }
 
@@ -100,11 +100,11 @@ public class Booking {
         this.packageid = packageid;
     }
 
-    public Set<Bookingdetail> getBookingdetails() {
+    public Set<BookingDetail> getBookingdetails() {
         return bookingdetails;
     }
 
-    public void setBookingdetails(Set<Bookingdetail> bookingdetails) {
+    public void setBookingdetails(Set<BookingDetail> bookingdetails) {
         this.bookingdetails = bookingdetails;
     }
 
