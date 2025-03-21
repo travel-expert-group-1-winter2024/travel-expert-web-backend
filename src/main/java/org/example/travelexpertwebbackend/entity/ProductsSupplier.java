@@ -1,6 +1,7 @@
 package org.example.travelexpertwebbackend.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import org.hibernate.annotations.ColumnDefault;
@@ -18,16 +19,16 @@ public class ProductsSupplier {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "productid")
-    @JsonBackReference
+    @JsonIgnore
     private Product productid;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "supplierid")
-    @JsonBackReference
+    @JsonIgnore
     private Supplier supplierid;
 
     @ManyToMany(mappedBy = "productsSuppliers")
-    @JsonBackReference
+    @JsonIgnore
     private Set<Package> packages = new LinkedHashSet<>();
 
     public Set<Package> getPackages() {
