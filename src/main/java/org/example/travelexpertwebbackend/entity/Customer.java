@@ -1,5 +1,6 @@
 package org.example.travelexpertwebbackend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -72,6 +73,7 @@ public class Customer {
     private Agent agentid;
 
     @OneToMany(mappedBy = "customerid")
+    @JsonIgnore
     private Set<Booking> bookings = new LinkedHashSet<>();
 
     @OneToOne(mappedBy = "customerid")
