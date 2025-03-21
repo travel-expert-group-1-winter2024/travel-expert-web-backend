@@ -1,5 +1,6 @@
 package org.example.travelexpertwebbackend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
@@ -52,7 +53,7 @@ public class Package {
     @JoinTable(name = "packages_products_suppliers",
             joinColumns = @JoinColumn(name = "packageid"),
             inverseJoinColumns = @JoinColumn(name = "productsupplierid"))
-    @JsonManagedReference
+    @JsonIgnore
     private Set<ProductsSupplier> productsSuppliers = new LinkedHashSet<>();
 
     public Integer getId() {
