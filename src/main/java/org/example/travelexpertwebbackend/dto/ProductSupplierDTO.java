@@ -5,6 +5,15 @@ public class ProductSupplierDTO {
     private String prodName;
     private Integer supplierId;
     private String supName;
+    private Integer productSupplierId;
+
+    public Integer getProductSupplierId() {
+        return productSupplierId;
+    }
+
+    public void setProductSupplierId(Integer productSupplierId) {
+        this.productSupplierId = productSupplierId;
+    }
 
     // Getters and Setters
     public Integer getProductId() {

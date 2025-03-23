@@ -20,49 +20,27 @@ public class PackageService {
 
     @Autowired
     private PackageRepository packageRepository;
+
     @Autowired
     private ProductsSupplierRepository productsSupplierRepository;
 
+    // Get all packages
+    public List<PackageDetailsDTO> getAllPackages() {
+        List<Package> packages = packageRepository.findAll();
+        return packages.stream()
+                .map(this::mapToPackageDetailsDTO)
+                .collect(Collectors.toList());
+    }
+
+    // Get package details by ID
     public PackageDetailsDTO getPackageDetails(Integer id) {
         Package pkg = packageRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Package not found"));
 
-        PackageDetailsDTO dto = new PackageDetailsDTO();
-        dto.setPackageid(pkg.getId());
-        dto.setPkgname(pkg.getPkgname());
-        dto.setPkgstartdate(pkg.getPkgstartdate());
-        dto.setPkgenddate(pkg.getPkgenddate());
-        dto.setPkgdesc(pkg.getPkgdesc());
-        dto.setPkgbaseprice(pkg.getPkgbaseprice());
-        dto.setPkgagencycommission(pkg.getPkgagencycommission());
-
-        Set<ProductSupplierDTO> productSupplierDTOs = pkg.getProductsSuppliers().stream()
-                .map(this::mapToProductSupplierDTO)
-                .collect(Collectors.toSet());
-
-        dto.setProductsSuppliers(productSupplierDTOs);
-        return dto;
+        return mapToPackageDetailsDTO(pkg);
     }
 
-    private ProductSupplierDTO mapToProductSupplierDTO(ProductsSupplier ps) {
-        ProductSupplierDTO dto = new ProductSupplierDTO();
-
-        // Check for null productid
-        if (ps.getProductid() != null) {
-            dto.setProductId(ps.getProductid().getId());
-            dto.setProdName(ps.getProductid().getProdname());
-        }
-
-        // Check for null supplierid
-        if (ps.getSupplierid() != null) {
-            dto.setSupplierId(ps.getSupplierid().getId());
-            dto.setSupName(ps.getSupplierid().getSupname());
-        }
-
-        return dto;
-    }
-
-    //Creating new package
+    // Create a new package
     @Transactional
     public Package createPackage(PackageRequestDTO request) {
         Package pkg = new Package();
@@ -87,7 +65,7 @@ public class PackageService {
         return packageRepository.save(savedPackage);
     }
 
-    //updating the package
+    // Update an existing package
     @Transactional
     public Package updatePackage(Integer id, PackageRequestDTO request) {
         Package pkg = packageRepository.findById(id)
@@ -113,17 +91,60 @@ public class PackageService {
         return packageRepository.save(pkg);
     }
 
-    //deleting the package
+    // Delete a package
     @Transactional
     public void deletePackage(Integer id) {
-        // Step 1: Find the package by ID
         Package pkg = packageRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Package not found with id: " + id));
 
-        // Step 2: Clear the associations in the bridging table
-        pkg.getProductsSuppliers().clear();
+        pkg.getProductsSuppliers().clear(); // Clear associations
+        packageRepository.delete(pkg); // Delete the package
+    }
 
-        // Step 3: Delete the package
-        packageRepository.delete(pkg);
+    public List<ProductSupplierDTO> getAllProductSuppliers() {
+        List<ProductsSupplier> productsSuppliers = productsSupplierRepository.findAll();
+        return productsSuppliers.stream()
+                .map(this::mapToProductSupplierDTO)
+                .collect(Collectors.toList());
+    }
+
+
+    // Map Package entity to PackageDetailsDTO
+    private PackageDetailsDTO mapToPackageDetailsDTO(Package pkg) {
+        PackageDetailsDTO dto = new PackageDetailsDTO();
+        dto.setPackageid(pkg.getId());
+        dto.setPkgname(pkg.getPkgname());
+        dto.setPkgstartdate(pkg.getPkgstartdate());
+        dto.setPkgenddate(pkg.getPkgenddate());
+        dto.setPkgdesc(pkg.getPkgdesc());
+        dto.setPkgbaseprice(pkg.getPkgbaseprice());
+        dto.setPkgagencycommission(pkg.getPkgagencycommission());
+
+        // Map the associated productsSuppliers to ProductSupplierDTO
+        Set<ProductSupplierDTO> productSupplierDTOs = pkg.getProductsSuppliers().stream()
+                .map(this::mapToProductSupplierDTO)
+                .collect(Collectors.toSet());
+
+        dto.setProductsSuppliers(productSupplierDTOs);
+        return dto;
+    }
+
+    // Map ProductsSupplier entity to ProductSupplierDTO
+    private ProductSupplierDTO mapToProductSupplierDTO(ProductsSupplier ps) {
+        ProductSupplierDTO dto = new ProductSupplierDTO();
+        dto.setProductSupplierId(ps.getId());
+        // Check for null productid
+        if (ps.getProductid() != null) {
+            dto.setProductId(ps.getProductid().getId());
+            dto.setProdName(ps.getProductid().getProdname());
+        }
+
+        // Check for null supplierid
+        if (ps.getSupplierid() != null) {
+            dto.setSupplierId(ps.getSupplierid().getId());
+            dto.setSupName(ps.getSupplierid().getSupname());
+        }
+
+        return dto;
     }
 }

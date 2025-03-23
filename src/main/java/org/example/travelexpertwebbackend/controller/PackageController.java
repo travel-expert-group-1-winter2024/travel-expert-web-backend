@@ -2,11 +2,14 @@ package org.example.travelexpertwebbackend.controller;
 
 import org.example.travelexpertwebbackend.dto.PackageDetailsDTO;
 import org.example.travelexpertwebbackend.dto.PackageRequestDTO;
+import org.example.travelexpertwebbackend.dto.ProductSupplierDTO;
 import org.example.travelexpertwebbackend.service.PackageService;
 import org.example.travelexpertwebbackend.entity.Package;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/packages")
@@ -14,6 +17,13 @@ public class PackageController {
 
     @Autowired
     private PackageService packageService;
+
+    //GET Package Details
+    @GetMapping
+    public ResponseEntity<List<PackageDetailsDTO>> getAllPackages() {
+        List<PackageDetailsDTO> packages = packageService.getAllPackages();
+        return ResponseEntity.ok(packages);
+    }
 
     //GET Package Details
     @GetMapping("/{id}/details")
@@ -41,5 +51,11 @@ public class PackageController {
     public ResponseEntity<Void> deletePackage(@PathVariable Integer id) {
         packageService.deletePackage(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/product-supplier")
+    public ResponseEntity<List<ProductSupplierDTO>> getAllProductSuppliers() {
+        List<ProductSupplierDTO> productSuppliers = packageService.getAllProductSuppliers();
+        return ResponseEntity.ok(productSuppliers);
     }
 }
