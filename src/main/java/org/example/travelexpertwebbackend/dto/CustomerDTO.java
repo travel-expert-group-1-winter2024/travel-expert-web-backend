@@ -47,7 +47,7 @@ public class CustomerDTO {
         this.custhomephone = customer.getCusthomephone();
         this.custbusphone = customer.getCustbusphone();
         this.custemail = customer.getCustemail();
-        this.agentId= customer.getAgentid().getId();
+        this.agentId= customer.getAgent().getId();
     }
 
     // Getters and Setters
