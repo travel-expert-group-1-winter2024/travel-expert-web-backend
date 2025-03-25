@@ -1,5 +1,7 @@
 package org.example.travelexpertwebbackend.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import org.hibernate.annotations.ColumnDefault;
@@ -19,42 +21,42 @@ public class Agent {
     @Size(max = 20)
     @ColumnDefault("NULL")
     @Column(name = "agtfirstname", length = 20)
-    private String agtfirstname;
+    private String agtFirstName;
 
     @Size(max = 5)
     @ColumnDefault("NULL")
     @Column(name = "agtmiddleinitial", length = 5)
-    private String agtmiddleinitial;
+    private String agtMiddleInitial;
 
     @Size(max = 20)
     @ColumnDefault("NULL")
     @Column(name = "agtlastname", length = 20)
-    private String agtlastname;
+    private String agtLastName;
 
     @Size(max = 20)
     @ColumnDefault("NULL")
     @Column(name = "agtbusphone", length = 20)
-    private String agtbusphone;
+    private String agtBusPhone;
 
     @Size(max = 50)
     @ColumnDefault("NULL")
     @Column(name = "agtemail", length = 50)
-    private String agtemail;
+    private String agtEmail;
 
     @Size(max = 20)
     @ColumnDefault("NULL")
     @Column(name = "agtposition", length = 20)
-    private String agtposition;
+    private String agtPosition;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "agencyid")
-    private Agency agencyid;
+    private Agency agency;
 
-    @OneToMany(mappedBy = "agentid")
-    private Set<org.example.travelexpertwebbackend.entity.Customer> customers = new LinkedHashSet<>();
+    @OneToMany(mappedBy = "agent")
+    private Set<Customer> customers = new LinkedHashSet<>();
 
     @OneToOne(mappedBy = "agentid")
-    private org.example.travelexpertwebbackend.entity.User user;
+    private User user;
 
     public Integer getId() {
         return id;
@@ -64,75 +66,75 @@ public class Agent {
         this.id = id;
     }
 
-    public String getAgtfirstname() {
-        return agtfirstname;
+    public String getAgtFirstName() {
+        return agtFirstName;
     }
 
-    public void setAgtfirstname(String agtfirstname) {
-        this.agtfirstname = agtfirstname;
+    public void setAgtFirstName(String agtFirstName) {
+        this.agtFirstName = agtFirstName;
     }
 
-    public String getAgtmiddleinitial() {
-        return agtmiddleinitial;
+    public String getAgtMiddleInitial() {
+        return agtMiddleInitial;
     }
 
-    public void setAgtmiddleinitial(String agtmiddleinitial) {
-        this.agtmiddleinitial = agtmiddleinitial;
+    public void setAgtMiddleInitial(String agtMiddleInitial) {
+        this.agtMiddleInitial = agtMiddleInitial;
     }
 
-    public String getAgtlastname() {
-        return agtlastname;
+    public String getAgtLastName() {
+        return agtLastName;
     }
 
-    public void setAgtlastname(String agtlastname) {
-        this.agtlastname = agtlastname;
+    public void setAgtLastName(String agtLastName) {
+        this.agtLastName = agtLastName;
     }
 
-    public String getAgtbusphone() {
-        return agtbusphone;
+    public String getAgtBusPhone() {
+        return agtBusPhone;
     }
 
-    public void setAgtbusphone(String agtbusphone) {
-        this.agtbusphone = agtbusphone;
+    public void setAgtBusPhone(String agtBusPhone) {
+        this.agtBusPhone = agtBusPhone;
     }
 
-    public String getAgtemail() {
-        return agtemail;
+    public String getAgtEmail() {
+        return agtEmail;
     }
 
-    public void setAgtemail(String agtemail) {
-        this.agtemail = agtemail;
+    public void setAgtEmail(String agtEmail) {
+        this.agtEmail = agtEmail;
     }
 
-    public String getAgtposition() {
-        return agtposition;
+    public String getAgtPosition() {
+        return agtPosition;
     }
 
-    public void setAgtposition(String agtposition) {
-        this.agtposition = agtposition;
+    public void setAgtPosition(String agtPosition) {
+        this.agtPosition = agtPosition;
     }
 
-    public Agency getAgencyid() {
-        return agencyid;
+    public Agency getAgency() {
+        return agency;
     }
 
-    public void setAgencyid(Agency agencyid) {
-        this.agencyid = agencyid;
+    public void setAgency(Agency agency) {
+        this.agency = agency;
     }
 
-    public Set<org.example.travelexpertwebbackend.entity.Customer> getCustomers() {
+    public Set<Customer> getCustomers() {
         return customers;
     }
 
-    public void setCustomers(Set<org.example.travelexpertwebbackend.entity.Customer> customers) {
+    public void setCustomers(Set<Customer> customers) {
         this.customers = customers;
     }
 
-    public org.example.travelexpertwebbackend.entity.User getUser() {
+    public User getUser() {
         return user;
     }
 
-    public void setUser(org.example.travelexpertwebbackend.entity.User user) {
+    public void setUser(User user) {
         this.user = user;
     }
 

@@ -1,5 +1,6 @@
 package org.example.travelexpertwebbackend.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import org.hibernate.annotations.ColumnDefault;
@@ -19,40 +20,40 @@ public class Agency {
     @Size(max = 50)
     @ColumnDefault("NULL")
     @Column(name = "agncyaddress", length = 50)
-    private String agncyaddress;
+    private String agencyAddress;
 
     @Size(max = 50)
     @ColumnDefault("NULL")
     @Column(name = "agncycity", length = 50)
-    private String agncycity;
+    private String agencyCity;
 
     @Size(max = 50)
     @ColumnDefault("NULL")
     @Column(name = "agncyprov", length = 50)
-    private String agncyprov;
+    private String agencyProvince;
 
     @Size(max = 50)
     @ColumnDefault("NULL")
     @Column(name = "agncypostal", length = 50)
-    private String agncypostal;
+    private String agencyPostal;
 
     @Size(max = 50)
     @ColumnDefault("NULL")
     @Column(name = "agncycountry", length = 50)
-    private String agncycountry;
+    private String agencyCountry;
 
     @Size(max = 50)
     @ColumnDefault("NULL")
     @Column(name = "agncyphone", length = 50)
-    private String agncyphone;
+    private String agencyPhone;
 
     @Size(max = 50)
     @ColumnDefault("NULL")
     @Column(name = "agncyfax", length = 50)
-    private String agncyfax;
+    private String agencyFax;
 
-    @OneToMany(mappedBy = "agencyid")
-    private Set<org.example.travelexpertwebbackend.entity.Agent> agents = new LinkedHashSet<>();
+    @OneToMany(mappedBy = "agency")
+    private Set<Agent> agents = new LinkedHashSet<>();
 
     public Integer getId() {
         return id;
@@ -62,60 +63,60 @@ public class Agency {
         this.id = id;
     }
 
-    public String getAgncyaddress() {
-        return agncyaddress;
+    public String getAgencyAddress() {
+        return agencyAddress;
     }
 
-    public void setAgncyaddress(String agncyaddress) {
-        this.agncyaddress = agncyaddress;
+    public void setAgencyAddress(String agencyAddress) {
+        this.agencyAddress = agencyAddress;
     }
 
-    public String getAgncycity() {
-        return agncycity;
+    public String getAgencyCity() {
+        return agencyCity;
     }
 
-    public void setAgncycity(String agncycity) {
-        this.agncycity = agncycity;
+    public void setAgencyCity(String agencyCity) {
+        this.agencyCity = agencyCity;
     }
 
-    public String getAgncyprov() {
-        return agncyprov;
+    public String getAgencyProvince() {
+        return agencyProvince;
     }
 
-    public void setAgncyprov(String agncyprov) {
-        this.agncyprov = agncyprov;
+    public void setAgencyProvince(String agencyProvince) {
+        this.agencyProvince = agencyProvince;
     }
 
-    public String getAgncypostal() {
-        return agncypostal;
+    public String getAgencyPostal() {
+        return agencyPostal;
     }
 
-    public void setAgncypostal(String agncypostal) {
-        this.agncypostal = agncypostal;
+    public void setAgencyPostal(String agencyPostal) {
+        this.agencyPostal = agencyPostal;
     }
 
-    public String getAgncycountry() {
-        return agncycountry;
+    public String getAgencyCountry() {
+        return agencyCountry;
     }
 
-    public void setAgncycountry(String agncycountry) {
-        this.agncycountry = agncycountry;
+    public void setAgencyCountry(String agencyCountry) {
+        this.agencyCountry = agencyCountry;
     }
 
-    public String getAgncyphone() {
-        return agncyphone;
+    public String getAgencyPhone() {
+        return agencyPhone;
     }
 
-    public void setAgncyphone(String agncyphone) {
-        this.agncyphone = agncyphone;
+    public void setAgencyPhone(String agencyPhone) {
+        this.agencyPhone = agencyPhone;
     }
 
-    public String getAgncyfax() {
-        return agncyfax;
+    public String getAgencyFax() {
+        return agencyFax;
     }
 
-    public void setAgncyfax(String agncyfax) {
-        this.agncyfax = agncyfax;
+    public void setAgencyFax(String agencyFax) {
+        this.agencyFax = agencyFax;
     }
 
     public Set<org.example.travelexpertwebbackend.entity.Agent> getAgents() {
