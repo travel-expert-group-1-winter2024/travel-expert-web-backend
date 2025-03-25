@@ -58,6 +58,11 @@ public class Agent {
     @OneToOne(mappedBy = "agentid")
     private User user;
 
+    private String photoPath;
+
+    public Agent() {
+    }
+
     public Integer getId() {
         return id;
     }
@@ -138,4 +143,11 @@ public class Agent {
         this.user = user;
     }
 
+    public String getPhotoPath() {
+        return photoPath;
+    }
+
+    public void setPhotoPath(String photoPath) {
+        this.photoPath = photoPath;
+    }
 }
