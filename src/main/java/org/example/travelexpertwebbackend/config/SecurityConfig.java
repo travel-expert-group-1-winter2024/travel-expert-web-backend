@@ -45,7 +45,7 @@ public class SecurityConfig {
         // grant authorization to users based on roles
         httpSecurity.authorizeHttpRequests(securityConfigurer ->
                 securityConfigurer
-                        .requestMatchers("/api/register").permitAll()
+                        .requestMatchers("/api/signup").permitAll()
                         .requestMatchers("/api/login").permitAll()
         );
 
