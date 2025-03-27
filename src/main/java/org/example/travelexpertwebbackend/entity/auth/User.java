@@ -1,5 +1,6 @@
 package org.example.travelexpertwebbackend.entity.auth;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -79,6 +80,11 @@ public class User {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    @JsonIgnore
+    public String[] getRoles() {
+        return role.split(",");
     }
 
     public Agent getAgentid() {
