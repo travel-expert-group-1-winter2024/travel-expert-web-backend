@@ -12,6 +12,7 @@ import org.example.travelexpertwebbackend.service.auth.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
@@ -53,18 +54,25 @@ public class UserController {
 
     @PostMapping("/api/login")
     public ResponseEntity<GenericApiResponse<LoginResponseDTO>> loginUser(@Valid @RequestBody LoginRequestDTO user) {
-        // use AuthenticationManager to authenticate user
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword())
-        );
-        // check if authentication is successful
-        if (authentication.isAuthenticated()) {
-            Logger.debug("Logging in user: " + user.getUsername());
-            // return user token that was created
-            return ResponseEntity.ok(new GenericApiResponse<>(new LoginResponseDTO(jwtService.generateToken(userService.loadUserByUsername(user.getUsername())))));
-        } else {
-            Logger.error("Authentication failed for user: " + user.getUsername());
-            return ResponseEntity.status(401).body(new GenericApiResponse<>(List.of(new ErrorInfo("Authentication failed"))));
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword())
+            );
+
+            if (authentication.isAuthenticated()) {
+                Logger.debug("Logging in user: " + user.getUsername());
+                return ResponseEntity.ok(new GenericApiResponse<>(
+                        new LoginResponseDTO(jwtService.generateToken(userService.loadUserByUsername(user.getUsername())))
+                ));
+            }
+        } catch (BadCredentialsException ex) {
+            Logger.warn("Bad credentials for user: " + user.getUsername());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new GenericApiResponse<>(List.of(new ErrorInfo("Username or password is incorrect"))));
         }
+
+        // other error
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new GenericApiResponse<>(List.of(new ErrorInfo("Authentication failed"))));
     }
 }
