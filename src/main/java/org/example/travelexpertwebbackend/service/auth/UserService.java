@@ -50,4 +50,19 @@ public class UserService implements UserDetailsService {
                 savedUser.getRole()
         );
     }
+
+    public SignUpResponseDTO saveAgent(String username, String password) {
+
+        User user = new User();
+        user.setUsername(username);
+        user.setPasswordHash(new BCryptPasswordEncoder().encode(password));
+        user.setRole(Role.AGENT.name()); // default role
+
+        User savedUser = userRepository.save(user);
+        return new SignUpResponseDTO(
+                savedUser.getId().toString(),
+                savedUser.getUsername(),
+                savedUser.getRole()
+        );
+    }
 }

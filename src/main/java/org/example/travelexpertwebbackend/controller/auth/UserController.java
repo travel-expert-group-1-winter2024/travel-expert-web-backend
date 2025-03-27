@@ -29,10 +29,18 @@ public class UserController {
         this.authenticationManager = authenticationManager;
     }
 
+    // for user registration
     @PostMapping("/api/signup")
     public ResponseEntity<SignUpResponseDTO> signup(@Validated @RequestBody SignUpRequestDTO request) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(userService.saveUser(request.getUsername(), request.getPassword()));
+    }
+
+    // for agent registration
+    @PostMapping("/api/signup/agent")
+    public ResponseEntity<SignUpResponseDTO> signupAgent(@Validated @RequestBody SignUpRequestDTO request) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(userService.saveAgent(request.getUsername(), request.getPassword()));
     }
 
     @PostMapping("/api/login")
