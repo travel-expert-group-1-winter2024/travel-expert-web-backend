@@ -1,5 +1,6 @@
 package org.example.travelexpertwebbackend.controller.auth;
 
+import jakarta.validation.Valid;
 import org.example.travelexpertwebbackend.dto.ErrorInfo;
 import org.example.travelexpertwebbackend.dto.GenericApiResponse;
 import org.example.travelexpertwebbackend.dto.auth.LoginRequestDTO;
@@ -35,27 +36,27 @@ public class UserController {
 
     // for user registration
     @PostMapping("/api/signup")
-    public ResponseEntity<SignUpResponseDTO> signup(@Validated @RequestBody SignUpRequestDTO request) {
+    public ResponseEntity<SignUpResponseDTO> signup(@Valid @RequestBody SignUpRequestDTO request) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(userService.saveUser(request.getUsername(), request.getPassword()));
     }
 
     // for agent registration
     @PostMapping("/api/signup/agent")
-    public ResponseEntity<SignUpResponseDTO> signupAgent(@Validated @RequestBody SignUpRequestDTO request) {
+    public ResponseEntity<SignUpResponseDTO> signupAgent(@Valid @RequestBody SignUpRequestDTO request) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(userService.saveAgent(request.getUsername(), request.getPassword(), request.getAgentId()));
     }
 
     @PostMapping("/api/login")
-    public ResponseEntity<GenericApiResponse<LoginResponseDTO>> loginUser(@Validated @RequestBody LoginRequestDTO user) {
-        Logger.debug("Logging in user: " + user.getUsername());
+    public ResponseEntity<GenericApiResponse<LoginResponseDTO>> loginUser(@Valid @RequestBody LoginRequestDTO user) {
         // use AuthenticationManager to authenticate user
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword())
         );
         // check if authentication is successful
         if (authentication.isAuthenticated()) {
+            Logger.debug("Logging in user: " + user.getUsername());
             // return user token that was created
             return ResponseEntity.ok(new GenericApiResponse<>(new LoginResponseDTO(jwtService.generateToken(userService.loadUserByUsername(user.getUsername())))));
         } else {
