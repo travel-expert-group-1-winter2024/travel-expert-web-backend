@@ -1,8 +1,10 @@
-package org.example.travelexpertwebbackend.entity;
+package org.example.travelexpertwebbackend.entity.auth;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import org.example.travelexpertwebbackend.entity.Agent;
+import org.example.travelexpertwebbackend.entity.Customer;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
