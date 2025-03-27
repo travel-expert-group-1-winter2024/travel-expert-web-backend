@@ -47,7 +47,7 @@ public class SecurityConfig {
         httpSecurity.authorizeHttpRequests(securityConfigurer ->
                 securityConfigurer
                         .requestMatchers("/api/signup").permitAll()
-                        .requestMatchers("/api/signup/agent").permitAll()
+                        .requestMatchers("/api/signup/agent").permitAll() //TODO: change to admin or manager later
                         .requestMatchers("/api/login").permitAll()
                         .requestMatchers(HttpMethod.GET,"/agencies").permitAll()
                         .requestMatchers(HttpMethod.POST,"/agents").permitAll() // TODO: change to admin or manager later
