@@ -1,10 +1,10 @@
 package org.example.travelexpertwebbackend.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import org.example.travelexpertwebbackend.entity.auth.User;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.util.LinkedHashSet;
@@ -78,7 +78,7 @@ public class Customer {
     private Set<Booking> bookings = new LinkedHashSet<>();
 
     @OneToOne(mappedBy = "customerid")
-    private org.example.travelexpertwebbackend.entity.User user;
+    private User user;
 
     public Integer getId() {
         return id;
@@ -184,11 +184,11 @@ public class Customer {
         this.bookings = bookings;
     }
 
-    public org.example.travelexpertwebbackend.entity.User getUser() {
+    public User getUser() {
         return user;
     }
 
-    public void setUser(org.example.travelexpertwebbackend.entity.User user) {
+    public void setUser(User user) {
         this.user = user;
     }
 
