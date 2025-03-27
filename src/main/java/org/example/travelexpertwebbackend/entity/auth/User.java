@@ -1,9 +1,13 @@
-package org.example.travelexpertwebbackend.entity;
+package org.example.travelexpertwebbackend.entity.auth;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import org.example.travelexpertwebbackend.entity.Agent;
+import org.example.travelexpertwebbackend.entity.Customer;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -14,8 +18,9 @@ import java.util.UUID;
 @Table(name = "users")
 public class User {
     @Id
-    @ColumnDefault("gen_random_uuid()")
-    @Column(name = "id", nullable = false)
+    @GeneratedValue(generator = "UUID")
+    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+    @Column(name = "id", nullable = false, updatable = false)
     private UUID id;
 
     @Size(max = 50)
@@ -77,6 +82,11 @@ public class User {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    @JsonIgnore
+    public String[] getRoles() {
+        return role.split(",");
     }
 
     public Agent getAgentid() {

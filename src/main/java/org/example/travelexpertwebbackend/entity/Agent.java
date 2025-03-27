@@ -1,9 +1,8 @@
 package org.example.travelexpertwebbackend.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
+import org.example.travelexpertwebbackend.entity.auth.User;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.util.LinkedHashSet;
