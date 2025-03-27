@@ -12,6 +12,8 @@ import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import org.tinylog.Logger;
+
 
 @Service
 public class JwtService {
@@ -29,7 +31,7 @@ public class JwtService {
 
         // convert the key to string for printing
         String encodedKey = Base64.getEncoder().encodeToString(key.getEncoded());
-        System.out.println("Encoded Key: " + encodedKey);
+        Logger.debug("Encoded Key: " + encodedKey);
 
         // convert byte to a key
         return Keys.hmacShaKeyFor(key.getEncoded());

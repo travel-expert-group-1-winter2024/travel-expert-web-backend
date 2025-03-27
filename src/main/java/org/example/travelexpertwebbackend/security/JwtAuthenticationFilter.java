@@ -11,6 +11,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.tinylog.Logger;
 
 import java.io.IOException;
 
@@ -34,7 +35,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // extract the JWT token from the request header
         // get the token from the request header
         String authHeader = request.getHeader("Authorization");
-        System.out.println("Authorization Header: " + authHeader);
+        Logger.debug("Authorization Header: " + authHeader);
 
         // ensure the token in header is not null
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
@@ -45,7 +46,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String jwt = authHeader.substring(7);
         String username = jwtService.getUsernameFromToken(jwt);
-        System.out.println("Username: " + username);
+        Logger.debug("Username: " + username);
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             // extract user details from username
@@ -58,7 +59,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         userDetails.getPassword(),
                         userDetails.getAuthorities()
                 );
-                System.out.println("User roles: " + userDetails.getAuthorities());
+                Logger.debug("User roles: " + userDetails.getAuthorities());
                 // add this the auth token to the request
                 authenticationToken.setDetails(new WebAuthenticationDetailsSource()
                         .buildDetails(request)
@@ -66,7 +67,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 // put the auth token in the security context
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             } else {
-                System.out.println("Token is expired");
+                Logger.warn("Token is expired");
             }
         }
         filterChain.doFilter(request, response);
