@@ -3,10 +3,12 @@ package org.example.travelexpertwebbackend.dto.auth;
 import jakarta.validation.constraints.NotNull;
 
 public class SignUpRequestDTO {
-    @NotNull(message = "Username cannot be null")
+    @NotNull(message = "Username is required")
     private String username;
-    @NotNull(message = "Password cannot be null")
+    @NotNull(message = "Password is required")
     private String password;
+    @NotNull(message = "Agent ID is required")
+    private Integer agentId;
 
     public SignUpRequestDTO() {
     }
@@ -25,5 +27,13 @@ public class SignUpRequestDTO {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public Integer getAgentId() {
+        return agentId;
+    }
+
+    public void setAgentId(Integer agentId) {
+        this.agentId = agentId;
     }
 }
