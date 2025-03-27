@@ -1,8 +1,11 @@
 package org.example.travelexpertwebbackend.service.auth;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.example.travelexpertwebbackend.dto.auth.SignUpResponseDTO;
+import org.example.travelexpertwebbackend.entity.Agent;
 import org.example.travelexpertwebbackend.entity.auth.Role;
 import org.example.travelexpertwebbackend.entity.auth.User;
+import org.example.travelexpertwebbackend.repository.AgentRepository;
 import org.example.travelexpertwebbackend.repository.auth.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -16,9 +19,12 @@ import java.util.Optional;
 public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
+    private final AgentRepository agentRepository;
 
-    public UserService(UserRepository userRepository) {
+
+    public UserService(UserRepository userRepository, AgentRepository agentRepository) {
         this.userRepository = userRepository;
+        this.agentRepository = agentRepository;
     }
 
     @Override
@@ -51,11 +57,16 @@ public class UserService implements UserDetailsService {
         );
     }
 
-    public SignUpResponseDTO saveAgent(String username, String password) {
+    public SignUpResponseDTO saveAgent(String username, String password, Integer agentId) {
+
+        // find Agent by agentId
+        Agent agent = agentRepository.findById(agentId)
+                .orElseThrow(() -> new EntityNotFoundException("Agent not found with id: " + agentId));
 
         User user = new User();
         user.setUsername(username);
         user.setPasswordHash(new BCryptPasswordEncoder().encode(password));
+        user.setAgentid(agent);
         user.setRole(Role.AGENT.name()); // default role
 
         User savedUser = userRepository.save(user);

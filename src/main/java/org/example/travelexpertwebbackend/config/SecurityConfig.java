@@ -5,6 +5,7 @@ import org.example.travelexpertwebbackend.security.JwtAuthenticationFilter;
 import org.example.travelexpertwebbackend.service.auth.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
@@ -46,7 +47,10 @@ public class SecurityConfig {
         httpSecurity.authorizeHttpRequests(securityConfigurer ->
                 securityConfigurer
                         .requestMatchers("/api/signup").permitAll()
+                        .requestMatchers("/api/signup/agent").permitAll()
                         .requestMatchers("/api/login").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/agencies").permitAll()
+                        .requestMatchers(HttpMethod.POST,"/agents").permitAll() // TODO: change to admin or manager later
         );
 
         httpSecurity.addFilterBefore(

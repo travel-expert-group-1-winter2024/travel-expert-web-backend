@@ -40,7 +40,7 @@ public class UserController {
     @PostMapping("/api/signup/agent")
     public ResponseEntity<SignUpResponseDTO> signupAgent(@Validated @RequestBody SignUpRequestDTO request) {
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(userService.saveAgent(request.getUsername(), request.getPassword()));
+                .body(userService.saveAgent(request.getUsername(), request.getPassword(), request.getAgentId()));
     }
 
     @PostMapping("/api/login")
