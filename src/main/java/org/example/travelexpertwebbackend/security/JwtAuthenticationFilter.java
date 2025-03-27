@@ -35,41 +35,36 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // extract the JWT token from the request header
         // get the token from the request header
         String authHeader = request.getHeader("Authorization");
-        Logger.debug("Authorization Header: " + authHeader);
 
         // ensure the token in header is not null
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            System.out.println("Token is invalid");
-            filterChain.doFilter(request, response);
-            return;
-        }
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String jwt = authHeader.substring(7);
+            String username = jwtService.getUsernameFromToken(jwt);
 
-        String jwt = authHeader.substring(7);
-        String username = jwtService.getUsernameFromToken(jwt);
-        Logger.debug("Username: " + username);
-
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            // extract user details from username
-            UserDetails userDetails = userService.loadUserByUsername(username);
-            // check if token is valid => token has not expired
-            if (jwtService.isTokenNotExpired(jwt)) {
-                // if token is not expired then perform basic authentication using username and password
-                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                        username,
-                        userDetails.getPassword(),
-                        userDetails.getAuthorities()
-                );
-                Logger.debug("User roles: " + userDetails.getAuthorities());
-                // add this the auth token to the request
-                authenticationToken.setDetails(new WebAuthenticationDetailsSource()
-                        .buildDetails(request)
-                );
-                // put the auth token in the security context
-                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-            } else {
-                Logger.warn("Token is expired");
+            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                // extract user details from username
+                UserDetails userDetails = userService.loadUserByUsername(username);
+                // check if token is valid => token has not expired
+                if (jwtService.isTokenNotExpired(jwt)) {
+                    // if token is not expired then perform basic authentication using username and password
+                    UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                            username,
+                            userDetails.getPassword(),
+                            userDetails.getAuthorities()
+                    );
+                    Logger.debug("User roles: " + userDetails.getAuthorities());
+                    // add this the auth token to the request
+                    authenticationToken.setDetails(new WebAuthenticationDetailsSource()
+                            .buildDetails(request)
+                    );
+                    // put the auth token in the security context
+                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                } else {
+                    Logger.warn("Token is expired");
+                }
             }
         }
+
         filterChain.doFilter(request, response);
     }
 }
