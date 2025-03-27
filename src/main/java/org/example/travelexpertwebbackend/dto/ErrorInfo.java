@@ -1,5 +1,8 @@
 package org.example.travelexpertwebbackend.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+@JsonInclude(JsonInclude.Include.NON_NULL) // Exclude null fields from JSON serialization
 public class ErrorInfo {
     private String fields;
     private String detail;
