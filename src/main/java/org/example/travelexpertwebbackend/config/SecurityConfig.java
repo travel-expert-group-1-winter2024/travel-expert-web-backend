@@ -1,11 +1,10 @@
 package org.example.travelexpertwebbackend.config;
 
 
-import org.example.travelexpertwebbackend.service.auth.JwtAuthenticationFilter;
+import org.example.travelexpertwebbackend.security.JwtAuthenticationFilter;
 import org.example.travelexpertwebbackend.service.auth.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;

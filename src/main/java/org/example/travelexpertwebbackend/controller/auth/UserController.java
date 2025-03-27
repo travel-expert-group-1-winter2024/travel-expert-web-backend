@@ -3,7 +3,7 @@ package org.example.travelexpertwebbackend.controller.auth;
 import org.example.travelexpertwebbackend.dto.auth.LoginRequestDTO;
 import org.example.travelexpertwebbackend.dto.auth.SignUpResponseDTO;
 import org.example.travelexpertwebbackend.dto.auth.SignUpRequestDTO;
-import org.example.travelexpertwebbackend.service.auth.JwtService;
+import org.example.travelexpertwebbackend.security.JwtService;
 import org.example.travelexpertwebbackend.service.auth.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

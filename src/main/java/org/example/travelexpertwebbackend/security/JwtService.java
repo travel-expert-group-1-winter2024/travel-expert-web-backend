@@ -1,4 +1,4 @@
-package org.example.travelexpertwebbackend.service.auth;
+package org.example.travelexpertwebbackend.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
