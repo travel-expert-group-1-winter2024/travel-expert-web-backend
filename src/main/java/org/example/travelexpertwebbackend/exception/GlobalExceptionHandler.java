@@ -7,17 +7,17 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.util.List;
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<GenericApiResponse<?>> handleValidationErrors(MethodArgumentNotValidException ex) {
-        String errorMessage = ex.getBindingResult().getFieldErrors().stream()
-            .map(error -> error.getDefaultMessage())
-            .reduce((msg1, msg2) -> msg1 + "; " + msg2)
-            .orElse("Validation failed");
+        List<ErrorInfo> errors = ex.getBindingResult().getFieldErrors().stream()
+            .map(error -> new ErrorInfo(error.getField(), error.getDefaultMessage()))
+            .toList();
 
-        ErrorInfo errorInfo = new ErrorInfo(errorMessage);
-        GenericApiResponse<?> response = new GenericApiResponse<>(errorInfo);
+        GenericApiResponse<?> response = new GenericApiResponse<>(errors);
         return ResponseEntity.badRequest().body(response);
     }
 }
