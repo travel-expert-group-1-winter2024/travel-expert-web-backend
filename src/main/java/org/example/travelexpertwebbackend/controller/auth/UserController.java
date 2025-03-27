@@ -20,6 +20,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.tinylog.Logger;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @RestController
 public class UserController {
 
@@ -61,7 +64,7 @@ public class UserController {
             return ResponseEntity.ok(new GenericApiResponse<>(new LoginResponseDTO(jwtService.generateToken(userService.loadUserByUsername(user.getUsername())))));
         } else {
             Logger.error("Authentication failed for user: " + user.getUsername());
-            return ResponseEntity.status(401).body(new GenericApiResponse<>(new ErrorInfo("Authentication failed")));
+            return ResponseEntity.status(401).body(new GenericApiResponse<>(List.of(new ErrorInfo("Authentication failed"))));
         }
     }
 }
