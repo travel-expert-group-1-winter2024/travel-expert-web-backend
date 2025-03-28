@@ -51,6 +51,20 @@ public class SecurityConfig {
                         .requestMatchers("/api/login").permitAll()
                         .requestMatchers(HttpMethod.GET,"/agencies").permitAll()
                         .requestMatchers(HttpMethod.POST,"/agents").permitAll() // TODO: change to admin or manager later
+                        .requestMatchers(HttpMethod.GET, "/api/customers").permitAll()
+                        // packages
+                        // TODO: change to agent later
+                        .requestMatchers(HttpMethod.GET, "/packages").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/packages").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/packages/product-supplier").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/packages/*").permitAll()
+                        // product
+                        // TODO: change to agent later
+                        .requestMatchers(HttpMethod.GET, "/products").permitAll()
+                        // supplier contact
+                        // TODO: change to agent later
+                        .requestMatchers(HttpMethod.GET, "/suppliercontacts").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/suppliercontacts/*").permitAll()
         );
 
         httpSecurity.addFilterBefore(
