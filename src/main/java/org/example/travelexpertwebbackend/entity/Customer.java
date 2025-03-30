@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import org.example.travelexpertwebbackend.entity.auth.User;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.util.LinkedHashSet;
@@ -68,16 +69,16 @@ public class Customer {
     @Column(name = "custemail", nullable = false, length = 50)
     private String custemail;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne()
     @JoinColumn(name = "agentid")
-    private Agent agentid;
+    private Agent agent;
 
     @OneToMany(mappedBy = "customerid")
     @JsonIgnore
     private Set<Booking> bookings = new LinkedHashSet<>();
 
     @OneToOne(mappedBy = "customerid")
-    private org.example.travelexpertwebbackend.entity.User user;
+    private User user;
 
     public Integer getId() {
         return id;
@@ -167,12 +168,12 @@ public class Customer {
         this.custemail = custemail;
     }
 
-    public Agent getAgentid() {
-        return agentid;
+    public Agent getAgent() {
+        return agent;
     }
 
-    public void setAgentid(Agent agentid) {
-        this.agentid = agentid;
+    public void setAgent(Agent agent) {
+        this.agent = agent;
     }
 
     public Set<Booking> getBookings() {
@@ -183,11 +184,11 @@ public class Customer {
         this.bookings = bookings;
     }
 
-    public org.example.travelexpertwebbackend.entity.User getUser() {
+    public User getUser() {
         return user;
     }
 
-    public void setUser(org.example.travelexpertwebbackend.entity.User user) {
+    public void setUser(User user) {
         this.user = user;
     }
 
