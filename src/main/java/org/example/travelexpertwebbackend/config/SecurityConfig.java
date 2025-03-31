@@ -60,11 +60,13 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/packages/*").permitAll()
                         // product
                         // TODO: change to agent later
-                        .requestMatchers(HttpMethod.GET, "/products").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/products").permitAll()
+
                         // supplier contact
                         // TODO: change to agent later
-                        .requestMatchers(HttpMethod.GET, "/suppliercontacts").permitAll()
-                        .requestMatchers(HttpMethod.PUT, "/suppliercontacts/*").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/suppliercontacts").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/api/suppliercontacts/*").permitAll()
+
         );
 
         httpSecurity.addFilterBefore(
