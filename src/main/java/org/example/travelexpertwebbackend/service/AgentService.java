@@ -1,5 +1,6 @@
 package org.example.travelexpertwebbackend.service;
 
+import org.example.travelexpertwebbackend.dto.AgentDetailResponseDTO;
 import org.example.travelexpertwebbackend.entity.Agent;
 import org.example.travelexpertwebbackend.repository.AgentRepository;
 import org.springframework.stereotype.Service;
@@ -42,5 +43,26 @@ public class AgentService {
         agentRepository.save(agent);
 
         return filename;
+    }
+
+    public AgentDetailResponseDTO getCurrentAgent(String username) {
+        // find agent by username
+        Optional<Agent> agent = agentRepository.findByAgtEmail(username);
+        if (agent.isEmpty()) {
+            throw new IllegalArgumentException("Agent not found");
+        }
+
+        Agent result = agent.get();
+
+        return new AgentDetailResponseDTO(
+                result.getId(),
+                result.getAgtFirstName(),
+                result.getAgtMiddleInitial(),
+                result.getAgtLastName(),
+                result.getAgtBusPhone(),
+                result.getAgtEmail(),
+                result.getAgtPosition(),
+                result.getAgency().getId()
+        );
     }
 }
