@@ -1,18 +1,23 @@
 package org.example.travelexpertwebbackend.service;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.criteria.*;
 import jakarta.transaction.Transactional;
 import org.example.travelexpertwebbackend.dto.PackageDetailsDTO;
 import org.example.travelexpertwebbackend.dto.PackageRequestDTO;
 import org.example.travelexpertwebbackend.dto.ProductSupplierDTO;
 import org.example.travelexpertwebbackend.entity.Package;
 import org.example.travelexpertwebbackend.entity.ProductsSupplier;
+import org.example.travelexpertwebbackend.entity.Ratings;
 import org.example.travelexpertwebbackend.repository.PackageRepository;
 import org.example.travelexpertwebbackend.repository.ProductsSupplierRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Set;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -20,6 +25,8 @@ public class PackageService {
 
     @Autowired
     private PackageRepository packageRepository;
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Autowired
     private ProductsSupplierRepository productsSupplierRepository;
@@ -119,7 +126,7 @@ public class PackageService {
         dto.setPkgdesc(pkg.getPkgdesc());
         dto.setPkgbaseprice(pkg.getPkgbaseprice());
         dto.setPkgagencycommission(pkg.getPkgagencycommission());
-
+        dto.setDestination(pkg.getDestination());
         // Map the associated productsSuppliers to ProductSupplierDTO
         Set<ProductSupplierDTO> productSupplierDTOs = pkg.getProductsSuppliers().stream()
                 .map(this::mapToProductSupplierDTO)
@@ -146,5 +153,48 @@ public class PackageService {
         }
 
         return dto;
+    }
+
+    @Transactional
+    public List<Package> searchAndSort(String search, String sortBy, String order,
+                                       LocalDateTime startDate, LocalDateTime endDate) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Package> query = cb.createQuery(Package.class);
+        Root<Package> packageRoot = query.from(Package.class);
+
+        List<Predicate> predicates = new ArrayList<>();
+
+        // Search filter (by destination or package name)
+        if (search != null && !search.isEmpty()) {
+            Predicate destinationMatch = cb.like(cb.lower(packageRoot.get("destination")), "%" + search.toLowerCase() + "%");
+            Predicate nameMatch = cb.like(cb.lower(packageRoot.get("pkgname")), "%" + search.toLowerCase() + "%");
+            predicates.add(cb.or(destinationMatch, nameMatch));
+        }
+
+        // Start Date filter
+        if (startDate != null) {
+            predicates.add(cb.greaterThanOrEqualTo(packageRoot.get("pkgstartdate"), startDate));
+        }
+
+        // End Date filter
+        if (endDate != null) {
+            predicates.add(cb.lessThanOrEqualTo(packageRoot.get("pkgenddate"), endDate));
+        }
+
+        // Apply all conditions
+        query.where(predicates.toArray(new Predicate[0]));
+
+        // Sorting
+        if ("price".equalsIgnoreCase(sortBy)) {
+            query.orderBy("desc".equalsIgnoreCase(order) ? cb.desc(packageRoot.get("pkgbaseprice")) : cb.asc(packageRoot.get("pkgbaseprice")));
+        } else if ("rating".equalsIgnoreCase(sortBy)) {
+            Subquery<Double> ratingSubquery = query.subquery(Double.class);
+            Root<Ratings> ratingRoot = ratingSubquery.from(Ratings.class);
+            ratingSubquery.select(cb.avg(ratingRoot.get("rating")))
+                    .where(cb.equal(ratingRoot.get("packageEntity"), packageRoot));
+            query.orderBy("desc".equalsIgnoreCase(order) ? cb.desc(ratingSubquery) : cb.asc(ratingSubquery));
+        }
+
+        return entityManager.createQuery(query).getResultList();
     }
 }
