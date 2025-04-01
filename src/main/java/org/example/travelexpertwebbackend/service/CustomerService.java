@@ -1,6 +1,8 @@
 package org.example.travelexpertwebbackend.service;
  import org.example.travelexpertwebbackend.dto.CustomerDTO;
+ import org.example.travelexpertwebbackend.entity.Agent;
  import org.example.travelexpertwebbackend.entity.Customer;
+ import org.example.travelexpertwebbackend.repository.AgentRepository;
  import org.example.travelexpertwebbackend.repository.CustomerRepository;
  import org.springframework.beans.factory.annotation.Autowired;
  import org.springframework.stereotype.Service;
@@ -13,9 +15,11 @@ package org.example.travelexpertwebbackend.service;
  public class CustomerService {
     @Autowired
     private final CustomerRepository customerRepository;
+    private final AgentRepository agentRepository;
 
-    public CustomerService(CustomerRepository customerRepository) {
+    public CustomerService(CustomerRepository customerRepository, AgentRepository agentRepository) {
         this.customerRepository = customerRepository;
+        this.agentRepository = agentRepository;
     }
 
      public List<CustomerDTO> getAllCustomers() {
@@ -45,5 +49,25 @@ package org.example.travelexpertwebbackend.service;
             customerRepository.save(customer);
             return new CustomerDTO(customer);
         });
+    }
+
+    public CustomerDTO registerCustomer(CustomerDTO customerDTO) {
+        Customer customer = new Customer();
+        Agent agent = agentRepository.findById(customerDTO.getAgentId())
+                .orElseThrow(() -> new IllegalArgumentException("Agent not found"));
+        customer.setCustfirstname(customerDTO.getCustfirstname());
+        customer.setCustlastname(customerDTO.getCustlastname());
+        customer.setCustaddress(customerDTO.getCustaddress());
+        customer.setCustcity(customerDTO.getCustcity());
+        customer.setCustprov(customerDTO.getCustprov());
+        customer.setCustpostal(customerDTO.getCustpostal());
+        customer.setCustcountry(customerDTO.getCustcountry());
+        customer.setCusthomephone(customerDTO.getCusthomephone());
+        customer.setCustbusphone(customerDTO.getCustbusphone());
+        customer.setCustemail(customerDTO.getCustemail());
+        customer.setAgent(agent);
+
+        customer = customerRepository.save(customer);
+        return new CustomerDTO(customer);
     }
 }

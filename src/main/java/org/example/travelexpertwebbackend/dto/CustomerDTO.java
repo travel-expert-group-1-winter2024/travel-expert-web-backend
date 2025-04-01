@@ -1,5 +1,7 @@
 package org.example.travelexpertwebbackend.dto;
 
+import jakarta.validation.constraints.NotNull;
+import org.example.travelexpertwebbackend.entity.Agent;
 import org.example.travelexpertwebbackend.entity.Customer;
 
 public class CustomerDTO {
@@ -14,13 +16,17 @@ public class CustomerDTO {
     private String custhomephone;
     private String custbusphone;
     private String custemail;
-    private Integer agentId; // Store only the ID to avoid circular references
+    private Integer agentId;
+    @NotNull(message = "Password is required")
+    private String password;
+    @NotNull(message = "Confirm Password is required")
 
     public CustomerDTO() {}
 
     public CustomerDTO(Integer id, String custfirstname, String custlastname, String custaddress,
                        String custcity, String custprov, String custpostal, String custcountry,
-                       String custhomephone, String custbusphone, String custemail, Integer agentId) {
+                       String custhomephone, String custbusphone, String custemail, Integer agentId,
+                       String password) {
         this.customerid = id;
         this.custfirstname = custfirstname;
         this.custlastname = custlastname;
@@ -33,6 +39,7 @@ public class CustomerDTO {
         this.custbusphone = custbusphone;
         this.custemail = custemail;
         this.agentId = agentId;
+        this.password = password;
     }
 
     public CustomerDTO(Customer customer) {
@@ -86,4 +93,12 @@ public class CustomerDTO {
 
     public Integer getAgentId() { return agentId; }
     public void setAgentId(Integer agentId) { this.agentId = agentId; }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
 }

@@ -1,6 +1,7 @@
 package org.example.travelexpertwebbackend.service.auth;
 
 import jakarta.persistence.EntityNotFoundException;
+import org.example.travelexpertwebbackend.dto.CustomerDTO;
 import org.example.travelexpertwebbackend.dto.auth.SignUpResponseDTO;
 import org.example.travelexpertwebbackend.entity.Agent;
 import org.example.travelexpertwebbackend.entity.auth.Role;
@@ -41,13 +42,14 @@ public class UserService implements UserDetailsService {
                 .build();
     }
 
-    public SignUpResponseDTO saveUser(String username, String password) {
+    public SignUpResponseDTO saveUser(CustomerDTO customerdata) {
 
         // create a new user
         User user = new User();
-        user.setUsername(username);
-        user.setPasswordHash(new BCryptPasswordEncoder().encode(password));
-        user.setRole(Role.CUSTOMER.name()); // default role
+        user.setUsername(customerdata.getCustemail());
+        user.setPasswordHash(new BCryptPasswordEncoder().encode(customerdata.getPassword()));
+        user.setRole(Role.CUSTOMER.name());
+//        user.setCustomerid(customerID);// default role
 
         User savedUser = userRepository.save(user);
         return new SignUpResponseDTO(
