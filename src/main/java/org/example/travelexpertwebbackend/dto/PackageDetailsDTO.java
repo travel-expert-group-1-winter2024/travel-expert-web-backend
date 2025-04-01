@@ -13,6 +13,7 @@ public class PackageDetailsDTO {
     private BigDecimal pkgbaseprice;
     private BigDecimal pkgagencycommission;
     private Set<ProductSupplierDTO> productsSuppliers;
+    private String destination;
 
     // Getters and Setters
     public Integer getPackageid() {
@@ -79,4 +80,11 @@ public class PackageDetailsDTO {
         this.productsSuppliers = productsSuppliers;
     }
 
+    public String getDestination() {
+        return destination;
+    }
+
+    public void setDestination(String destination) {
+        this.destination = destination;
+    }
 }

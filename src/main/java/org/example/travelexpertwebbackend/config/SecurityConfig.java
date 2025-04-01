@@ -43,7 +43,7 @@ public class SecurityConfig {
     // configure roles
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-        // grant authorization to users based on roles
+//         grant authorization to users based on roles
         httpSecurity.authorizeHttpRequests(securityConfigurer ->
                 securityConfigurer
                         .requestMatchers("/api/signup").permitAll()
@@ -58,13 +58,18 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/packages").permitAll()
                         .requestMatchers(HttpMethod.GET, "/packages/product-supplier").permitAll()
                         .requestMatchers(HttpMethod.PUT, "/packages/*").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/packages/search/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/packages/search").permitAll()
+
                         // product
                         // TODO: change to agent later
-                        .requestMatchers(HttpMethod.GET, "/products").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/products").permitAll()
+
                         // supplier contact
                         // TODO: change to agent later
-                        .requestMatchers(HttpMethod.GET, "/suppliercontacts").permitAll()
-                        .requestMatchers(HttpMethod.PUT, "/suppliercontacts/*").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/suppliercontacts").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/api/suppliercontacts/*").permitAll()
+
         );
 
         httpSecurity.addFilterBefore(
