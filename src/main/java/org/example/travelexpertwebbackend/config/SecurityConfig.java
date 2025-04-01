@@ -49,8 +49,11 @@ public class SecurityConfig {
                         .requestMatchers("/api/signup").permitAll()
                         .requestMatchers("/api/signup/agent").permitAll() //TODO: change to admin or manager later
                         .requestMatchers("/api/login").permitAll()
-                        .requestMatchers(HttpMethod.GET,"/agencies").permitAll()
-                        .requestMatchers(HttpMethod.POST,"/agents").permitAll() // TODO: change to admin or manager later
+                        // agencies
+                        .requestMatchers(HttpMethod.GET, "/agencies").permitAll()
+                        // agents
+                        .requestMatchers(HttpMethod.GET, "/agents/me").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/agents").permitAll() // TODO: change to admin or manager later
                         .requestMatchers(HttpMethod.GET, "/api/customers").permitAll()
                         // packages
                         // TODO: change to agent later

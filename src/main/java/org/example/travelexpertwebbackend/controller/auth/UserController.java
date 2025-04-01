@@ -5,8 +5,8 @@ import org.example.travelexpertwebbackend.dto.ErrorInfo;
 import org.example.travelexpertwebbackend.dto.GenericApiResponse;
 import org.example.travelexpertwebbackend.dto.auth.LoginRequestDTO;
 import org.example.travelexpertwebbackend.dto.auth.LoginResponseDTO;
-import org.example.travelexpertwebbackend.dto.auth.SignUpResponseDTO;
 import org.example.travelexpertwebbackend.dto.auth.SignUpRequestDTO;
+import org.example.travelexpertwebbackend.dto.auth.SignUpResponseDTO;
 import org.example.travelexpertwebbackend.security.JwtService;
 import org.example.travelexpertwebbackend.service.auth.UserService;
 import org.springframework.http.HttpStatus;
@@ -15,13 +15,11 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.tinylog.Logger;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
