@@ -52,8 +52,9 @@ public class SecurityConfig {
                         // agencies
                         .requestMatchers(HttpMethod.GET, "/agencies").permitAll()
                         // agents
+                        // TODO: change to admin or manager later
                         .requestMatchers(HttpMethod.GET, "/agents/me").authenticated()
-                        .requestMatchers(HttpMethod.POST, "/agents").permitAll() // TODO: change to admin or manager later
+                        .requestMatchers(HttpMethod.POST, "/agents").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/customers").permitAll()
                         // packages
                         // TODO: change to agent later
