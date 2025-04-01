@@ -33,9 +33,9 @@ public class Package {
     @Column(name = "pkgenddate")
     private Instant pkgenddate;
 
-    @Size(max = 50)
+    @Size(max = 100)
     @ColumnDefault("NULL")
-    @Column(name = "pkgdesc", length = 50)
+    @Column(name = "pkgdesc", length = 100)
     private String pkgdesc;
 
     @NotNull
@@ -46,8 +46,17 @@ public class Package {
     @Column(name = "pkgagencycommission", precision = 19, scale = 4)
     private BigDecimal pkgagencycommission;
 
+    @Size(max = 100)
+    @ColumnDefault("NULL")
+    @Column(name = "destination", length = 100)
+    private String destination;
+
     @OneToMany(mappedBy = "packageid")
     private Set<Booking> bookings = new LinkedHashSet<>();
+
+    @OneToMany(mappedBy = "packageEntity")
+    @JsonManagedReference
+    private Set<Ratings> ratings = new LinkedHashSet<>();
 
     @ManyToMany
     @JoinTable(name = "packages_products_suppliers",
@@ -128,4 +137,19 @@ public class Package {
         this.productsSuppliers = productsSuppliers;
     }
 
+    public String getDestination() {
+        return destination;
+    }
+
+    public void setDestination(String destination) {
+        this.destination = destination;
+    }
+
+    public Set<Ratings> getRatings() {
+        return ratings;
+    }
+
+    public void setRatings(Set<Ratings> ratings) {
+        this.ratings = ratings;
+    }
 }

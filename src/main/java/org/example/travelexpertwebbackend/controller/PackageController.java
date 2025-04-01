@@ -1,14 +1,18 @@
 package org.example.travelexpertwebbackend.controller;
 
+import jakarta.annotation.security.PermitAll;
 import org.example.travelexpertwebbackend.dto.PackageDetailsDTO;
 import org.example.travelexpertwebbackend.dto.PackageRequestDTO;
 import org.example.travelexpertwebbackend.dto.ProductSupplierDTO;
 import org.example.travelexpertwebbackend.service.PackageService;
 import org.example.travelexpertwebbackend.entity.Package;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -57,5 +61,16 @@ public class PackageController {
     public ResponseEntity<List<ProductSupplierDTO>> getAllProductSuppliers() {
         List<ProductSupplierDTO> productSuppliers = packageService.getAllProductSuppliers();
         return ResponseEntity.ok(productSuppliers);
+    }
+
+    @GetMapping("/search")
+    public List<Package> searchAndSortPackages(
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String sortBy,
+            @RequestParam(required = false, defaultValue = "asc") String order,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate) {
+
+        return packageService.searchAndSort(search, sortBy, order, startDate, endDate);
     }
 }
