@@ -37,11 +37,12 @@ public class UserController {
     }
 
     // for user registration
-    @PostMapping("/api/signup")
-    public ResponseEntity<SignUpResponseDTO> signup(@Valid @RequestBody SignUpRequestDTO request) {
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(userService.saveUser(request.getUsername(), request.getPassword()));
-    }
+    // TODO: Commenting this as we have separate SIGN UP for customer and Agent
+//    @PostMapping("/api/signup")
+//    public ResponseEntity<SignUpResponseDTO> signup(@Valid @RequestBody SignUpRequestDTO request) {
+//        return ResponseEntity.status(HttpStatus.CREATED)
+//                .body(userService.saveUser(request.getUsername(), request.getPassword()));
+//    }
 
     // for agent registration
     @PostMapping("/api/signup/agent")
