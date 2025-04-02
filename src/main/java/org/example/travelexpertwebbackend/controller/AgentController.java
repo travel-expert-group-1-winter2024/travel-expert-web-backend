@@ -38,6 +38,20 @@ public class AgentController {
         }
     }
 
+    @GetMapping("/{id}/photo")
+    public ResponseEntity<byte[]> downloadAgentPhoto(@PathVariable int id) {
+        try {
+            byte[] imageData = agentService.getAgentPhoto(id);
+            return ResponseEntity.ok()
+                    .header("Content-Type", "image/jpeg")
+                    .body(imageData);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
     @GetMapping("/me")
     public ResponseEntity<GenericApiResponse<AgentDetailResponseDTO>> getCurrentAgent(Authentication authentication) {
         try {
