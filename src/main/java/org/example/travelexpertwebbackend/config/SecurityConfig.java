@@ -52,6 +52,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET,"/agencies").permitAll()
                         .requestMatchers(HttpMethod.POST,"/agents").permitAll() // TODO: change to admin or manager later
                         .requestMatchers(HttpMethod.GET, "/api/customers").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/customers/register").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/customers/updatecustomer/**").permitAll()
+                        .requestMatchers(HttpMethod.DELETE,"/api/customers/delete/**").permitAll()
+
                         // packages
                         // TODO: change to agent later
                         .requestMatchers(HttpMethod.GET, "/packages").permitAll()
@@ -76,6 +80,7 @@ public class SecurityConfig {
                 jwtAuthenticationFilter,
                 UsernamePasswordAuthenticationFilter.class
         );
+
         // disable CSRF for testing purposes
         httpSecurity.csrf(AbstractHttpConfigurer::disable);
 
