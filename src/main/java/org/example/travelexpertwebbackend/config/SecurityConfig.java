@@ -42,7 +42,7 @@ public class SecurityConfig {
     // Security Config using filter chains
     // configure roles
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity, CustomCorsConfiguration customCorsConfiguration) throws Exception {
 //         grant authorization to users based on roles
         httpSecurity.authorizeHttpRequests(securityConfigurer ->
                 securityConfigurer
@@ -76,6 +76,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/suppliercontacts").permitAll()
                         .requestMatchers(HttpMethod.PUT, "/api/suppliercontacts/*").permitAll()
 
+        );
+
+        httpSecurity.cors(httpSecurityCorsConfigurer -> httpSecurityCorsConfigurer
+                .configurationSource(customCorsConfiguration)
         );
 
         httpSecurity.addFilterBefore(
