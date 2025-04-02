@@ -34,7 +34,7 @@ package org.example.travelexpertwebbackend.service;
     }
 
     // Update an existing customer
-    public Optional<CustomerDTO> updateCustomer(Integer id, CustomerDTO customerDTO) {
+    public Optional<CustomerDTO> updateCustomerMobile(Integer id, CustomerDTO customerDTO) {
         return customerRepository.findById(id).map(customer -> {
             customer.setCustfirstname(customerDTO.getCustfirstname());
             customer.setCustlastname(customerDTO.getCustlastname());
@@ -69,5 +69,31 @@ package org.example.travelexpertwebbackend.service;
 
         customer = customerRepository.save(customer);
         return new CustomerDTO(customer);
+    }
+
+    // Update an existing customer
+    public Optional<CustomerDTO> updateCustomer(Integer id, CustomerDTO customerDTO) {
+        return customerRepository.findById(id).map(customer -> {
+            Agent agent = agentRepository.findById(customerDTO.getAgentId())
+                    .orElseThrow(() -> new IllegalArgumentException("Agent not found"));
+            customer.setCustfirstname(customerDTO.getCustfirstname());
+            customer.setCustlastname(customerDTO.getCustlastname());
+            customer.setCustaddress(customerDTO.getCustaddress());
+            customer.setCustcity(customerDTO.getCustcity());
+            customer.setCustprov(customerDTO.getCustprov());
+            customer.setCustpostal(customerDTO.getCustpostal());
+            customer.setCustcountry(customerDTO.getCustcountry());
+            customer.setCusthomephone(customerDTO.getCusthomephone());
+            customer.setCustbusphone(customerDTO.getCustbusphone());
+            customer.setCustemail(customerDTO.getCustemail());
+            customer.setAgent(agent);
+            customerRepository.save(customer);
+            return new CustomerDTO(customer);
+        });
+    }
+
+    //Delete Customer
+    public void deleteCustomer(Integer id) {
+        customerRepository.deleteById(id);
     }
 }

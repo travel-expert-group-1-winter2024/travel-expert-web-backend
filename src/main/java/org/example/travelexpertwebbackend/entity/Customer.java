@@ -77,7 +77,7 @@ public class Customer {
     @JsonIgnore
     private Set<Booking> bookings = new LinkedHashSet<>();
 
-    @OneToOne(mappedBy = "customerid")
+    @OneToOne(mappedBy = "customerid", cascade = CascadeType.ALL, orphanRemoval = true)
     private User user;
 
     public Integer getId() {
