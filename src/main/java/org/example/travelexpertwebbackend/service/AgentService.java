@@ -65,4 +65,25 @@ public class AgentService {
                 result.getAgency().getId()
         );
     }
+
+    public byte[] getAgentPhoto(int id) {
+        // find agent by id
+        Optional<Agent> optionalAgent = agentRepository.findById(id);
+        if (optionalAgent.isEmpty()) {
+            throw new IllegalArgumentException("Agent not found");
+        }
+
+        Agent agent = optionalAgent.get();
+        String photoPath = agent.getPhotoPath();
+        if (photoPath == null || photoPath.isEmpty()) {
+            throw new IllegalArgumentException("Agent photo not found");
+        }
+
+        Path path = Paths.get("uploads/").resolve(photoPath);
+        try {
+            return Files.readAllBytes(path);
+        } catch (IOException e) {
+            throw new RuntimeException("Error reading photo file", e);
+        }
+    }
 }
