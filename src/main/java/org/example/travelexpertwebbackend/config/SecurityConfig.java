@@ -42,20 +42,24 @@ public class SecurityConfig {
     // Security Config using filter chains
     // configure roles
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity, CustomCorsConfiguration customCorsConfiguration) throws Exception {
 //         grant authorization to users based on roles
         httpSecurity.authorizeHttpRequests(securityConfigurer ->
                 securityConfigurer
                         .requestMatchers("/api/signup").permitAll()
                         .requestMatchers("/api/signup/agent").permitAll() //TODO: change to admin or manager later
                         .requestMatchers("/api/login").permitAll()
-                        .requestMatchers(HttpMethod.GET,"/agencies").permitAll()
-                        .requestMatchers(HttpMethod.POST,"/agents").permitAll() // TODO: change to admin or manager later
+                        // agencies
+                        .requestMatchers(HttpMethod.GET, "/agencies").permitAll()
+                        // agents
+                        // TODO: change to admin or manager later
+                        .requestMatchers(HttpMethod.GET, "/agents/me").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/agents").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/agents/*/upload").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/agents/*/photo").permitAll()
+                        // customers
                         .requestMatchers(HttpMethod.GET, "/api/customers").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/customers/register").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/customers/updatecustomer/**").permitAll()
-                        .requestMatchers(HttpMethod.DELETE,"/api/customers/delete/**").permitAll()
-
+                        .requestMatchers(HttpMethod.GET, "/api/customers/me").hasRole("CUSTOMER")
                         // packages
                         // TODO: change to agent later
                         .requestMatchers(HttpMethod.GET, "/packages").permitAll()
@@ -76,11 +80,14 @@ public class SecurityConfig {
 
         );
 
+        httpSecurity.cors(httpSecurityCorsConfigurer -> httpSecurityCorsConfigurer
+                .configurationSource(customCorsConfiguration)
+        );
+
         httpSecurity.addFilterBefore(
                 jwtAuthenticationFilter,
                 UsernamePasswordAuthenticationFilter.class
         );
-
         // disable CSRF for testing purposes
         httpSecurity.csrf(AbstractHttpConfigurer::disable);
 
