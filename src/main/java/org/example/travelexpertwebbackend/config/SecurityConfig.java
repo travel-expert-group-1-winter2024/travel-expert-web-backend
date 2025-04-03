@@ -49,17 +49,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/signup").permitAll()
                         .requestMatchers("/api/signup/agent").permitAll() //TODO: change to admin or manager later
                         .requestMatchers("/api/login").permitAll()
-                        // agencies
-                        .requestMatchers(HttpMethod.GET, "/agencies").permitAll()
-                        // agents
-                        // TODO: change to admin or manager later
-                        .requestMatchers(HttpMethod.GET, "/agents/me").authenticated()
-                        .requestMatchers(HttpMethod.POST, "/agents").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/agents/*/upload").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/agents/*/photo").permitAll()
-                        // customers
+                        .requestMatchers(HttpMethod.GET,"/agencies").permitAll()
+                        .requestMatchers(HttpMethod.POST,"/agents").permitAll() // TODO: change to admin or manager later
                         .requestMatchers(HttpMethod.GET, "/api/customers").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/customers/me").hasRole("CUSTOMER")
                         // packages
                         // TODO: change to agent later
                         .requestMatchers(HttpMethod.GET, "/packages").permitAll()
