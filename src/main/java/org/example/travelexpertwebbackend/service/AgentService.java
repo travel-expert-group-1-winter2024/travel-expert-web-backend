@@ -29,14 +29,20 @@ public class AgentService {
     }
 
     public String uploadAgentPhoto(int agentId, MultipartFile image) throws IOException {
+        // find agent by id
         Optional<Agent> optionalAgent = agentRepository.findById(agentId);
         if (optionalAgent.isEmpty()) {
             throw new IllegalArgumentException("Agent not found");
         }
 
+        // check if image is empty
+        if (image.getOriginalFilename() == null || image.getOriginalFilename().isEmpty()) {
+            throw new IllegalArgumentException("File is empty");
+        }
+
         Agent agent = optionalAgent.get();
         String uploadDir = "uploads/";
-        String filename = "agent_" + agentId + "_" + image.getOriginalFilename();
+        String filename = image.getOriginalFilename();
 
         Path dirPath = Paths.get(uploadDir);
         if (!Files.exists(dirPath)) {

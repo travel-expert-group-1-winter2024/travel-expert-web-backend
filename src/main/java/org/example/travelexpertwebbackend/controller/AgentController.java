@@ -29,7 +29,6 @@ public class AgentController {
     public ResponseEntity<String> uploadAgentPhoto(
             @PathVariable int id,
             @RequestParam("image") MultipartFile image) {
-
         try {
             String savedFilename = agentService.uploadAgentPhoto(id, image);
             return ResponseEntity.ok("Image uploaded successfully: " + savedFilename);
