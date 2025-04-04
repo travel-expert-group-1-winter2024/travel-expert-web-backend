@@ -21,4 +21,8 @@ public class BookingDetailService {
         List<BookingDetailsView> bookingDetailsViewList = bookingDetailsRepository.findAll();
         return bookingDetailsViewList;
     }
+
+    public List<BookingDetailsView> getAllBookingDetailsforCustomer(Integer customerId) {
+        return bookingDetailsRepository.findByCustomerid(customerId);
+    }
 }
