@@ -80,6 +80,18 @@ public class Customer {
     @OneToOne(mappedBy = "customerid", cascade = CascadeType.ALL, orphanRemoval = true)
     private User user;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "customer_type_id")
+    private CustomerType customerType;
+
+    public CustomerType getCustomerType() {
+        return customerType;
+    }
+
+    public void setCustomerType(CustomerType customerType) {
+        this.customerType = customerType;
+    }
+
     public Integer getId() {
         return id;
     }
