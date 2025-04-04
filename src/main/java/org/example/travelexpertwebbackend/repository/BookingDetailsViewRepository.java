@@ -12,4 +12,5 @@ import java.util.List;
 public interface BookingDetailsViewRepository extends JpaRepository<BookingDetailsView,Integer> {
     @Query(nativeQuery = true, value = "SELECT * FROM bookingdetailsview")
     List<BookingDetailsView> findAllBookingDetails();
+    List<BookingDetailsView> findByCustomerid(Integer customerid);
 }
