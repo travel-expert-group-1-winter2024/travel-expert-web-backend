@@ -36,8 +36,7 @@ public class BookingDetailController {
 
             if (bookingDetails == null || bookingDetails.isEmpty()) {
                 Logger.warn("No bookings found for customer ID " + customerid);
-                return ResponseEntity.status(HttpStatus.OK)
-                        .body(new GenericApiResponse<>(List.of(new ErrorInfo("No booking details for this customer"))));
+                return ResponseEntity.ok(new GenericApiResponse<>(bookingDetails));
             }
 
             Logger.info("Successfully Got Booking Details " + customerid);
