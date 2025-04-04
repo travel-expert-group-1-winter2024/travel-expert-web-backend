@@ -1,6 +1,8 @@
 package org.example.travelexpertwebbackend.controller;
 
 import org.example.travelexpertwebbackend.dto.AgentDetailResponseDTO;
+import org.example.travelexpertwebbackend.dto.agent.AgentUpdateRequestDTO;
+import org.example.travelexpertwebbackend.dto.agent.AgentUpdateResponseDTO;
 import org.example.travelexpertwebbackend.dto.ErrorInfo;
 import org.example.travelexpertwebbackend.dto.GenericApiResponse;
 import org.example.travelexpertwebbackend.service.AgentService;
@@ -46,8 +48,10 @@ public class AgentController {
                     .header("Content-Type", "image/jpeg")
                     .body(imageData);
         } catch (IllegalArgumentException e) {
+            Logger.error(e, "Error retrieving agent photo");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         } catch (Exception e) {
+            Logger.error(e, "Error retrieving agent photo");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -64,6 +68,21 @@ public class AgentController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new GenericApiResponse<>(List.of(new ErrorInfo("Agent not found"))));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new GenericApiResponse<>(List.of(new ErrorInfo("Failed to retrieve agent"))));
+        }
+    }
+
+    // update agent
+    @PutMapping("/{id}")
+    public ResponseEntity<GenericApiResponse<AgentUpdateResponseDTO>> updateAgent(
+            @PathVariable int id,
+            @RequestBody AgentUpdateRequestDTO request) {
+        try {
+            AgentUpdateResponseDTO updatedAgent = agentService.updateAgent(id, request);
+            return ResponseEntity.ok(new GenericApiResponse<>(updatedAgent));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new GenericApiResponse<>(List.of(new ErrorInfo("Agent not found"))));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new GenericApiResponse<>(List.of(new ErrorInfo("Failed to update agent"))));
         }
     }
 }
