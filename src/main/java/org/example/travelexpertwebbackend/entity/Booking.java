@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import org.hibernate.annotations.ColumnDefault;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -40,6 +41,15 @@ public class Booking {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "packageid")
     private org.example.travelexpertwebbackend.entity.Package packageid;
+
+    @Column(name = "total_discount")
+    private BigDecimal totalDiscount;
+
+    @Column(name = "points_earned")
+    private Integer pointsEarned;
+
+    @Column(name = "final_price")
+    private BigDecimal finalPrice;
 
     @OneToMany(mappedBy = "bookingid")
     private Set<BookingDetail> bookingdetails = new LinkedHashSet<>();
@@ -98,6 +108,30 @@ public class Booking {
 
     public void setPackageid(org.example.travelexpertwebbackend.entity.Package packageid) {
         this.packageid = packageid;
+    }
+
+    public BigDecimal getTotalDiscount() {
+        return totalDiscount;
+    }
+
+    public void setTotalDiscount(BigDecimal totalDiscount) {
+        this.totalDiscount = totalDiscount;
+    }
+
+    public Integer getPointsEarned() {
+        return pointsEarned;
+    }
+
+    public void setPointsEarned(Integer pointsEarned) {
+        this.pointsEarned = pointsEarned;
+    }
+
+    public BigDecimal getFinalPrice() {
+        return finalPrice;
+    }
+
+    public void setFinalPrice(BigDecimal finalPrice) {
+        this.finalPrice = finalPrice;
     }
 
     public Set<BookingDetail> getBookingdetails() {
