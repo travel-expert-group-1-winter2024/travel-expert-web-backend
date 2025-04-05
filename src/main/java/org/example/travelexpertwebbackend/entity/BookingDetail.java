@@ -40,7 +40,7 @@ public class BookingDetail {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bookingid")
-    private org.example.travelexpertwebbackend.entity.Booking bookingid;
+    private Booking booking;
 
     @Column(name = "productsupplierid")
     private Integer productsupplierid;
@@ -109,12 +109,12 @@ public class BookingDetail {
         this.agencycommission = agencycommission;
     }
 
-    public org.example.travelexpertwebbackend.entity.Booking getBookingid() {
-        return bookingid;
+    public org.example.travelexpertwebbackend.entity.Booking getBooking() {
+        return booking;
     }
 
-    public void setBookingid(org.example.travelexpertwebbackend.entity.Booking bookingid) {
-        this.bookingid = bookingid;
+    public void setBooking(org.example.travelexpertwebbackend.entity.Booking bookingid) {
+        this.booking = bookingid;
     }
 
     public Integer getProductsupplierid() {
