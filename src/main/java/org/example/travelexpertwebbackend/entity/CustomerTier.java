@@ -11,11 +11,11 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "customer_types")
-public class CustomerType {
+@Table(name = "customer_tiers")
+public class CustomerTier {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "customer_types_id_gen")
-    @SequenceGenerator(name = "customer_types_id_gen", sequenceName = "customer_types_id_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "customer_tiers_id_gen")
+    @SequenceGenerator(name = "customer_tiers_id_gen", sequenceName = "customer_tiers_id_seq", allocationSize = 1)
     @Column(name = "id", nullable = false)
     private Integer id;
 
@@ -39,7 +39,7 @@ public class CustomerType {
     @Column(name = "created_at")
     private Instant createdAt;
 
-    @OneToMany(mappedBy = "customerType")
+    @OneToMany(mappedBy = "customerTier")
     private Set<Customer> customers = new LinkedHashSet<>();
 
     public Integer getId() {
