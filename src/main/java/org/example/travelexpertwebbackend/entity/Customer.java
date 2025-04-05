@@ -81,15 +81,15 @@ public class Customer {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "customer_type_id")
-    private CustomerType customerType;
+    @JoinColumn(name = "customer_tier_id")
+    private CustomerTier customerTier;
 
-    public CustomerType getCustomerType() {
-        return customerType;
+    public CustomerTier getCustomerTier() {
+        return customerTier;
     }
 
-    public void setCustomerType(CustomerType customerType) {
-        this.customerType = customerType;
+    public void setCustomerTier(CustomerTier customerTier) {
+        this.customerTier = customerTier;
     }
 
     public Integer getId() {
