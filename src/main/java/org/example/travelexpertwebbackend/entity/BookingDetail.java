@@ -45,6 +45,9 @@ public class BookingDetail {
     @Column(name = "productsupplierid")
     private Integer productsupplierid;
 
+    public BookingDetail() {
+    }
+
     public Integer getId() {
         return id;
     }
