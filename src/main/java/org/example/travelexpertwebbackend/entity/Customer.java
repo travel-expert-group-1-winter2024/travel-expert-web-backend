@@ -69,6 +69,14 @@ public class Customer {
     @Column(name = "custemail", nullable = false, length = 50)
     private String custemail;
 
+    @Size(max = 255)
+    @Column(name = "photo_path")
+    private String photoPath;
+
+    @ColumnDefault("0")
+    @Column(name = "points")
+    private Integer points;
+
     @ManyToOne()
     @JoinColumn(name = "agentid")
     private Agent agent;
@@ -83,6 +91,12 @@ public class Customer {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_tier_id")
     private CustomerTier customerTier;
+
+    @OneToOne(mappedBy = "customer")
+    private Wallet wallets;
+
+    public Customer() {
+    }
 
     public CustomerTier getCustomerTier() {
         return customerTier;
@@ -204,4 +218,27 @@ public class Customer {
         this.user = user;
     }
 
+    public String getPhotoPath() {
+        return photoPath;
+    }
+
+    public void setPhotoPath(String photoPath) {
+        this.photoPath = photoPath;
+    }
+
+    public Integer getPoints() {
+        return points;
+    }
+
+    public void setPoints(Integer points) {
+        this.points = points;
+    }
+
+    public Wallet getWallets() {
+        return wallets;
+    }
+
+    public void setWallets(Wallet wallets) {
+        this.wallets = wallets;
+    }
 }
