@@ -14,30 +14,30 @@ public class TripType {
     @Size(max = 1)
     @SequenceGenerator(name = "triptypes_id_gen", sequenceName = "suppliersid_seq", allocationSize = 1)
     @Column(name = "triptypeid", nullable = false, length = 1)
-    private String triptypeid;
+    private String id;
 
     @Size(max = 25)
     @ColumnDefault("NULL")
     @Column(name = "ttname", length = 25)
-    private String ttname;
+    private String ttName;
 
-    @OneToMany(mappedBy = "triptypeid")
+    @OneToMany(mappedBy = "tripType")
     private Set<Booking> bookings = new LinkedHashSet<>();
 
-    public String getTriptypeid() {
-        return triptypeid;
+    public String getId() {
+        return id;
     }
 
-    public void setTriptypeid(String triptypeid) {
-        this.triptypeid = triptypeid;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public String getTtname() {
-        return ttname;
+    public String getTtName() {
+        return ttName;
     }
 
-    public void setTtname(String ttname) {
-        this.ttname = ttname;
+    public void setTtName(String ttname) {
+        this.ttName = ttname;
     }
 
     public Set<Booking> getBookings() {

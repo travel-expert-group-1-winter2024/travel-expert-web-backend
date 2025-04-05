@@ -73,11 +73,11 @@ public class Customer {
     @JoinColumn(name = "agentid")
     private Agent agent;
 
-    @OneToMany(mappedBy = "customerid")
+    @OneToMany(mappedBy = "customer")
     @JsonIgnore
     private Set<Booking> bookings = new LinkedHashSet<>();
 
-    @OneToOne(mappedBy = "customerid", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
