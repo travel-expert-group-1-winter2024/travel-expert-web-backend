@@ -41,13 +41,13 @@ public class User {
     @OneToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.SET_NULL)
     @JoinColumn(name = "agentid")
-    private Agent agentid;
+    private Agent agent;
 
     @OneToOne(fetch = FetchType.LAZY,cascade = CascadeType.PERSIST)
 //    @OnDelete(action = OnDeleteAction.SET_NULL)
 //    @JoinColumn(name = "customerid")
     @JoinColumn(name = "customerid", referencedColumnName = "customerid")
-    private Customer customerid;
+    private Customer customer;
 
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "created_at")
@@ -90,20 +90,20 @@ public class User {
         return role.split(",");
     }
 
-    public Agent getAgentid() {
-        return agentid;
+    public Agent getAgent() {
+        return agent;
     }
 
-    public void setAgentid(Agent agentid) {
-        this.agentid = agentid;
+    public void setAgent(Agent agent) {
+        this.agent = agent;
     }
 
-    public Customer getCustomerid() {
-        return customerid;
+    public Customer getCustomer() {
+        return customer;
     }
 
-    public void setCustomerid(Customer customerid) {
-        this.customerid = customerid;
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
     }
 
     public Instant getCreatedAt() {
