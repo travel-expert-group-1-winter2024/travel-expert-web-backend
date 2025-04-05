@@ -43,9 +43,10 @@ public class User {
     @JoinColumn(name = "agentid")
     private Agent agentid;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.SET_NULL)
-    @JoinColumn(name = "customerid")
+    @OneToOne(fetch = FetchType.LAZY,cascade = CascadeType.PERSIST)
+//    @OnDelete(action = OnDeleteAction.SET_NULL)
+//    @JoinColumn(name = "customerid")
+    @JoinColumn(name = "customerid", referencedColumnName = "customerid")
     private Customer customerid;
 
     @ColumnDefault("CURRENT_TIMESTAMP")

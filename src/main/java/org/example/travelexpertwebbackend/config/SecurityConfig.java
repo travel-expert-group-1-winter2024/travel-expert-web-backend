@@ -42,41 +42,49 @@ public class SecurityConfig {
     // Security Config using filter chains
     // configure roles
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity, CustomCorsConfiguration customCorsConfiguration) throws Exception {
 //         grant authorization to users based on roles
         httpSecurity.authorizeHttpRequests(securityConfigurer ->
                 securityConfigurer
-                        .requestMatchers("/api/signup").permitAll()
-                        .requestMatchers("/api/signup/agent").permitAll() //TODO: change to admin or manager later
-                        .requestMatchers("/api/login").permitAll()
-                        // agencies
-                        .requestMatchers(HttpMethod.GET, "/agencies").permitAll()
-                        // agents
-                        // TODO: change to admin or manager later
-                        .requestMatchers(HttpMethod.GET, "/agents/me").authenticated()
-                        .requestMatchers(HttpMethod.POST, "/agents").permitAll()
-                        .requestMatchers(HttpMethod.PUT, "/agents/{id}").authenticated()
-                        // customers
-                        .requestMatchers(HttpMethod.GET, "/api/customers").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/customers/me").hasRole("CUSTOMER")
-                        // packages
-                        // TODO: change to agent later
-                        .requestMatchers(HttpMethod.GET, "/packages").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/packages").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/packages/product-supplier").permitAll()
-                        .requestMatchers(HttpMethod.PUT, "/packages/*").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/packages/search/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/packages/search").permitAll()
+         
+                        // TODO: This is for development period
+                        // Added Agent requestMatchers
+                        .anyRequest().permitAll()
+//                         .requestMatchers("/api/signup").permitAll()
+//                         .requestMatchers("/api/signup/agent").permitAll() //TODO: change to admin or manager later
+//                         .requestMatchers("/api/login").permitAll()
+//                         // agencies
+//                         .requestMatchers(HttpMethod.GET, "/agencies").permitAll()
+//                         // agents
+//                         // TODO: change to admin or manager later
+//                         .requestMatchers(HttpMethod.GET, "/agents/me").authenticated()
+//                         .requestMatchers(HttpMethod.POST, "/agents").permitAll()
+//                         .requestMatchers(HttpMethod.PUT, "/agents/{id}").authenticated()
+//                         // customers
+//                         .requestMatchers(HttpMethod.GET, "/api/customers").permitAll()
+//                         .requestMatchers(HttpMethod.GET, "/api/customers/me").hasRole("CUSTOMER")
+//                         // packages
+//                         // TODO: change to agent later
+//                         .requestMatchers(HttpMethod.GET, "/packages").permitAll()
+//                         .requestMatchers(HttpMethod.POST, "/packages").permitAll()
+//                         .requestMatchers(HttpMethod.GET, "/packages/product-supplier").permitAll()
+//                         .requestMatchers(HttpMethod.PUT, "/packages/*").permitAll()
+//                         .requestMatchers(HttpMethod.GET, "/packages/search/**").permitAll()
+//                         .requestMatchers(HttpMethod.GET, "/packages/search").permitAll()
+                           // product
+//                         // TODO: change to agent later
+//                         .requestMatchers(HttpMethod.GET, "/api/products").permitAll()
+//
+//                         // supplier contact
+//                         // TODO: change to agent later
+//                         .requestMatchers(HttpMethod.GET, "/api/suppliercontacts").permitAll()
+//                         .requestMatchers(HttpMethod.PUT, "/api/suppliercontacts/*").permitAll()
 
-                        // product
-                        // TODO: change to agent later
-                        .requestMatchers(HttpMethod.GET, "/api/products").permitAll()
 
-                        // supplier contact
-                        // TODO: change to agent later
-                        .requestMatchers(HttpMethod.GET, "/api/suppliercontacts").permitAll()
-                        .requestMatchers(HttpMethod.PUT, "/api/suppliercontacts/*").permitAll()
+        );
 
+        httpSecurity.cors(httpSecurityCorsConfigurer -> httpSecurityCorsConfigurer
+                .configurationSource(customCorsConfiguration)
         );
 
         httpSecurity.addFilterBefore(
