@@ -39,8 +39,9 @@ public class AgentController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<GenericApiResponse<AgentDetailResponseDTO>> getCurrentAgent(Authentication authentication) {
+    public ResponseEntity<GenericApiResponse<AgentDetailResponseDTO>> getCurrentAgent(Authentication authentication, String authorizationHeader) {
         try {
+            Logger.debug("Authorization Header: " + authorizationHeader);
             Logger.debug("Here is the authentication: " + authentication);
             String username = (String) authentication.getPrincipal();
             Logger.debug("Here is the username: " + username);

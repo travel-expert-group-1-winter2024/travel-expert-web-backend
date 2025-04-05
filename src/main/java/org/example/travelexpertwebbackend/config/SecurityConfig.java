@@ -55,6 +55,7 @@ public class SecurityConfig {
                         // TODO: change to admin or manager later
                         .requestMatchers(HttpMethod.GET, "/agents/me").authenticated()
                         .requestMatchers(HttpMethod.POST, "/agents").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/agents/{id}").authenticated()
                         // customers
                         .requestMatchers(HttpMethod.GET, "/api/customers").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/customers/me").hasRole("CUSTOMER")
