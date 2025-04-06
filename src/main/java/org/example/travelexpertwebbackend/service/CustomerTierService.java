@@ -1,5 +1,6 @@
 package org.example.travelexpertwebbackend.service;
 
+import org.example.travelexpertwebbackend.entity.Customer;
 import org.example.travelexpertwebbackend.entity.CustomerTier;
 import org.example.travelexpertwebbackend.repository.CustomerRepository;
 import org.example.travelexpertwebbackend.repository.CustomerTierRepository;
@@ -29,7 +30,14 @@ public class CustomerTierService {
                 () -> new IllegalArgumentException("Customer Tier not found"));
     }
 
-    public BigDecimal calculateDiscount(CustomerTier customerTier, BigDecimal totalAmount) {
+    public BigDecimal calculateDiscount(Customer customer, CustomerTier customerTier, BigDecimal totalAmount) {
+        // check limit
+        BigDecimal limit = customerTier.getDiscountLimit();
+        BigDecimal totalSpent = transactionRepository.sumAmountByCustomerId(customer.getId()).orElse(BigDecimal.ZERO);
+        if (limit != null && totalSpent.compareTo(limit) >= 0) {
+            return BigDecimal.ZERO;
+        }
+
         BigDecimal discountRate = customerTier.getDiscountPercentage();
         return totalAmount.multiply(discountRate).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
     }
