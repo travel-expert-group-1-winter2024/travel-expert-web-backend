@@ -11,4 +11,6 @@ import java.util.Optional;
 @Repository
 public interface CustomerRepository extends JpaRepository<Customer, Integer> {
     Optional<Customer> findByCustemail(@Size(max = 50) @NotNull String custemail);
+
+    boolean existsByCustemail(@Size(max = 50) @NotNull String custemail);
 }
