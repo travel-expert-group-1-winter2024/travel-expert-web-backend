@@ -7,6 +7,7 @@ import org.example.travelexpertwebbackend.entity.CustomerTier;
 import org.example.travelexpertwebbackend.entity.Wallet;
 import org.example.travelexpertwebbackend.repository.AgentRepository;
 import org.example.travelexpertwebbackend.repository.CustomerRepository;
+import org.example.travelexpertwebbackend.repository.WalletRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +24,8 @@ public class CustomerService {
     private final AgentRepository agentRepository;
     @Autowired
     private CustomerTierService customerTierService;
+    @Autowired
+    private WalletRepository walletRepository;
 
     public CustomerService(CustomerRepository customerRepository, AgentRepository agentRepository) {
         this.customerRepository = customerRepository;
@@ -78,14 +81,17 @@ public class CustomerService {
         // link with start tier
         CustomerTier starterTier = customerTierService.getStarterTier();
         customer.setCustomerTier(starterTier);
+        customer = customerRepository.save(customer);
 
         // create wallet for customer
         Wallet wallet = new Wallet();
         wallet.setBalance(BigDecimal.ZERO);
         wallet.setCustomer(customer);
         wallet.setLastUpdated(Instant.now());
-        customer.setWallet(wallet);
+        Wallet savedWallet = walletRepository.save(wallet);
 
+        // update wallet
+        customer.setWallet(savedWallet);
         customer = customerRepository.save(customer);
 
         return new CustomerDTO(customer);
