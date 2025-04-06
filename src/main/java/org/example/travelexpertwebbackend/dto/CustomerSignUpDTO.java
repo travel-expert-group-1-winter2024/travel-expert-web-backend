@@ -54,13 +54,21 @@ public class CustomerSignUpDTO {
     @Email
     private String email;
 
+    @NotNull
+    private String username;
+
+    @NotBlank
+    @Size(min = 8, message = "Password must be at least 8 characters long.")
+    @Pattern(regexp = "^(?=.*[A-Z])(?=.*\\\\d)(?=.*[@$!%*?&])[A-Za-z\\\\d@$!%*?&]{8,}$" , message = "Password must contain at least one upper case letter, one number and one special character.")
+    private String password;
+
     /**
      * ! Args & No Args Constructors
      */
 
     public CustomerSignUpDTO() {}
 
-    public CustomerSignUpDTO(String firstName, String lastName, String address, String city, String province, String postalCode, String country, String homePhone, String busPhone, String email) {
+    public CustomerSignUpDTO(String firstName, String lastName, String address, String city, String province, String postalCode, String country, String homePhone, String busPhone, String email, String username, String password) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.address = address;
@@ -71,6 +79,8 @@ public class CustomerSignUpDTO {
         this.homePhone = homePhone;
         this.busPhone = busPhone;
         this.email = email;
+        this.username = username;
+        this.password = password;
     }
 
     /**
@@ -154,5 +164,21 @@ public class CustomerSignUpDTO {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }//class
