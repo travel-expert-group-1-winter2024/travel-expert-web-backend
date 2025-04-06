@@ -6,8 +6,8 @@ import org.example.travelexpertwebbackend.dto.booking.BookingCreateResponseDTO;
 import org.example.travelexpertwebbackend.entity.*;
 import org.example.travelexpertwebbackend.entity.Package;
 import org.example.travelexpertwebbackend.repository.BookingRepository;
-import org.example.travelexpertwebbackend.repository.CustomerRepository;
 import org.example.travelexpertwebbackend.repository.PackageRepository;
+import org.example.travelexpertwebbackend.repository.TransactionRepository;
 import org.example.travelexpertwebbackend.repository.TripTypesRepository;
 import org.example.travelexpertwebbackend.service.auth.UserService;
 import org.springframework.stereotype.Service;
@@ -21,17 +21,23 @@ public class BookingService {
     private final BookingRepository bookingRepository;
     private final PackageRepository packageRepository;
     private final TripTypesRepository tripTypesRepository;
+    private final TransactionRepository transactionRepository;
     private final CustomerTierService customerTierService;
     private final UserService userService;
-    private final CustomerRepository customerRepository;
 
-    public BookingService(BookingRepository bookingRepository, PackageRepository packageRepository, TripTypesRepository tripTypesRepository, CustomerTierService customerTierService, UserService userService, CustomerRepository customerRepository) {
+    public BookingService(
+            BookingRepository bookingRepository,
+            PackageRepository packageRepository,
+            TripTypesRepository tripTypesRepository,
+            TransactionRepository transactionRepository,
+            CustomerTierService customerTierService,
+            UserService userService) {
         this.bookingRepository = bookingRepository;
         this.packageRepository = packageRepository;
         this.tripTypesRepository = tripTypesRepository;
         this.customerTierService = customerTierService;
         this.userService = userService;
-        this.customerRepository = customerRepository;
+        this.transactionRepository = transactionRepository;
     }
 
     // Create a new booking
@@ -49,13 +55,35 @@ public class BookingService {
         TripType tripType = tripTypesRepository.findById(requestDTO.getTripTypeId())
                 .orElseThrow(() -> new IllegalArgumentException("Trip Type not found with ID: " + requestDTO.getTripTypeId()));
 
+
         // create a new booking
         BigDecimal totalPrice = calculateTotalPrice(aPackage.getPkgbaseprice(), aPackage.getPkgagencycommission(), requestDTO.getTravelerCount());
         String bookingNo = generateBookingNumber();
         double travelerCount = requestDTO.getTravelerCount();
-        BigDecimal discount = customerTierService.calculateDiscount(customer.getCustomerTier(), totalPrice);
+        BigDecimal discount = customerTierService.calculateDiscount(customer, customer.getCustomerTier(), totalPrice);
         int pointsEarned = calculatePointToEarn(totalPrice);
         BigDecimal finalPrice = calculateFinalPrice(totalPrice, discount);
+
+        // check money in wallet
+        Wallet wallet = customer.getWallet();
+        if (wallet.getBalance().compareTo(finalPrice) < 0) {
+            throw new IllegalArgumentException("Insufficient balance in wallet");
+        }
+        // deduct money from wallet
+        wallet.setBalance(wallet.getBalance().subtract(finalPrice));
+
+        // add record in transaction
+        Transaction transaction = new Transaction();
+        transaction.setTransactionDate(Instant.now());
+        transaction.setAmount(finalPrice);
+        transaction.setTransactionType(Transaction.TransactionType.DEBIT);
+        transaction.setDescription("Booking for " + aPackage.getPkgname() + " with booking number " + bookingNo);
+        transaction.setWallet(wallet);
+        Transaction savedTransaction = transactionRepository.save(transaction);
+
+        // add transaction to wallet
+        wallet.getTransactions().add(savedTransaction);
+        customer.setWallet(wallet);
 
         Booking booking = new Booking();
         booking.setBookingDate(Instant.now());
