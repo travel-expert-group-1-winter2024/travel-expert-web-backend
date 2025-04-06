@@ -21,21 +21,21 @@ public class Transaction {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "wallet_id", nullable = false)
     private Wallet wallet;
-
     @NotNull
+    @Enumerated(EnumType.STRING)
     @Column(name = "transaction_type", nullable = false)
-    private Integer transactionType;
-
+    private TransactionType transactionType;
     @NotNull
     @Column(name = "amount", nullable = false, precision = 18, scale = 2)
     private BigDecimal amount;
-
     @Column(name = "description", length = Integer.MAX_VALUE)
     private String description;
-
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "transaction_date")
     private Instant transactionDate;
+
+    public Transaction() {
+    }
 
     public UUID getId() {
         return id;
@@ -53,11 +53,11 @@ public class Transaction {
         this.wallet = wallet;
     }
 
-    public Integer getTransactionType() {
+    public TransactionType getTransactionType() {
         return transactionType;
     }
 
-    public void setTransactionType(Integer transactionType) {
+    public void setTransactionType(TransactionType transactionType) {
         this.transactionType = transactionType;
     }
 
@@ -83,6 +83,11 @@ public class Transaction {
 
     public void setTransactionDate(Instant transactionDate) {
         this.transactionDate = transactionDate;
+    }
+
+    public enum TransactionType {
+        CREDIT,
+        DEBIT
     }
 
 }
