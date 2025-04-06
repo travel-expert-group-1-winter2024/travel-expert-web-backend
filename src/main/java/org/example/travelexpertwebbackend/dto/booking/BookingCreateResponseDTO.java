@@ -1,19 +1,21 @@
 package org.example.travelexpertwebbackend.dto.booking;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import java.math.BigDecimal;
-import java.util.Optional;
 
 public class BookingCreateResponseDTO {
     private int bookingId;
     private String bookingNo;
     private BigDecimal finalPrice;
     private int pointsEarned;
-    private Optional<String> newCustomerTier;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String newCustomerTier;
 
     public BookingCreateResponseDTO() {
     }
 
-    public BookingCreateResponseDTO(int bookingId, String bookingNo, BigDecimal finalPrice, int pointsEarned, Optional<String> newCustomerTier) {
+    public BookingCreateResponseDTO(int bookingId, String bookingNo, BigDecimal finalPrice, int pointsEarned, String newCustomerTier) {
         this.bookingId = bookingId;
         this.bookingNo = bookingNo;
         this.finalPrice = finalPrice;
@@ -37,7 +39,7 @@ public class BookingCreateResponseDTO {
         return pointsEarned;
     }
 
-    public Optional<String> getNewCustomerTier() {
+    public String getNewCustomerTier() {
         return newCustomerTier;
     }
 }
