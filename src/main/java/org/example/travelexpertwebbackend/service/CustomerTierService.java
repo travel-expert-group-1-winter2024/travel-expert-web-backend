@@ -32,18 +32,22 @@ public class CustomerTierService {
     }
 
     public BigDecimal calculateDiscount(Customer customer, CustomerTier customerTier, BigDecimal totalAmount) {
-        // check limit
-        BigDecimal limit = customerTier.getDiscountLimit();
-        BigDecimal totalSpent = transactionRepository.sumAmountByCustomerIdAndType(customer.getId(), Transaction.TransactionType.DEBIT).orElse(BigDecimal.ZERO);
-        if (limit != null && totalSpent.subtract(new BigDecimal(customerTier.getRequiredPoints())).compareTo(limit) >= 0) { // this based on 1 point = 1 dollar
+        BigDecimal discountLimit = customerTier.getDiscountLimit();
+        BigDecimal totalDebitAmount = transactionRepository
+                .sumAmountByCustomerIdAndType(customer.getId(), Transaction.TransactionType.DEBIT)
+                .orElse(BigDecimal.ZERO);
+
+        boolean exceedsLimit = discountLimit != null &&
+                totalDebitAmount.subtract(BigDecimal.valueOf(customerTier.getRequiredPoints()))
+                        .compareTo(discountLimit) >= 0;
+
+        if (exceedsLimit || customerTier.getDiscountPercentage().compareTo(BigDecimal.ZERO) == 0) {
             return BigDecimal.ZERO;
         }
 
-        BigDecimal discountRate = customerTier.getDiscountPercentage();
-        if (discountRate.equals(BigDecimal.ZERO)) {
-            return BigDecimal.ZERO;
-        }
-        return totalAmount.multiply(discountRate).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+        return totalAmount
+                .multiply(customerTier.getDiscountPercentage())
+                .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
     }
 
     public CustomerTier getTierByPoint(Integer point) {
