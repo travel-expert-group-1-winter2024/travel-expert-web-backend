@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import org.hibernate.annotations.ColumnDefault;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -18,31 +19,43 @@ public class Booking {
     private Integer id;
 
     @Column(name = "bookingdate")
-    private Instant bookingdate;
+    private Instant bookingDate;
 
     @Size(max = 50)
     @ColumnDefault("NULL")
     @Column(name = "bookingno", length = 50)
-    private String bookingno;
+    private String bookingNo;
 
     @Column(name = "travelercount")
-    private Double travelercount;
+    private Double travelerCount;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customerid")
-    private org.example.travelexpertwebbackend.entity.Customer customerid;
+    private Customer customer;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @ColumnDefault("NULL")
     @JoinColumn(name = "triptypeid")
-    private TripType triptypeid;
+    private TripType tripType;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "packageid")
-    private org.example.travelexpertwebbackend.entity.Package packageid;
+    private Package packageid;
 
-    @OneToMany(mappedBy = "bookingid")
-    private Set<BookingDetail> bookingdetails = new LinkedHashSet<>();
+    @Column(name = "total_discount")
+    private BigDecimal totalDiscount;
+
+    @Column(name = "points_earned")
+    private Integer pointsEarned;
+
+    @Column(name = "final_price")
+    private BigDecimal finalPrice;
+
+    @OneToMany(mappedBy = "booking")
+    private Set<BookingDetail> bookingDetails = new LinkedHashSet<>();
+
+    public Booking() {
+    }
 
     public Integer getId() {
         return id;
@@ -52,60 +65,84 @@ public class Booking {
         this.id = id;
     }
 
-    public Instant getBookingdate() {
-        return bookingdate;
+    public Instant getBookingDate() {
+        return bookingDate;
     }
 
-    public void setBookingdate(Instant bookingdate) {
-        this.bookingdate = bookingdate;
+    public void setBookingDate(Instant bookingDate) {
+        this.bookingDate = bookingDate;
     }
 
-    public String getBookingno() {
-        return bookingno;
+    public String getBookingNo() {
+        return bookingNo;
     }
 
-    public void setBookingno(String bookingno) {
-        this.bookingno = bookingno;
+    public void setBookingNo(String bookingNo) {
+        this.bookingNo = bookingNo;
     }
 
-    public Double getTravelercount() {
-        return travelercount;
+    public Double getTravelerCount() {
+        return travelerCount;
     }
 
-    public void setTravelercount(Double travelercount) {
-        this.travelercount = travelercount;
+    public void setTravelerCount(Double travelerCount) {
+        this.travelerCount = travelerCount;
     }
 
-    public org.example.travelexpertwebbackend.entity.Customer getCustomerid() {
-        return customerid;
+    public Customer getCustomer() {
+        return customer;
     }
 
-    public void setCustomerid(org.example.travelexpertwebbackend.entity.Customer customerid) {
-        this.customerid = customerid;
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
     }
 
-    public TripType getTriptypeid() {
-        return triptypeid;
+    public TripType getTripType() {
+        return tripType;
     }
 
-    public void setTriptypeid(TripType triptypeid) {
-        this.triptypeid = triptypeid;
+    public void setTripType(TripType tripType) {
+        this.tripType = tripType;
     }
 
-    public org.example.travelexpertwebbackend.entity.Package getPackageid() {
+    public Package getPackageid() {
         return packageid;
     }
 
-    public void setPackageid(org.example.travelexpertwebbackend.entity.Package packageid) {
+    public void setPackageid(Package packageid) {
         this.packageid = packageid;
     }
 
-    public Set<BookingDetail> getBookingdetails() {
-        return bookingdetails;
+    public BigDecimal getTotalDiscount() {
+        return totalDiscount;
     }
 
-    public void setBookingdetails(Set<BookingDetail> bookingdetails) {
-        this.bookingdetails = bookingdetails;
+    public void setTotalDiscount(BigDecimal totalDiscount) {
+        this.totalDiscount = totalDiscount;
+    }
+
+    public Integer getPointsEarned() {
+        return pointsEarned;
+    }
+
+    public void setPointsEarned(Integer pointsEarned) {
+        this.pointsEarned = pointsEarned;
+    }
+
+    public BigDecimal getFinalPrice() {
+        return finalPrice;
+    }
+
+    public void setFinalPrice(BigDecimal finalPrice) {
+        this.finalPrice = finalPrice;
+    }
+
+    public Set<BookingDetail> getBookingDetails() {
+        return bookingDetails;
+    }
+
+    public void setBookingDetails(Set<BookingDetail> bookingDetails) {
+        this.bookingDetails = bookingDetails;
     }
 
 }

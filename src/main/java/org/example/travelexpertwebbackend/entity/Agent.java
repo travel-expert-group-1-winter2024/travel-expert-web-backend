@@ -54,7 +54,7 @@ public class Agent {
     @OneToMany(mappedBy = "agent")
     private Set<Customer> customers = new LinkedHashSet<>();
 
-    @OneToOne(mappedBy = "agentid")
+    @OneToOne(mappedBy = "agent")
     private User user;
 
     private String photoPath;

@@ -59,7 +59,7 @@ public class UserService implements UserDetailsService {
         if (customerData.getCustomerid() != null) {
             Optional<Customer> customerOpt = customerRepository.findById(customerData.getCustomerid());
             if (customerOpt.isPresent()) {
-                user.setCustomerid(customerOpt.get());
+                user.setCustomer(customerOpt.get());
             } else {
                 throw new EntityNotFoundException("Customer not found with ID: " + customerData.getCustomerid());
             }
@@ -84,7 +84,7 @@ public class UserService implements UserDetailsService {
         User user = new User();
         user.setUsername(username);
         user.setPasswordHash(new BCryptPasswordEncoder().encode(password));
-        user.setAgentid(agent);
+        user.setAgent(agent);
         user.setRole(Role.AGENT.name()); // default role
 
         User savedUser = userRepository.save(user);
@@ -124,5 +124,16 @@ public class UserService implements UserDetailsService {
     public void deleteUserByEmail(String email) {
         Optional<User> user = userRepository.findByUsername(email);
         user.ifPresent(userRepository::delete);
+    }
+
+    public Customer getCustomerByUsername(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        if (user.getCustomer() == null) {
+            throw new IllegalStateException("User is not registered as a customer");
+        }
+
+        return user.getCustomer();
     }
 }

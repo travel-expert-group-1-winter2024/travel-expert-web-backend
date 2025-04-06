@@ -25,7 +25,7 @@ public class CustomerController {
 
 
     @Autowired
-    public CustomerController(CustomerService customerService, UserService userService,UserRepository userRepository) {
+    public CustomerController(CustomerService customerService, UserService userService, UserRepository userRepository) {
         this.customerService = customerService;
         this.userService = userService;
         this.userRepository = userRepository;
@@ -73,6 +73,7 @@ public class CustomerController {
 
             Logger.debug("Registering customer: " + customerDTO.getCustemail());
             CustomerDTO registeredCustomer = customerService.registerCustomer(customerDTO);
+            customerDTO.setCustomerid(registeredCustomer.getCustomerid());
             Logger.info("Successfully registered customer: " + customerDTO.getCustemail());
 
             if (registeredCustomer.getCustomerid() != null) {
@@ -81,7 +82,7 @@ public class CustomerController {
             return ResponseEntity.ok(new GenericApiResponse<>(registeredCustomer));
 
         } catch (Exception ex) {
-            Logger.error("Error registering customer: " + customerDTO.getCustemail(), ex);
+            Logger.error(ex, "Error registering customer: " + customerDTO.getCustemail());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new GenericApiResponse<>(List.of(new ErrorInfo("An unexpected error occurred"))));
         }
