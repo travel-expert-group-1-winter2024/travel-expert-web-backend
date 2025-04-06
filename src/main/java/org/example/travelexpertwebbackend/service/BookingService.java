@@ -42,10 +42,7 @@ public class BookingService {
 
     // Create a new booking
     @Transactional
-    public BookingCreateResponseDTO createBooking(String username, BookingCreateRequestDTO requestDTO) {
-        // find customer by username
-        Customer customer = userService.getCustomerByUsername(username);
-
+    public BookingCreateResponseDTO createBooking(Customer customer, BookingCreateRequestDTO requestDTO) {
         // check if the packageId is valid
         Package aPackage = packageRepository.findById(requestDTO.getPackageId())
                 .orElseThrow(() -> new IllegalArgumentException("Package not found with ID: " + requestDTO.getPackageId())
