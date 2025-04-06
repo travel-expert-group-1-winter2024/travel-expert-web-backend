@@ -93,7 +93,7 @@ public class Customer {
     private CustomerTier customerTier;
 
     @OneToOne(mappedBy = "customer")
-    private Wallet wallets;
+    private Wallet wallet;
 
     public Customer() {
     }
@@ -234,11 +234,11 @@ public class Customer {
         this.points = points;
     }
 
-    public Wallet getWallets() {
-        return wallets;
+    public Wallet getWallet() {
+        return wallet;
     }
 
-    public void setWallets(Wallet wallets) {
-        this.wallets = wallets;
+    public void setWallet(Wallet wallet) {
+        this.wallet = wallet;
     }
 }
