@@ -75,7 +75,7 @@ public class Customer {
 
     @ColumnDefault("0")
     @Column(name = "points")
-    private Integer points;
+    private Integer points = 0;
 
     @ManyToOne()
     @JoinColumn(name = "agentid")
