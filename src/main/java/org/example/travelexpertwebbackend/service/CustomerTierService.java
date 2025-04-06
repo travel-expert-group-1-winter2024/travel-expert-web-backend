@@ -2,6 +2,7 @@ package org.example.travelexpertwebbackend.service;
 
 import org.example.travelexpertwebbackend.entity.Customer;
 import org.example.travelexpertwebbackend.entity.CustomerTier;
+import org.example.travelexpertwebbackend.entity.Transaction;
 import org.example.travelexpertwebbackend.repository.CustomerRepository;
 import org.example.travelexpertwebbackend.repository.CustomerTierRepository;
 import org.example.travelexpertwebbackend.repository.TransactionRepository;
@@ -31,15 +32,22 @@ public class CustomerTierService {
     }
 
     public BigDecimal calculateDiscount(Customer customer, CustomerTier customerTier, BigDecimal totalAmount) {
-        // check limit
-        BigDecimal limit = customerTier.getDiscountLimit();
-        BigDecimal totalSpent = transactionRepository.sumAmountByCustomerId(customer.getId()).orElse(BigDecimal.ZERO);
-        if (limit != null && totalSpent.compareTo(limit) >= 0) {
+        BigDecimal discountLimit = customerTier.getDiscountLimit();
+        BigDecimal totalDebitAmount = transactionRepository
+                .sumAmountByCustomerIdAndType(customer.getId(), Transaction.TransactionType.DEBIT)
+                .orElse(BigDecimal.ZERO);
+
+        boolean exceedsLimit = discountLimit != null &&
+                totalDebitAmount.subtract(BigDecimal.valueOf(customerTier.getRequiredPoints()))
+                        .compareTo(discountLimit) >= 0;
+
+        if (exceedsLimit || customerTier.getDiscountPercentage().compareTo(BigDecimal.ZERO) == 0) {
             return BigDecimal.ZERO;
         }
 
-        BigDecimal discountRate = customerTier.getDiscountPercentage();
-        return totalAmount.multiply(discountRate).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+        return totalAmount
+                .multiply(customerTier.getDiscountPercentage())
+                .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
     }
 
     public CustomerTier getTierByPoint(Integer point) {

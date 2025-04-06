@@ -67,7 +67,8 @@ public class BookingService {
             throw new IllegalArgumentException("Insufficient balance in wallet");
         }
         // deduct money from wallet
-        wallet.setBalance(wallet.getBalance().subtract(finalPrice));
+        BigDecimal newBalance = wallet.getBalance().subtract(finalPrice);
+        wallet.setBalance(newBalance);
 
         // add record in transaction
         Transaction transaction = new Transaction();
@@ -129,7 +130,9 @@ public class BookingService {
         return new BookingCreateResponseDTO(
                 savedBooking.getId(),
                 savedBooking.getBookingNo(),
+                discount,
                 savedBooking.getFinalPrice(),
+                newBalance,
                 pointsEarned,
                 isNewTier ? customerTier.getName() : null
         );

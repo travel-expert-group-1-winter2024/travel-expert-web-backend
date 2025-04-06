@@ -12,6 +12,6 @@ import java.util.UUID;
 
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, UUID> {
-    @Query("SELECT SUM(t.amount) FROM Transaction t WHERE t.wallet.customer.id = :customerId")
-    Optional<BigDecimal> sumAmountByCustomerId(@Param("customerId") Integer customerId);
+    @Query("SELECT SUM(t.amount) FROM Transaction t WHERE t.wallet.customer.id = :customerId AND t.transactionType = :type")
+    Optional<BigDecimal> sumAmountByCustomerIdAndType(@Param("customerId") Integer customerId, @Param("type") Transaction.TransactionType type);
 }
