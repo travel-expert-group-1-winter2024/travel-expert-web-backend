@@ -7,7 +7,6 @@ import jakarta.validation.constraints.Size;
 import org.example.travelexpertwebbackend.entity.Agent;
 import org.example.travelexpertwebbackend.entity.Customer;
 import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -18,8 +17,7 @@ import java.util.UUID;
 @Table(name = "users")
 public class User {
     @Id
-    @GeneratedValue(generator = "UUID")
-    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", nullable = false, updatable = false)
     private UUID id;
 
@@ -43,7 +41,7 @@ public class User {
     @JoinColumn(name = "agentid")
     private Agent agent;
 
-    @OneToOne(fetch = FetchType.LAZY,cascade = CascadeType.PERSIST)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
 //    @OnDelete(action = OnDeleteAction.SET_NULL)
 //    @JoinColumn(name = "customerid")
     @JoinColumn(name = "customerid", referencedColumnName = "customerid")
