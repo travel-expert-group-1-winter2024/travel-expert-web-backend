@@ -15,6 +15,11 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 @Configuration
 public class SecurityConfig {
@@ -38,6 +43,19 @@ public class SecurityConfig {
         return provider;
     }
 
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(List.of("http://localhost:5173"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(List.of("*"));
+        config.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
+    }
+
 
     // Security Config using filter chains
     // configure roles
@@ -57,7 +75,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/agents").permitAll()
                         .requestMatchers(HttpMethod.PUT, "/agents/{id}").authenticated()
                         // customers
-                        .requestMatchers(HttpMethod.GET, "/api/customers").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/customers").permitAll()
+
+                        //.requestMatchers(HttpMethod.POST, "/customers").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/**/customers").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/customers/me").hasRole("CUSTOMER")
                         // packages
                         // TODO: change to agent later
@@ -85,6 +106,7 @@ public class SecurityConfig {
         );
         // disable CSRF for testing purposes
         httpSecurity.csrf(AbstractHttpConfigurer::disable);
+
 
         return httpSecurity.build();
     }
