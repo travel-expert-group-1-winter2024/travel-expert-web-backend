@@ -6,11 +6,13 @@ import org.example.travelexpertwebbackend.dto.GenericApiResponse;
 import org.example.travelexpertwebbackend.dto.booking.BookingCreateRequestDTO;
 import org.example.travelexpertwebbackend.dto.booking.BookingCreateResponseDTO;
 import org.example.travelexpertwebbackend.service.BookingService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.tinylog.Logger;
 
 import java.util.List;
 
@@ -25,15 +27,16 @@ public class BookingController {
     }
 
     @PostMapping()
-    public GenericApiResponse<BookingCreateResponseDTO> createBooking(Authentication authentication, @Valid @RequestBody BookingCreateRequestDTO responseDTO) {
+    public ResponseEntity<GenericApiResponse<BookingCreateResponseDTO>> createBooking(Authentication authentication, @Valid @RequestBody BookingCreateRequestDTO responseDTO) {
         try {
             String username = (String) authentication.getPrincipal();
             BookingCreateResponseDTO bookingCreateResponseDTO = bookingService.createBooking(username, responseDTO);
-            return new GenericApiResponse<>(bookingCreateResponseDTO);
-        } catch (IllegalArgumentException e) {
-            return new GenericApiResponse<>(List.of(new ErrorInfo(e.getMessage())));
+            return ResponseEntity.ok(new GenericApiResponse<>(bookingCreateResponseDTO));
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            return ResponseEntity.badRequest().body(new GenericApiResponse<>(List.of(new ErrorInfo(e.getMessage()))));
         } catch (Exception e) {
-            return new GenericApiResponse<>(List.of(new ErrorInfo("Failed to create booking.")));
+            Logger.error(e, "Failed to create booking");
+            return ResponseEntity.internalServerError().body(new GenericApiResponse<>(List.of(new ErrorInfo("Failed to create booking"))));
         }
     }
 
