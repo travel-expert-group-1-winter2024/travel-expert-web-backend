@@ -2,6 +2,7 @@ package org.example.travelexpertwebbackend.service;
 
 import org.example.travelexpertwebbackend.entity.Customer;
 import org.example.travelexpertwebbackend.entity.CustomerTier;
+import org.example.travelexpertwebbackend.entity.Transaction;
 import org.example.travelexpertwebbackend.repository.CustomerRepository;
 import org.example.travelexpertwebbackend.repository.CustomerTierRepository;
 import org.example.travelexpertwebbackend.repository.TransactionRepository;
@@ -33,12 +34,15 @@ public class CustomerTierService {
     public BigDecimal calculateDiscount(Customer customer, CustomerTier customerTier, BigDecimal totalAmount) {
         // check limit
         BigDecimal limit = customerTier.getDiscountLimit();
-        BigDecimal totalSpent = transactionRepository.sumAmountByCustomerId(customer.getId()).orElse(BigDecimal.ZERO);
-        if (limit != null && totalSpent.compareTo(limit) >= 0) {
+        BigDecimal totalSpent = transactionRepository.sumAmountByCustomerIdAndType(customer.getId(), Transaction.TransactionType.DEBIT).orElse(BigDecimal.ZERO);
+        if (limit != null && totalSpent.subtract(new BigDecimal(customerTier.getRequiredPoints())).compareTo(limit) >= 0) { // this based on 1 point = 1 dollar
             return BigDecimal.ZERO;
         }
 
         BigDecimal discountRate = customerTier.getDiscountPercentage();
+        if (discountRate.equals(BigDecimal.ZERO)) {
+            return BigDecimal.ZERO;
+        }
         return totalAmount.multiply(discountRate).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
     }
 
