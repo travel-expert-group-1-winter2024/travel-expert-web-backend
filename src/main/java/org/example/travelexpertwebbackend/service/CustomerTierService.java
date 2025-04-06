@@ -52,4 +52,9 @@ public class CustomerTierService {
 
         return matchedTier;
     }
+
+    public CustomerTier getStarterTier() {
+        return customerTierRepository.findById(1).orElseThrow(
+                () -> new IllegalArgumentException("Start Tier not found"));
+    }
 }

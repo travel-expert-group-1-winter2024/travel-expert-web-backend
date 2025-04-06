@@ -1,31 +1,35 @@
 package org.example.travelexpertwebbackend.service;
- import org.example.travelexpertwebbackend.dto.CustomerDTO;
- import org.example.travelexpertwebbackend.entity.Agent;
- import org.example.travelexpertwebbackend.entity.Customer;
- import org.example.travelexpertwebbackend.repository.AgentRepository;
- import org.example.travelexpertwebbackend.repository.CustomerRepository;
- import org.springframework.beans.factory.annotation.Autowired;
- import org.springframework.stereotype.Service;
 
- import java.util.List;
- import java.util.Optional;
- import java.util.stream.Collectors;
+import org.example.travelexpertwebbackend.dto.CustomerDTO;
+import org.example.travelexpertwebbackend.entity.Agent;
+import org.example.travelexpertwebbackend.entity.Customer;
+import org.example.travelexpertwebbackend.entity.CustomerTier;
+import org.example.travelexpertwebbackend.repository.AgentRepository;
+import org.example.travelexpertwebbackend.repository.CustomerRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
- public class CustomerService {
+public class CustomerService {
     @Autowired
     private final CustomerRepository customerRepository;
     private final AgentRepository agentRepository;
+    @Autowired
+    private CustomerTierService customerTierService;
 
     public CustomerService(CustomerRepository customerRepository, AgentRepository agentRepository) {
         this.customerRepository = customerRepository;
         this.agentRepository = agentRepository;
     }
 
-     public List<CustomerDTO> getAllCustomers() {
-         List<Customer> customers = customerRepository.findAll();
-         return customers.stream().map(CustomerDTO::new).collect(Collectors.toList());
-     }
+    public List<CustomerDTO> getAllCustomers() {
+        List<Customer> customers = customerRepository.findAll();
+        return customers.stream().map(CustomerDTO::new).collect(Collectors.toList());
+    }
 
     // Get customer details by ID
     public Optional<CustomerDTO> getCustomerDetails(Integer id) {
@@ -65,9 +69,15 @@ package org.example.travelexpertwebbackend.service;
         customer.setCusthomephone(customerDTO.getCusthomephone());
         customer.setCustbusphone(customerDTO.getCustbusphone());
         customer.setCustemail(customerDTO.getCustemail());
+        customer.setPoints(0); // Initialize points to 0
         customer.setAgent(agent);
 
+        // link with start tier
+        CustomerTier starterTier = customerTierService.getStarterTier();
+        customer.setCustomerTier(starterTier);
+
         customer = customerRepository.save(customer);
+
         return new CustomerDTO(customer);
     }
 
