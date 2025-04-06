@@ -4,11 +4,14 @@ import org.example.travelexpertwebbackend.dto.CustomerDTO;
 import org.example.travelexpertwebbackend.entity.Agent;
 import org.example.travelexpertwebbackend.entity.Customer;
 import org.example.travelexpertwebbackend.entity.CustomerTier;
+import org.example.travelexpertwebbackend.entity.Wallet;
 import org.example.travelexpertwebbackend.repository.AgentRepository;
 import org.example.travelexpertwebbackend.repository.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -75,6 +78,13 @@ public class CustomerService {
         // link with start tier
         CustomerTier starterTier = customerTierService.getStarterTier();
         customer.setCustomerTier(starterTier);
+
+        // create wallet for customer
+        Wallet wallet = new Wallet();
+        wallet.setBalance(BigDecimal.ZERO);
+        wallet.setCustomer(customer);
+        wallet.setLastUpdated(Instant.now());
+        customer.setWallet(wallet);
 
         customer = customerRepository.save(customer);
 
