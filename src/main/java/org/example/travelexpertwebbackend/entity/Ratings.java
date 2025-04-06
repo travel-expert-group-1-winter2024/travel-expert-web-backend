@@ -22,6 +22,11 @@ public class Ratings {
     @Column(nullable = false)
     private int rating;
 
+    @ManyToOne
+    @JoinColumn(name = "customerid", nullable = false)
+    @JsonBackReference
+    private Customer customer;
+
     @Column(columnDefinition = "TEXT")
     private String comments;
 
@@ -55,5 +60,13 @@ public class Ratings {
 
     public void setComments(String comments) {
         this.comments = comments;
+    }
+
+    public Customer getCustomer() {
+        return customer;
+    }
+
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
     }
 }

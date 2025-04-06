@@ -69,16 +69,42 @@ public class Customer {
     @Column(name = "custemail", nullable = false, length = 50)
     private String custemail;
 
+    @Size(max = 255)
+    @Column(name = "photo_path")
+    private String photoPath;
+
+    @ColumnDefault("0")
+    @Column(name = "points")
+    private Integer points = 0;
+
     @ManyToOne()
     @JoinColumn(name = "agentid")
     private Agent agent;
 
-    @OneToMany(mappedBy = "customerid")
+    @OneToMany(mappedBy = "customer")
     @JsonIgnore
     private Set<Booking> bookings = new LinkedHashSet<>();
 
-    @OneToOne(mappedBy = "customerid")
+    @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
     private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "customer_tier_id")
+    private CustomerTier customerTier;
+
+    @OneToOne(mappedBy = "customer")
+    private Wallet wallet;
+
+    public Customer() {
+    }
+
+    public CustomerTier getCustomerTier() {
+        return customerTier;
+    }
+
+    public void setCustomerTier(CustomerTier customerTier) {
+        this.customerTier = customerTier;
+    }
 
     public Integer getId() {
         return id;
@@ -192,4 +218,27 @@ public class Customer {
         this.user = user;
     }
 
+    public String getPhotoPath() {
+        return photoPath;
+    }
+
+    public void setPhotoPath(String photoPath) {
+        this.photoPath = photoPath;
+    }
+
+    public Integer getPoints() {
+        return points;
+    }
+
+    public void setPoints(Integer points) {
+        this.points = points;
+    }
+
+    public Wallet getWallet() {
+        return wallet;
+    }
+
+    public void setWallet(Wallet wallet) {
+        this.wallet = wallet;
+    }
 }
