@@ -5,24 +5,31 @@ import org.example.travelexpertwebbackend.entity.*;
 import org.example.travelexpertwebbackend.entity.auth.User;
 import org.example.travelexpertwebbackend.repository.*;
 import org.example.travelexpertwebbackend.repository.auth.UserRepository;
-import org.example.travelexpertwebbackend.dto.CustomerDetailResponseDTO;
-import org.example.travelexpertwebbackend.dto.CustomerSignUpDTO;
-import org.example.travelexpertwebbackend.entity.Customer;
-import org.example.travelexpertwebbackend.entity.auth.Role;
-import org.example.travelexpertwebbackend.entity.auth.User;
-import org.example.travelexpertwebbackend.repository.CustomerRepository;
-import org.example.travelexpertwebbackend.repository.auth.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 public class CustomerService {
     @Autowired
     private final CustomerRepository customerRepository;
+    private final AgentRepository agentRepository;
+    @Autowired
+    private CustomerTierService customerTierService;
+    @Autowired
+    private WalletRepository walletRepository;
+    @Autowired
+    private CustomerTierRepository customerTierRepository;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private BookingRepository bookingRepository;
 
     public CustomerService(CustomerRepository customerRepository, AgentRepository agentRepository) {
         this.customerRepository = customerRepository;
@@ -97,6 +104,8 @@ public class CustomerService {
     // Update an existing customer
     public Optional<CustomerDTO> updateCustomer(Integer id, CustomerDTO customerDTO) {
         return customerRepository.findById(id).map(customer -> {
+            Agent agent = agentRepository.findById(customerDTO.getAgentId())
+                    .orElseThrow(() -> new IllegalArgumentException("Agent not found"));
             customer.setCustfirstname(customerDTO.getCustfirstname());
             customer.setCustlastname(customerDTO.getCustlastname());
             customer.setCustaddress(customerDTO.getCustaddress());
@@ -107,6 +116,7 @@ public class CustomerService {
             customer.setCusthomephone(customerDTO.getCusthomephone());
             customer.setCustbusphone(customerDTO.getCustbusphone());
             customer.setCustemail(customerDTO.getCustemail());
+            customer.setAgent(agent);
             customerRepository.save(customer);
             return new CustomerDTO(customer);
         });
@@ -150,38 +160,5 @@ public class CustomerService {
         }
 
         customerRepository.deleteById(id);
-    }
-
-    public CustomerDetailResponseDTO signUpCustomer(CustomerSignUpDTO dto) {
-        //Todo: Check to see if the username/email already exists
-        //Todo: Check to see if the customer is an agent.
-        //Todo: Create the Customer record first
-        //Todo: Create the User record second
-
-        String CUSTOMER_ROLE = Role.CUSTOMER.name();
-        String AGENT_ROLE = Role.AGENT.name();
-
-        //Psuedo code
-        // Check if agent account, set a boolean to true if so, false if not.
-        // If true, assign role AGENT
-        // Otherwise, set CUSTOMER ROLE. Might be best to have the Roles in place as properties in the method
-        if (userRepository.findByUsername(dto.getUsername()).isPresent()) {
-
-        }
-
-        // Creating the Customer object
-        Customer customer = new Customer();
-        customer.setCustfirstname(dto.getFirstName());
-        customer.setCustlastname(dto.getLastName());
-        customer.setCustaddress(dto.getAddress());
-        customer.setCustcity(dto.getCity());
-        customer.setCustprov(dto.getProvince());
-        customer.setCustcountry(dto.getCountry());
-        customer.setCusthomephone(dto.getHomePhone());
-        customer.setCustbusphone(dto.getBusPhone());
-
-        //Creating the User object
-        User user = new User();
-        user.setUsername(dto.getEmail());
     }
 }

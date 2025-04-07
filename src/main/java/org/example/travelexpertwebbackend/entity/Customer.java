@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import org.example.travelexpertwebbackend.entity.auth.User;
 import org.hibernate.annotations.ColumnDefault;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -94,6 +95,9 @@ public class Customer {
 
     @OneToOne(mappedBy = "customer")
     private Wallet wallet;
+
+    @Column(name = "is_agent")
+    private boolean isAgent;
 
     public Customer() {
     }
@@ -240,5 +244,13 @@ public class Customer {
 
     public void setWallet(Wallet wallet) {
         this.wallet = wallet;
+    }
+
+    public boolean isAgent() {
+        return isAgent;
+    }
+
+    public void setAgent(boolean agent) {
+        isAgent = agent;
     }
 }
