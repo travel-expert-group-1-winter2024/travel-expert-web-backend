@@ -2,6 +2,7 @@ package org.example.travelexpertwebbackend.service;
 
 import org.example.travelexpertwebbackend.dto.CustomerDTO;
 import org.example.travelexpertwebbackend.entity.*;
+import org.example.travelexpertwebbackend.entity.auth.Role;
 import org.example.travelexpertwebbackend.entity.auth.User;
 import org.example.travelexpertwebbackend.repository.*;
 import org.example.travelexpertwebbackend.repository.auth.UserRepository;
@@ -10,9 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -66,9 +65,36 @@ public class CustomerService {
     }
 
     public CustomerDTO registerCustomer(CustomerDTO customerDTO) {
+        //* The default state for each Customer being registered
+        boolean isAgent = false;
+
+        //* Will check if email exists in Users table, and change accordingly.
+        boolean userAlreadyExists = false;
+
+       //* Check email coming for a match in Users table
+        Optional<User> existingUser = userRepository.findByUsername(customerDTO.getCustemail());
+
+        if (existingUser.isPresent()) {
+            if (customerDTO.getCustemail().toLowerCase().endsWith("@travelexperts.com")){
+                isAgent = true;
+            } else {
+                //* Assuming the email exists already, and is not an Agent email.
+                userAlreadyExists = true;
+            }
+        }
+
+        //* Grabbing all Agents from Agents db.
+        List<Agent> existingAgents = agentRepository.findAll();
+        //* Handling potential errors, such as error grabbing all Agents
+        if(existingAgents.isEmpty()){
+            throw new IllegalStateException("No available agents to assign");
+        }
+        //* Assigning a random numbered agent based on the length of the list
+        //* This will handle new agents being added without having to adjust the logic
+        Random random = new Random();
+        Agent assignedAgent = existingAgents.get(random.nextInt(existingAgents.size()));
+
         Customer customer = new Customer();
-        Agent agent = agentRepository.findById(customerDTO.getAgentId())
-                .orElseThrow(() -> new IllegalArgumentException("Agent not found"));
         customer.setCustfirstname(customerDTO.getCustfirstname());
         customer.setCustlastname(customerDTO.getCustlastname());
         customer.setCustaddress(customerDTO.getCustaddress());
@@ -80,7 +106,10 @@ public class CustomerService {
         customer.setCustbusphone(customerDTO.getCustbusphone());
         customer.setCustemail(customerDTO.getCustemail());
         customer.setPoints(0); // Initialize points to 0
-        customer.setAgent(agent);
+        //* Assigning a randomly selected agent
+        customer.setAgent(assignedAgent);
+        //* Setting true/false based on username/email check.
+        customer.setAgent(isAgent);
 
         // link with start tier
         CustomerTier starterTier = customerTierService.getStarterTier();
@@ -97,6 +126,23 @@ public class CustomerService {
         // update wallet
         customer.setWallet(savedWallet);
         customer = customerRepository.save(customer);
+
+        //* Create user credentials
+        User user = new User();
+        if (!userAlreadyExists) {
+            user.setUsername(customerDTO.getCustemail());
+            user.setPasswordHash(customerDTO.getPassword());
+            if (isAgent){
+                user.setRole(Role.AGENT.name());
+                Agent registeringAgent = agentRepository.findByAgtEmail(customerDTO.getCustemail()).orElseThrow(() -> new IllegalStateException("Agent not found"));
+                user.setAgent(registeringAgent);
+            } else {
+                user.setRole(Role.CUSTOMER.name());
+                Customer registeringCustomer = customerRepository.findByCustemail(customerDTO.getCustemail()).orElseThrow(() -> new IllegalStateException("Customer not found"));
+                user.setCustomer(registeringCustomer);
+            }
+        }
+
 
         return new CustomerDTO(customer);
     }

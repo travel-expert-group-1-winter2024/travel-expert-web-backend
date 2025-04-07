@@ -17,6 +17,8 @@ public class CustomerDTO {
     private String custbusphone;
     private String custemail;
     private Integer agentId;
+    private boolean isAgent;
+
     @NotNull(message = "Password is required")
     private String password;
     @NotNull(message = "Confirm Password is required")
@@ -26,7 +28,7 @@ public class CustomerDTO {
     public CustomerDTO(Integer id, String custfirstname, String custlastname, String custaddress,
                        String custcity, String custprov, String custpostal, String custcountry,
                        String custhomephone, String custbusphone, String custemail, Integer agentId,
-                       String password) {
+                       String password, boolean isAgent) {
         this.customerid = id;
         this.custfirstname = custfirstname;
         this.custlastname = custlastname;
@@ -40,6 +42,7 @@ public class CustomerDTO {
         this.custemail = custemail;
         this.agentId = agentId;
         this.password = password;
+        this.isAgent = isAgent;
     }
 
     public CustomerDTO(Customer customer) {
@@ -55,6 +58,7 @@ public class CustomerDTO {
         this.custbusphone = customer.getCustbusphone();
         this.custemail = customer.getCustemail();
         this.agentId= customer.getAgent().getId();
+        this.isAgent = customer.isAgent();
     }
 
     // Getters and Setters
@@ -100,5 +104,13 @@ public class CustomerDTO {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public boolean isAgent() {
+        return isAgent;
+    }
+
+    public void setAgent(boolean agent) {
+        isAgent = agent;
     }
 }
