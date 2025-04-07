@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.tinylog.Logger;
 
 import java.util.List;
@@ -36,6 +37,38 @@ public class CustomerController {
     public ResponseEntity<List<CustomerDTO>> getAllCustomers() {
         List<CustomerDTO> customers = customerService.getAllCustomers();
         return ResponseEntity.ok(customers);
+    }
+
+    @PostMapping("/{id}/upload")
+    public ResponseEntity<String> uploadCustomerPhoto(
+            @PathVariable int id,
+            @RequestParam("image") MultipartFile image) {
+        try {
+            String savedFilename = customerService.uploadCustomerPhoto(id, image);
+            return ResponseEntity.ok("Image uploaded successfully: " + savedFilename);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            Logger.error(e, "Error uploading customer photo");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to upload image.");
+        }
+    }
+
+    @GetMapping("/{id}/photo")
+    public ResponseEntity<byte[]> downloadCustomerPhoto(@PathVariable int id) {
+        try {
+            byte[] imageData = customerService.getCustomerPhoto(id);
+            return ResponseEntity.ok()
+                    .header("Content-Type", "image/jpeg")
+                    .body(imageData);
+        } catch (IllegalArgumentException e) {
+            Logger.error(e, "Error retrieving customer photo");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (Exception e) {
+            Logger.error(e, "Error retrieving customer photo");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @GetMapping("/{id}")
