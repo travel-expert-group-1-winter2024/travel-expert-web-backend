@@ -50,43 +50,59 @@ public class CustomerController {
         return updatedCustomer.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<GenericApiResponse<CustomerDTO>> registerCustomer(@RequestBody CustomerDTO customerDTO) {
-        try {
-            Optional<User> userExists = userRepository.findByUsername(customerDTO.getCustemail());
 
-            if (userExists.isPresent()) {
-                User existingUser = userExists.get();
 
-                if ("CUSTOMER".equals(existingUser.getRole())) {
-                    Logger.info("User Already Exists: " + customerDTO.getCustemail());
-                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                            .body(new GenericApiResponse<>(List.of(new ErrorInfo("User Already Exists"))));
-                } else if ("AGENT".equals(existingUser.getRole())) {
-                    Logger.info("User Already Exists as Agent: " + customerDTO.getCustemail());
-                    CustomerDTO registeredAgentCustomer = customerService.registerCustomer(customerDTO);
-                    customerDTO.setCustomerid(registeredAgentCustomer.getCustomerid());
-                    Logger.info("Successfully registered agent - customer: " + customerDTO.getCustemail());
-                    return ResponseEntity.ok(new GenericApiResponse<>(registeredAgentCustomer));
-                }
-            }
-
-            Logger.debug("Registering customer: " + customerDTO.getCustemail());
-            CustomerDTO registeredCustomer = customerService.registerCustomer(customerDTO);
-            customerDTO.setCustomerid(registeredCustomer.getCustomerid());
-            Logger.info("Successfully registered customer: " + customerDTO.getCustemail());
-
-            if (registeredCustomer.getCustomerid() != null) {
-                userService.saveUser(customerDTO);
-            }
-            return ResponseEntity.ok(new GenericApiResponse<>(registeredCustomer));
-
-        } catch (Exception ex) {
-            Logger.error(ex, "Error registering customer: " + customerDTO.getCustemail());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new GenericApiResponse<>(List.of(new ErrorInfo("An unexpected error occurred"))));
-        }
+//    @PostMapping("/register")
+//    public ResponseEntity<GenericApiResponse<CustomerDTO>> registerCustomer(@RequestBody CustomerDTO customerDTO) {
+//        try {
+//            Optional<User> userExists = userRepository.findByUsername(customerDTO.getCustemail());
+//
+//            if (userExists.isPresent()) {
+//                User existingUser = userExists.get();
+//
+//                if ("CUSTOMER".equals(existingUser.getRole())) {
+//                    Logger.info("User Already Exists: " + customerDTO.getCustemail());
+//                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                            .body(new GenericApiResponse<>(List.of(new ErrorInfo("User Already Exists"))));
+//                } else if ("AGENT".equals(existingUser.getRole())) {
+//                    Logger.info("User Already Exists as Agent: " + customerDTO.getCustemail());
+//                    CustomerDTO registeredAgentCustomer = customerService.registerCustomer(customerDTO);
+//                    customerDTO.setCustomerid(registeredAgentCustomer.getCustomerid());
+//                    Logger.info("Successfully registered agent - customer: " + customerDTO.getCustemail());
+//                    return ResponseEntity.ok(new GenericApiResponse<>(registeredAgentCustomer));
+//                }
+//            }
+//
+//            Logger.debug("Registering customer: " + customerDTO.getCustemail());
+//            CustomerDTO registeredCustomer = customerService.registerCustomer(customerDTO);
+//            customerDTO.setCustomerid(registeredCustomer.getCustomerid());
+//            Logger.info("Successfully registered customer: " + customerDTO.getCustemail());
+//
+//            if (registeredCustomer.getCustomerid() != null) {
+//                userService.saveUser(customerDTO);
+//            }
+//            return ResponseEntity.ok(new GenericApiResponse<>(registeredCustomer));
+//
+//        } catch (Exception ex) {
+//            Logger.error(ex, "Error registering customer: " + customerDTO.getCustemail());
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                    .body(new GenericApiResponse<>(List.of(new ErrorInfo("An unexpected error occurred"))));
+//        }
+//    }
+@PostMapping("/register")
+public ResponseEntity<GenericApiResponse<CustomerDTO>> registerCustomer(@RequestBody CustomerDTO customerDTO) {
+    try {
+        Logger.debug("Registering customer" + customerDTO.getCustemail());
+        CustomerDTO registeredCustomer = customerService.registerCustomer(customerDTO);
+        Logger.info("Successfully registered customer" + registeredCustomer.getCustemail());
+        return ResponseEntity.ok(new GenericApiResponse<>(registeredCustomer));
+    } catch (Exception e) {
+        Logger.error(e, "Error registering customer" + customerDTO.getCustemail());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new GenericApiResponse<>(List.of(new ErrorInfo("An unexpected error occurred."))));
     }
+}
+
+
 
 
     @PostMapping("/updatecustomer/{id}")
