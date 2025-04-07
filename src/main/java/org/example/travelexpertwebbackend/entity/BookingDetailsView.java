@@ -202,4 +202,20 @@ public class BookingDetailsView {
     public String getLastname(){
         return lastname;
     }
+
+    public void setAgentid(Integer agentid) {
+        this.agentid = agentid;
+    }
+
+    public void setCustomerid(Integer customerid) {
+        this.customerid = customerid;
+    }
+
+    public void setFirstname(String firstname) {
+        this.firstname = firstname;
+    }
+
+    public void setLastname(String lastname) {
+        this.lastname = lastname;
+    }
 }
