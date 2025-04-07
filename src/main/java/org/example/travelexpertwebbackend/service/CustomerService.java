@@ -65,10 +65,11 @@ public class CustomerService {
     }
 
     public CustomerDTO registerCustomer(CustomerDTO customerDTO) {
-        //* The default state for each Customer being registered
+        //* Boolean that will be true if the registering Customer is an agent, otherwise false.
+        //* Default state will be false.
         boolean isAgent = false;
-
         //* Will check if email exists in Users table, and change accordingly.
+        //* Default state will be false.
         boolean userAlreadyExists = false;
 
        //* Check email coming for a match in Users table
@@ -129,20 +130,14 @@ public class CustomerService {
 
         //* Create user credentials
         User user = new User();
-        if (!userAlreadyExists) {
+        if (!userAlreadyExists && !isAgent) {
             user.setUsername(customerDTO.getCustemail());
             user.setPasswordHash(customerDTO.getPassword());
-            if (isAgent){
-                user.setRole(Role.AGENT.name());
-                Agent registeringAgent = agentRepository.findByAgtEmail(customerDTO.getCustemail()).orElseThrow(() -> new IllegalStateException("Agent not found"));
-                user.setAgent(registeringAgent);
-            } else {
-                user.setRole(Role.CUSTOMER.name());
-                Customer registeringCustomer = customerRepository.findByCustemail(customerDTO.getCustemail()).orElseThrow(() -> new IllegalStateException("Customer not found"));
-                user.setCustomer(registeringCustomer);
-            }
-        }
-
+            user.setRole(Role.CUSTOMER.name());
+            Customer registeringCustomer = customerRepository.findByCustemail(customerDTO.getCustemail()).orElseThrow(() -> new IllegalStateException("Customer not found"));
+            user.setCustomer(registeringCustomer);
+            userRepository.save(user);
+        } else throw new IllegalStateException("Username/Email already exists in our records");
 
         return new CustomerDTO(customer);
     }
