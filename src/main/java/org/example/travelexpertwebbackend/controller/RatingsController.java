@@ -24,9 +24,9 @@ public class RatingsController {
         this.ratingsViewService = ratingsViewService;
     }
 
-    @GetMapping
-    public List<RatingsView> getAllRatingsInfo() {
-        return ratingsViewService.getAllRatingsWithCustomerInfo();
+    @GetMapping("/{packageID}")
+    public List<RatingsView> getAllRatingsInfo(@PathVariable Integer packageID) {
+        return ratingsViewService.getAllRatingsWithCustomerInfo(packageID);
     }
 
     @PostMapping
