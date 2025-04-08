@@ -12,6 +12,7 @@ import org.example.travelexpertwebbackend.repository.RatingsViewRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class RatingsViewService {
@@ -29,8 +30,15 @@ public class RatingsViewService {
         this.ratingsRepository = ratingsRepository;
     }
 
-    public List<RatingsView> getAllRatingsWithCustomerInfo() {
-        return ratingsViewRepository.findAll();
+    public List<RatingsView> getAllRatingsWithCustomerInfo(Integer packageID) {
+        List<RatingsView> allRatings = ratingsViewRepository.findAll();
+
+        // Filter using streams
+        List<RatingsView> filteredRatings = allRatings.stream()
+                .filter(rating -> rating.getPackageid().equals(packageID))
+                .collect(Collectors.toList());
+
+        return filteredRatings;
     }
 
     public Ratings addRating(RatingsDTO request) {
