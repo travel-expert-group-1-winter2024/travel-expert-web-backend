@@ -79,10 +79,10 @@ public class CustomerService {
         Customer customer = createAndSaveCustomer(customerDTO, assignedAgent, isAgent);
         // create wallet for customer
         Wallet wallet = createAndAssignWallet(customer);
-        //* If the new Customer is not an Agent, creates a new User Account.
-        if (!isAgent) {
-            createUserAccount(customerDTO, customer);
-        }
+//        //* If the new Customer is not an Agent, creates a new User Account.
+//        if (!isAgent) {
+//            createUserAccount(customerDTO, customer);
+//        }
         return new CustomerDTO(customer);
     }
 

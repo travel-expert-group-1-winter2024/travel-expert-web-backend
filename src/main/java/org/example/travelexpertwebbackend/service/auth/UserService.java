@@ -17,6 +17,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.tinylog.Logger;
 
+import java.time.Instant;
 import java.util.Optional;
 
 @Service
@@ -54,6 +55,7 @@ public class UserService implements UserDetailsService {
         user.setUsername(customerData.getCustemail());
         user.setPasswordHash(new BCryptPasswordEncoder().encode(customerData.getPassword()));
         user.setRole(Role.CUSTOMER.name());
+        user.setCreatedAt(Instant.now());
 
         // Fetch Customer entity using CustomerId before setting it
         if (customerData.getCustomerid() != null) {
