@@ -3,7 +3,6 @@ package org.example.travelexpertwebbackend.controller.auth;
 import jakarta.validation.Valid;
 import org.example.travelexpertwebbackend.dto.ErrorInfo;
 import org.example.travelexpertwebbackend.dto.auth.*;
-import org.example.travelexpertwebbackend.entity.Customer;
 import org.example.travelexpertwebbackend.security.JwtService;
 import org.example.travelexpertwebbackend.service.auth.UserService;
 import org.springframework.http.HttpStatus;
@@ -12,7 +11,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -51,26 +49,18 @@ public class UserController {
     }
 
     @PostMapping("/api/login")
-    public ResponseEntity<AuthResponse<LoginResponseDTO>> loginUser(@Valid @RequestBody LoginRequestDTO user) {
+    public ResponseEntity<AuthResponse<LoginUserDTO>> loginUser(@Valid @RequestBody LoginRequestDTO user) {
         try {
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword())
-            );
-
+            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
             if (authentication.isAuthenticated()) {
-                Logger.debug("Logging in user: " + user.getUsername());
+                // Get user details and generate JWT
                 UserDetails userDetails = userService.loadUserByUsername(user.getUsername());
                 String jwt = jwtService.generateToken(userDetails);
-                Customer customer = userService.getCustomerByUsername(user.getUsername());
-                return ResponseEntity.ok(new AuthResponse<>(new LoginResponseDTO(
-                        customer.getId(),
-                        customer.getCustfirstname() + " " + customer.getCustlastname(),
-                        userDetails.getUsername(), // username is email
-                        userDetails.getAuthorities().stream()
-                                .map(GrantedAuthority::getAuthority)
-                                .findFirst()
-                                .orElse("USER") // Default role if not found
-                ), jwt));
+
+                // Get user info
+                LoginUserDTO userInfo = userService.getLoginUserInfo(user.getUsername());
+
+                return ResponseEntity.ok(new AuthResponse<>(userInfo, jwt));
             }
         } catch (BadCredentialsException ex) {
             Logger.warn("Bad credentials for user: " + user.getUsername());

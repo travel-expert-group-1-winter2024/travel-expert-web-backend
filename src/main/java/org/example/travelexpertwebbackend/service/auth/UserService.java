@@ -2,6 +2,7 @@ package org.example.travelexpertwebbackend.service.auth;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.example.travelexpertwebbackend.dto.CustomerDTO;
+import org.example.travelexpertwebbackend.dto.auth.LoginUserDTO;
 import org.example.travelexpertwebbackend.dto.auth.SignUpResponseDTO;
 import org.example.travelexpertwebbackend.entity.Agent;
 import org.example.travelexpertwebbackend.entity.Customer;
@@ -26,9 +27,7 @@ public class UserService implements UserDetailsService {
     private final AgentRepository agentRepository;
     private final CustomerRepository customerRepository;
 
-
-
-    public UserService(UserRepository userRepository, AgentRepository agentRepository,CustomerRepository customerRepository) {
+    public UserService(UserRepository userRepository, AgentRepository agentRepository, CustomerRepository customerRepository) {
         this.userRepository = userRepository;
         this.agentRepository = agentRepository;
         this.customerRepository = customerRepository;
@@ -76,7 +75,6 @@ public class UserService implements UserDetailsService {
     }
 
     public SignUpResponseDTO saveAgent(String username, String password, Integer agentId) {
-
         // find Agent by agentId
         Agent agent = agentRepository.findById(agentId)
                 .orElseThrow(() -> new EntityNotFoundException("Agent not found with id: " + agentId));
@@ -105,7 +103,6 @@ public class UserService implements UserDetailsService {
             // Update user details
             existingUser.setPasswordHash(new BCryptPasswordEncoder().encode(customerData.getPassword()));
             existingUser.setRole(Role.CUSTOMER.name());
-            // existingUser.setCustomerid(customerID); // Uncomment if needed
 
             // Save updated user
             User updatedUser = userRepository.save(existingUser);
@@ -135,5 +132,37 @@ public class UserService implements UserDetailsService {
         }
 
         return user.getCustomer();
+    }
+
+    public LoginUserDTO getLoginUserInfo(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        String[] roles = user.getRoles();
+        if (roles == null || roles.length == 0) {
+            throw new IllegalStateException("User has no roles assigned");
+        }
+
+        // Check if the user is a customer or agent
+        if (user.getCustomer() == null && user.getAgent() == null) {
+            throw new IllegalStateException("User is not registered as a customer or agent");
+        }
+
+        String fullName = user.getCustomer() != null ? getCustomerFullName(user) : getAgentFullName(user);
+
+        return new LoginUserDTO(
+                user.getId(),
+                fullName,
+                user.getUsername(),
+                user.getRoles()
+        );
+    }
+
+    private String getCustomerFullName(User user) {
+        return user.getCustomer().getCustfirstname() + " " + user.getCustomer().getCustlastname();
+    }
+
+    private String getAgentFullName(User user) {
+        return user.getAgent().getAgtFirstName() + " " + user.getAgent().getAgtLastName();
     }
 }

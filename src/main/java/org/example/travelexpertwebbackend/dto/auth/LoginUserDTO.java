@@ -1,22 +1,24 @@
 package org.example.travelexpertwebbackend.dto.auth;
 
-public class LoginResponseDTO {
-    private int id;
+import java.util.UUID;
+
+public class LoginUserDTO {
+    private UUID id;
     private String name;
     private String email;
-    private String role;
+    private String[] role;
 
-    public LoginResponseDTO() {
+    public LoginUserDTO() {
     }
 
-    public LoginResponseDTO(int id, String name, String email, String role) {
+    public LoginUserDTO(UUID id, String name, String email, String[] role) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.role = role;
     }
 
-    public int getId() {
+    public UUID getId() {
         return id;
     }
 
@@ -28,7 +30,7 @@ public class LoginResponseDTO {
         return email;
     }
 
-    public String getRole() {
+    public String[] getRole() {
         return role;
     }
 }
