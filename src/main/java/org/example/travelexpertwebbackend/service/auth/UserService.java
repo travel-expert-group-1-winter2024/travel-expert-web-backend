@@ -2,8 +2,8 @@ package org.example.travelexpertwebbackend.service.auth;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.example.travelexpertwebbackend.dto.CustomerDTO;
-import org.example.travelexpertwebbackend.dto.auth.LoginUserDTO;
 import org.example.travelexpertwebbackend.dto.auth.SignUpResponseDTO;
+import org.example.travelexpertwebbackend.dto.auth.UserInfoDTO;
 import org.example.travelexpertwebbackend.entity.Agent;
 import org.example.travelexpertwebbackend.entity.Customer;
 import org.example.travelexpertwebbackend.entity.auth.Role;
@@ -134,7 +134,7 @@ public class UserService implements UserDetailsService {
         return user.getCustomer();
     }
 
-    public LoginUserDTO getLoginUserInfo(String username) {
+    public UserInfoDTO getUserInfo(String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
@@ -150,7 +150,7 @@ public class UserService implements UserDetailsService {
 
         String fullName = user.getCustomer() != null ? getCustomerFullName(user) : getAgentFullName(user);
 
-        return new LoginUserDTO(
+        return new UserInfoDTO(
                 user.getId(),
                 fullName,
                 user.getUsername(),

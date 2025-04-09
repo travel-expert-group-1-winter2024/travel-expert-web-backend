@@ -2,16 +2,16 @@ package org.example.travelexpertwebbackend.dto.auth;
 
 import java.util.UUID;
 
-public class LoginUserDTO {
+public class UserInfoDTO {
     private UUID id;
     private String name;
     private String email;
     private String[] role;
 
-    public LoginUserDTO() {
+    public UserInfoDTO() {
     }
 
-    public LoginUserDTO(UUID id, String name, String email, String[] role) {
+    public UserInfoDTO(UUID id, String name, String email, String[] role) {
         this.id = id;
         this.name = name;
         this.email = email;
