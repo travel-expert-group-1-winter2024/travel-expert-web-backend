@@ -83,6 +83,8 @@ public class CustomerController {
         return updatedCustomer.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+
+
     @PostMapping("/register")
     public ResponseEntity<GenericApiResponse<CustomerDTO>> registerCustomer(@RequestBody CustomerDTO customerDTO) {
         try {
@@ -120,6 +122,20 @@ public class CustomerController {
                     .body(new GenericApiResponse<>(List.of(new ErrorInfo("An unexpected error occurred"))));
         }
     }
+//@PostMapping("/register")
+//public ResponseEntity<GenericApiResponse<CustomerDTO>> registerCustomer(@RequestBody CustomerDTO customerDTO) {
+//    try {
+//        Logger.debug("Registering customer" + customerDTO.getCustemail());
+//        CustomerDTO registeredCustomer = customerService.registerCustomer(customerDTO);
+//        Logger.info("Successfully registered customer" + registeredCustomer.getCustemail());
+//        return ResponseEntity.ok(new GenericApiResponse<>(registeredCustomer));
+//    } catch (Exception e) {
+//        Logger.error(e, "Error registering customer" + customerDTO.getCustemail());
+//        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new GenericApiResponse<>(List.of(new ErrorInfo("An unexpected error occurred."))));
+//    }
+//}
+
+
 
 
     @PostMapping("/updatecustomer/{id}")
