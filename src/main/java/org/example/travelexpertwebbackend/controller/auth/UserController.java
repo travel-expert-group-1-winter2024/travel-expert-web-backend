@@ -2,11 +2,8 @@ package org.example.travelexpertwebbackend.controller.auth;
 
 import jakarta.validation.Valid;
 import org.example.travelexpertwebbackend.dto.ErrorInfo;
-import org.example.travelexpertwebbackend.dto.GenericApiResponse;
-import org.example.travelexpertwebbackend.dto.auth.LoginRequestDTO;
-import org.example.travelexpertwebbackend.dto.auth.LoginResponseDTO;
-import org.example.travelexpertwebbackend.dto.auth.SignUpRequestDTO;
-import org.example.travelexpertwebbackend.dto.auth.SignUpResponseDTO;
+import org.example.travelexpertwebbackend.dto.auth.*;
+import org.example.travelexpertwebbackend.entity.Customer;
 import org.example.travelexpertwebbackend.security.JwtService;
 import org.example.travelexpertwebbackend.service.auth.UserService;
 import org.springframework.http.HttpStatus;
@@ -15,6 +12,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -52,7 +51,7 @@ public class UserController {
     }
 
     @PostMapping("/api/login")
-    public ResponseEntity<GenericApiResponse<LoginResponseDTO>> loginUser(@Valid @RequestBody LoginRequestDTO user) {
+    public ResponseEntity<AuthResponse<LoginResponseDTO>> loginUser(@Valid @RequestBody LoginRequestDTO user) {
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword())
@@ -60,18 +59,27 @@ public class UserController {
 
             if (authentication.isAuthenticated()) {
                 Logger.debug("Logging in user: " + user.getUsername());
-                return ResponseEntity.ok(new GenericApiResponse<>(
-                        new LoginResponseDTO(jwtService.generateToken(userService.loadUserByUsername(user.getUsername())))
-                ));
+                UserDetails userDetails = userService.loadUserByUsername(user.getUsername());
+                String jwt = jwtService.generateToken(userDetails);
+                Customer customer = userService.getCustomerByUsername(user.getUsername());
+                return ResponseEntity.ok(new AuthResponse<>(new LoginResponseDTO(
+                        customer.getId(),
+                        customer.getCustfirstname() + " " + customer.getCustlastname(),
+                        userDetails.getUsername(), // username is email
+                        userDetails.getAuthorities().stream()
+                                .map(GrantedAuthority::getAuthority)
+                                .findFirst()
+                                .orElse("USER") // Default role if not found
+                ), jwt));
             }
         } catch (BadCredentialsException ex) {
             Logger.warn("Bad credentials for user: " + user.getUsername());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new GenericApiResponse<>(List.of(new ErrorInfo("Username or password is incorrect"))));
+                    .body(new AuthResponse<>(List.of(new ErrorInfo("Username or password is incorrect"))));
         }
 
         // other error
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(new GenericApiResponse<>(List.of(new ErrorInfo("Authentication failed"))));
+                .body(new AuthResponse<>(List.of(new ErrorInfo("Authentication failed"))));
     }
 }
