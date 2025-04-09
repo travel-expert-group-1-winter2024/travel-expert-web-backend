@@ -150,13 +150,25 @@ public class UserService implements UserDetailsService {
             throw new IllegalStateException("User is not registered as a customer or agent");
         }
 
-        String fullName = user.getCustomer() != null ? getCustomerFullName(user) : getAgentFullName(user);
+        String fullName = null;
+        Integer customerId = null;
+        Integer agentId = null;
+
+        if (user.getCustomer() != null) {
+            customerId = user.getCustomer().getId();
+            fullName = getCustomerFullName(user);
+        } else if (user.getAgent() != null) {
+            agentId = user.getAgent().getId();
+            fullName = getAgentFullName(user);
+        }
 
         return new UserInfoDTO(
                 user.getId(),
                 fullName,
                 user.getUsername(),
-                user.getRoles()
+                user.getRoles(),
+                customerId,
+                agentId
         );
     }
 
