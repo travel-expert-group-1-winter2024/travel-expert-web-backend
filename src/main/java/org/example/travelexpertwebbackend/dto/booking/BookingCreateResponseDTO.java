@@ -8,6 +8,7 @@ import java.time.Instant;
 public class BookingCreateResponseDTO {
     private int bookingId;
     private String bookingNo;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private BigDecimal discount;
     private BigDecimal finalPrice;
     @JsonInclude(JsonInclude.Include.NON_NULL)
