@@ -64,7 +64,7 @@ public class BookingController {
             // Create a payment intent with the amount and currency
             // You can modify the amount and currency based on your logic
             long amount = paymentRequest.getPackagePrice() * 100; // Amount in cents (1000 cents = $10.00)
-            String currency = "cad"; // Modify this if needed
+            String currency = "CAD"; // Modify this if needed
 
             // Create payment intent
             PaymentIntent paymentIntent = PaymentIntent.create(
@@ -84,7 +84,7 @@ public class BookingController {
         return response;
     }
 
-    @GetMapping("/cost-summary")
+    @PostMapping("/cost-summary")
     public ResponseEntity<GenericApiResponse<CostSummaryResponseDTO>>
     getPackageCostSummary(Authentication authentication, @Valid @RequestBody BookingCreateRequestDTO responseDTO){
         String username = "";

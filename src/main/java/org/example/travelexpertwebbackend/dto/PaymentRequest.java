@@ -34,4 +34,8 @@ public class PaymentRequest {
         public int getPackagePrice(){
             return packagePrice;
         }
+
+    public void setPackagePrice(int packagePrice) {
+        this.packagePrice = packagePrice;
+    }
 }
