@@ -3,10 +3,7 @@ package org.example.travelexpertwebbackend.controller.auth;
 import jakarta.validation.Valid;
 import org.example.travelexpertwebbackend.dto.ErrorInfo;
 import org.example.travelexpertwebbackend.dto.GenericApiResponse;
-import org.example.travelexpertwebbackend.dto.auth.LoginRequestDTO;
-import org.example.travelexpertwebbackend.dto.auth.LoginResponseDTO;
-import org.example.travelexpertwebbackend.dto.auth.SignUpRequestDTO;
-import org.example.travelexpertwebbackend.dto.auth.SignUpResponseDTO;
+import org.example.travelexpertwebbackend.dto.auth.*;
 import org.example.travelexpertwebbackend.security.JwtService;
 import org.example.travelexpertwebbackend.service.auth.UserService;
 import org.springframework.http.HttpStatus;
@@ -15,6 +12,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -52,26 +51,48 @@ public class UserController {
     }
 
     @PostMapping("/api/login")
-    public ResponseEntity<GenericApiResponse<LoginResponseDTO>> loginUser(@Valid @RequestBody LoginRequestDTO user) {
+    public ResponseEntity<AuthResponse<UserInfoDTO>> loginUser(@Valid @RequestBody LoginRequestDTO user) {
         try {
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword())
-            );
-
+            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
             if (authentication.isAuthenticated()) {
-                Logger.debug("Logging in user: " + user.getUsername());
-                return ResponseEntity.ok(new GenericApiResponse<>(
-                        new LoginResponseDTO(jwtService.generateToken(userService.loadUserByUsername(user.getUsername())))
-                ));
+                // Get user details and generate JWT
+                UserDetails userDetails = userService.loadUserByUsername(user.getUsername());
+                String jwt = jwtService.generateToken(userDetails);
+
+                // Get user info
+                UserInfoDTO userInfo = userService.getUserInfo(user.getUsername());
+
+                return ResponseEntity.ok(new AuthResponse<>(userInfo, jwt));
             }
         } catch (BadCredentialsException ex) {
             Logger.warn("Bad credentials for user: " + user.getUsername());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new GenericApiResponse<>(List.of(new ErrorInfo("Username or password is incorrect"))));
+                    .body(new AuthResponse<>(List.of(new ErrorInfo("Username or password is incorrect"))));
         }
 
         // other error
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(new GenericApiResponse<>(List.of(new ErrorInfo("Authentication failed"))));
+                .body(new AuthResponse<>(List.of(new ErrorInfo("Authentication failed"))));
+    }
+
+    @GetMapping("/api/auth/me")
+    public ResponseEntity<GenericApiResponse<UserInfoDTO>> getCurrentUser(Authentication authentication) {
+        try {
+            if (authentication == null || !authentication.isAuthenticated()) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(new GenericApiResponse<>(List.of(new ErrorInfo("User not authenticated"))));
+            }
+            String username = (String) authentication.getPrincipal();
+            UserInfoDTO userInfo = userService.getUserInfo(username);
+            return ResponseEntity.ok(new GenericApiResponse<>(userInfo));
+        } catch (IllegalArgumentException e) {
+            Logger.error(e, "Error retrieving user info");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new GenericApiResponse<>(List.of(new ErrorInfo("User not found"))));
+        } catch (Exception e) {
+            Logger.error(e, "Error retrieving user info");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new GenericApiResponse<>(List.of(new ErrorInfo("Failed to retrieve user info"))));
+        }
     }
 }

@@ -15,9 +15,10 @@ import org.example.travelexpertwebbackend.repository.ProductsSupplierRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -156,8 +157,8 @@ public class PackageService {
     }
 
     @Transactional
-    public List<Package> searchAndSort(String search, String sortBy, String order,
-                                       LocalDateTime startDate, LocalDateTime endDate) {
+    public List<PackageDetailsDTO> searchAndSort(String search, String sortBy, String order,
+                                                 LocalDateTime startDate, LocalDateTime endDate) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Package> query = cb.createQuery(Package.class);
         Root<Package> packageRoot = query.from(Package.class);
@@ -195,6 +196,9 @@ public class PackageService {
             query.orderBy("desc".equalsIgnoreCase(order) ? cb.desc(ratingSubquery) : cb.asc(ratingSubquery));
         }
 
-        return entityManager.createQuery(query).getResultList();
+        List<Package> results = entityManager.createQuery(query).getResultList();
+        return results.stream()
+                .map(this::mapToPackageDetailsDTO)
+                .collect(Collectors.toList());
     }
 }

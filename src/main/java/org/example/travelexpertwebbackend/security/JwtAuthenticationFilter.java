@@ -52,7 +52,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                             userDetails.getPassword(),
                             userDetails.getAuthorities()
                     );
-                    Logger.debug("User roles: " + userDetails.getAuthorities());
                     // add this the auth token to the request
                     authenticationToken.setDetails(new WebAuthenticationDetailsSource()
                             .buildDetails(request)

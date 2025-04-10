@@ -10,9 +10,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
 import org.tinylog.Logger;
 
+import org.springframework.web.multipart.MultipartFile;
+
+
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -22,6 +30,9 @@ public class CustomerService {
     @Autowired
     private final CustomerRepository customerRepository;
     private final AgentRepository agentRepository;
+
+    private static final String UPLOAD_DIR = "customer-uploads/";
+
     @Autowired
     private CustomerTierService customerTierService;
     @Autowired
@@ -43,6 +54,75 @@ public class CustomerService {
     public List<CustomerDTO> getAllCustomers() {
         List<Customer> customers = customerRepository.findAll();
         return customers.stream().map(CustomerDTO::new).collect(Collectors.toList());
+    }
+
+    public String uploadCustomerPhoto(int customerId, MultipartFile image) throws IOException {
+        Optional<Customer> optionalCustomer = customerRepository.findById(customerId);
+        // Validate customer exists
+        if (optionalCustomer.isEmpty()) {
+            throw new IllegalArgumentException("Customer not found");
+        }
+
+        // Validate file
+        validateImageFile(image);
+
+        if (image.isEmpty() || image.getOriginalFilename() == null) {
+            throw new IllegalArgumentException("File is empty");
+        }
+
+        Customer customer = optionalCustomer.get();
+        String filename = generateUniqueFilename(customerId, image.getOriginalFilename());
+
+        Path dirPath = Paths.get(UPLOAD_DIR);
+        if (!Files.exists(dirPath)) {
+            Files.createDirectories(dirPath);
+        }
+
+        Path filePath = dirPath.resolve(filename);
+        Files.write(filePath, image.getBytes());
+
+        customer.setPhotoPath(filename);
+        customerRepository.save(customer);
+
+        return filename;
+    }
+
+    private void validateImageFile(MultipartFile file) {
+        if (file.getContentType() == null) {
+            throw new IllegalArgumentException("File type cannot be determined");
+        }
+
+        String contentType = file.getContentType();
+        if (!contentType.equals("image/jpeg") &&
+                !contentType.equals("image/png") &&
+                !contentType.equals("image/jpg")) {
+            throw new IllegalArgumentException("Only JPEG/JPG/PNG images are allowed");
+        }
+    }
+
+    public byte[] getCustomerPhoto(int id) {
+        Optional<Customer> optionalCustomer = customerRepository.findById(id);
+        if (optionalCustomer.isEmpty()) {
+            throw new IllegalArgumentException("Customer not found");
+        }
+
+        Customer customer = optionalCustomer.get();
+        String photoPath = customer.getPhotoPath();
+        if (photoPath == null || photoPath.isEmpty()) {
+            throw new IllegalArgumentException("Customer photo not found");
+        }
+
+        Path path = Paths.get(UPLOAD_DIR).resolve(photoPath);
+        try {
+            return Files.readAllBytes(path);
+        } catch (IOException e) {
+            throw new RuntimeException("Error reading photo file", e);
+        }
+    }
+
+    private String generateUniqueFilename(int customerId, String originalFilename) {
+        String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+        return "customer-" + customerId + "-" + System.currentTimeMillis() + extension;
     }
 
     // Get customer details by ID
