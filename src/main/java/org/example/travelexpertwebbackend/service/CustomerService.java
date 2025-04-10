@@ -10,7 +10,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import org.tinylog.Logger;
+
 import org.springframework.web.multipart.MultipartFile;
+
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -243,30 +247,6 @@ public class CustomerService {
         Random random = new Random();
         return existingAgents.get(random.nextInt(existingAgents.size()));
     }
-
-    /**
-     * This method acts as the first check point before proceeding to create the customer and optional user objects
-     * @param customerDTO The data being sent from the client, pertaining to the customer, in this case specifically the email address
-     */
-    private void validateEmailExistence(CustomerDTO customerDTO){
-        Optional<User> existingUser = userRepository.findByUsername(customerDTO.getCustemail());
-        if (existingUser.isPresent() && !isAgentEmail(customerDTO.getCustemail())) {
-            throw new IllegalStateException("Email already exists in our records.");
-        }
-    }
-
-    /**
-     * This method checks to see if the email being entered belongs to an Agent
-     * @param email The email being checked
-     * @return True if it is a registered Agent email, false if otherwise.
-     */
-    private boolean isAgentEmail(String email) {
-        return userRepository.findByUsername(email)
-                .map(user -> Role.AGENT.name().equalsIgnoreCase(user.getRole()))
-                .orElse(false);
-
-    }
-
 
 
 
