@@ -69,7 +69,7 @@ public class BookingService {
         String bookingNo = generateBookingNumber();
         double travelerCount = requestDTO.getTravelerCount();
         BigDecimal discount = customerTierService.calculateDiscount(customer, customer.getCustomerTier(), totalPrice);
-        int pointsEarned = calculatePointToEarn(totalPrice);
+        Integer pointsEarned = calculatePointToEarn(totalPrice);
         BigDecimal finalPrice = calculateFinalPrice(totalPrice, discount);
 
         boolean isReservation = isReservationMode(requestDTO.getBookingMode());
@@ -123,10 +123,10 @@ public class BookingService {
         return new BookingCreateResponseDTO(
                 savedBooking.getId(),
                 savedBooking.getBookingNo(),
-                discount,
+                savedBooking.getTotalDiscount(),
                 savedBooking.getFinalPrice(),
                 newBalance, // optional
-                pointsEarned,
+                savedBooking.getPointsEarned(),
                 isNewTier ? customerTier.getName() : null, // optional
                 savedBooking.getBookingStatus().name(),
                 savedBooking.getReservedDatetime(), // optional
