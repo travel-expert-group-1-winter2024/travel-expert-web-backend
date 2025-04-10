@@ -5,10 +5,7 @@ import org.example.travelexpertwebbackend.dto.booking.BookingCreateRequestDTO;
 import org.example.travelexpertwebbackend.dto.booking.BookingCreateResponseDTO;
 import org.example.travelexpertwebbackend.entity.*;
 import org.example.travelexpertwebbackend.entity.Package;
-import org.example.travelexpertwebbackend.repository.BookingRepository;
-import org.example.travelexpertwebbackend.repository.PackageRepository;
-import org.example.travelexpertwebbackend.repository.TransactionRepository;
-import org.example.travelexpertwebbackend.repository.TripTypesRepository;
+import org.example.travelexpertwebbackend.repository.*;
 import org.example.travelexpertwebbackend.service.auth.UserService;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +21,7 @@ public class BookingService {
     private final TransactionRepository transactionRepository;
     private final CustomerTierService customerTierService;
     private final UserService userService;
+    private final BookingDetailRepository bookingDetailRepository;
 
     public BookingService(
             BookingRepository bookingRepository,
@@ -31,13 +29,14 @@ public class BookingService {
             TripTypesRepository tripTypesRepository,
             TransactionRepository transactionRepository,
             CustomerTierService customerTierService,
-            UserService userService) {
+            UserService userService, BookingDetailRepository bookingDetailRepository) {
         this.bookingRepository = bookingRepository;
         this.packageRepository = packageRepository;
         this.tripTypesRepository = tripTypesRepository;
         this.customerTierService = customerTierService;
         this.userService = userService;
         this.transactionRepository = transactionRepository;
+        this.bookingDetailRepository = bookingDetailRepository;
     }
 
     // Create a new booking
@@ -110,6 +109,9 @@ public class BookingService {
             // set booking detail to booking
             bookingDetail.setBooking(booking);
             booking.getBookingDetails().add(bookingDetail);
+
+            // save booking detail
+            bookingDetailRepository.save(bookingDetail);
         }
 
         // update customer points
