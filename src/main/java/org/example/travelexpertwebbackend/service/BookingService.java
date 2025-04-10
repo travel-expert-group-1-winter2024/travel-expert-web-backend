@@ -59,7 +59,14 @@ public class BookingService {
         int pointsEarned = calculatePointToEarn(totalPrice);
         BigDecimal finalPrice = calculateFinalPrice(totalPrice, discount);
 
-        BigDecimal newBalance = processPayment(requestDTO.getPaymentMethod(), customer, finalPrice, aPackage.getPkgname(), bookingNo);
+        BigDecimal newBalance = null;
+        boolean isReservation = requestDTO.getBookingMode() == BookingCreateRequestDTO.BookingMode.RESERVE;
+        Instant reservedUntil = null;
+        if (isReservation) {
+            reservedUntil = Instant.now().plusSeconds(24 * 60 * 60); // 24 hours
+        } else {
+            newBalance = processPayment(requestDTO.getPaymentMethod(), customer, finalPrice, aPackage.getPkgname(), bookingNo);
+        }
 
         Booking booking = new Booking();
         booking.setBookingDate(Instant.now());
@@ -68,6 +75,8 @@ public class BookingService {
         booking.setTotalDiscount(discount);
         booking.setPointsEarned(pointsEarned);
         booking.setFinalPrice(finalPrice);
+        booking.setBookingStatus(isReservation ? Booking.BookingStatus.RESERVED : Booking.BookingStatus.COMPLETED);
+        booking.setReservedDatetime(reservedUntil);
 
         // set associated entities
         booking.setTripType(tripType);
@@ -115,7 +124,7 @@ public class BookingService {
                 isNewTier ? customerTier.getName() : null, // optional
                 savedBooking.getBookingStatus().name(),
                 savedBooking.getReservedDatetime(), // optional
-                false // TODO: implement payment due logic
+                isReservation
         );
     }
 
