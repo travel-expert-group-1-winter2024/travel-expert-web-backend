@@ -1,21 +1,25 @@
 package org.example.travelexpertwebbackend.controller;
 
-import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
-import com.stripe.model.PaymentIntent;
 import jakarta.validation.Valid;
 import org.example.travelexpertwebbackend.dto.ErrorInfo;
 import org.example.travelexpertwebbackend.dto.GenericApiResponse;
 import org.example.travelexpertwebbackend.dto.PaymentRequest;
+import org.example.travelexpertwebbackend.dto.booking.BookingConfirmRequestDTO;
 import org.example.travelexpertwebbackend.dto.booking.BookingCreateRequestDTO;
 import org.example.travelexpertwebbackend.dto.booking.BookingCreateResponseDTO;
 import org.example.travelexpertwebbackend.dto.booking.CostSummaryResponseDTO;
 import org.example.travelexpertwebbackend.entity.Customer;
 import org.example.travelexpertwebbackend.service.BookingService;
+import org.example.travelexpertwebbackend.service.StripeService;
 import org.example.travelexpertwebbackend.service.auth.UserService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.tinylog.Logger;
 
 import java.util.HashMap;
@@ -28,13 +32,12 @@ public class BookingController {
 
     private final BookingService bookingService;
     private final UserService userService;
+    private final StripeService stripeService;
 
-    static {
-        Stripe.apiKey = "sk_test_51RC3awBOTKXX5G8ladKciV4ZeOkJB1Rig1pAgUu3Dl7pfv9b0KDaLrpmnYtTQNxjBMxmeAu8NUdAwy6AyxSndhtb004grNkBb2";
-    }
-    public BookingController(BookingService bookingService, UserService userService) {
+    public BookingController(BookingService bookingService, UserService userService, StripeService stripeService) {
         this.bookingService = bookingService;
         this.userService = userService;
+        this.stripeService = stripeService;
     }
 
     @PostMapping()
@@ -60,24 +63,9 @@ public class BookingController {
     public Map<String, Object> createPaymentIntent(@RequestBody PaymentRequest paymentRequest) {
         Map<String, Object> response = new HashMap<>();
         try {
-            // Create a payment intent with the amount and currency
-            // You can modify the amount and currency based on your logic
-            long amount = paymentRequest.getPackagePrice() * 100; // Amount in cents (1000 cents = $10.00)
-            String currency = "CAD"; // Modify this if needed
-
-            // Create payment intent
-            PaymentIntent paymentIntent = PaymentIntent.create(
-                    new HashMap<String, Object>() {{
-                        put("amount", amount);
-                        put("currency", currency);
-                        // Additional params based on your requirements can go here
-                    }}
-            );
-
-            // Return the clientSecret of the payment intent
-            response.put("clientSecret", paymentIntent.getClientSecret());
+            return stripeService.createStripePaymentIntent(paymentRequest);
         } catch (StripeException e) {
-            // Handle error
+            Logger.error(e, "Failed to create payment intent");
             response.put("error", e.getMessage());
         }
         return response;
@@ -85,12 +73,27 @@ public class BookingController {
 
     @PostMapping("/cost-summary")
     public ResponseEntity<GenericApiResponse<CostSummaryResponseDTO>>
-    getPackageCostSummary(Authentication authentication, @Valid @RequestBody BookingCreateRequestDTO responseDTO){
+    getPackageCostSummary(Authentication authentication, @Valid @RequestBody BookingCreateRequestDTO responseDTO) {
         String username = "";
-            username = (String) authentication.getPrincipal();
-            // find customer by username
-            Customer customer = userService.getCustomerByUsername(username);
-        CostSummaryResponseDTO bookingCreateResponseDTO = bookingService.getCostSummary(customer,responseDTO);
+        username = (String) authentication.getPrincipal();
+        // find customer by username
+        Customer customer = userService.getCustomerByUsername(username);
+        CostSummaryResponseDTO bookingCreateResponseDTO = bookingService.getCostSummary(customer, responseDTO);
         return ResponseEntity.ok(new GenericApiResponse<>(bookingCreateResponseDTO));
     }
+
+    @PostMapping("/confirm")
+    public ResponseEntity<GenericApiResponse<BookingCreateResponseDTO>> confirmBooking(@Valid @RequestBody BookingConfirmRequestDTO responseDTO) {
+        try {
+            BookingCreateResponseDTO response = bookingService.confirmBooking(responseDTO.getBookingId(), responseDTO.getPaymentMethod(), responseDTO.getPaymentId());
+            return ResponseEntity.ok(new GenericApiResponse<>(response));
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            return ResponseEntity.badRequest()
+                    .body(new GenericApiResponse<>(List.of(new ErrorInfo(e.getMessage()))));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new GenericApiResponse<>(List.of(new ErrorInfo("An internal error occurred."))));
+        }
+    }
+
 }
