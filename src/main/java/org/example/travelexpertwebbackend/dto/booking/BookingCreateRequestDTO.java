@@ -44,6 +44,10 @@ public class BookingCreateRequestDTO {
         this.travelerCount = travelerCount;
     }
 
+    public BookingMode getBookingMode() {
+        return bookingMode;
+    }
+
     public enum BookingMode {
         NORMAL,
         RESERVE
