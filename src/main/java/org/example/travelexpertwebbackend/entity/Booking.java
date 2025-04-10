@@ -171,6 +171,7 @@ public class Booking {
     }
 
     public enum BookingStatus {
+        PENDING, // for pending payment and old record
         RESERVED, // for reserve mode
         CONFIRMED, // for normal mode
         CANCELLED, // future use
