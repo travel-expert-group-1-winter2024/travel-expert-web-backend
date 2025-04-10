@@ -51,7 +51,7 @@ public class BookingController {
     }
 
     @PostMapping("/confirm")
-    public ResponseEntity<GenericApiResponse<BookingCreateResponseDTO>> confirmBooking(@RequestBody BookingConfirmRequestDTO responseDTO) {
+    public ResponseEntity<GenericApiResponse<BookingCreateResponseDTO>> confirmBooking(@Valid @RequestBody BookingConfirmRequestDTO responseDTO) {
         try {
             BookingCreateResponseDTO response = bookingService.confirmBooking(responseDTO.getBookingId(), responseDTO.getPaymentMethod());
             return ResponseEntity.ok(new GenericApiResponse<>(response));
