@@ -150,10 +150,19 @@ public class BookingService {
 
         Customer customer = booking.getCustomer();
         BigDecimal finalPrice = booking.getFinalPrice();
+        BigDecimal discount = booking.getTotalDiscount();
         Package aPackage = booking.getPackageid();
 
         // Perform payment
         BigDecimal newBalance = processPayment(paymentMethod, customer, finalPrice, aPackage.getPkgname(), booking.getBookingNo());
+
+        // checking and upgrading customer tier
+        BigDecimal priceBeforeDiscount = finalPrice.subtract(discount);
+        int pointsEarned = calculatePointToEarn(priceBeforeDiscount);
+
+        customer.setPoints(customer.getPoints() + pointsEarned);
+        CustomerTier customerTier = updateCustomerTierIfEligible(customer);
+        boolean isNewTier = customerTier != null;
 
         booking.setBookingStatus(Booking.BookingStatus.COMPLETED);
         booking.setReservedDatetime(null); // Clear reservation time
@@ -166,7 +175,7 @@ public class BookingService {
                 booking.getFinalPrice(),
                 newBalance,
                 booking.getPointsEarned(),
-                null,
+                isNewTier ? customerTier.getName() : null,
                 booking.getBookingStatus().name(),
                 null,
                 false
