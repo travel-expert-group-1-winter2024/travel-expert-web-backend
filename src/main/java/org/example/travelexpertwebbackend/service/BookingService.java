@@ -109,9 +109,6 @@ public class BookingService {
             // set booking detail to booking
             bookingDetail.setBooking(booking);
             booking.getBookingDetails().add(bookingDetail);
-
-            // save booking detail
-            bookingDetailRepository.save(bookingDetail);
         }
 
         // update customer points

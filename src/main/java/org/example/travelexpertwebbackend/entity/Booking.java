@@ -52,7 +52,7 @@ public class Booking {
     @Column(name = "final_price")
     private BigDecimal finalPrice;
 
-    @OneToMany(mappedBy = "booking")
+    @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL)
     private Set<BookingDetail> bookingDetails = new LinkedHashSet<>();
 
     @Column(name = "reserved_datetime")
