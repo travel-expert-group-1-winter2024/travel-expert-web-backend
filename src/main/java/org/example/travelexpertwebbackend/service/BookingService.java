@@ -132,7 +132,9 @@ public class BookingService {
                 isNewTier ? customerTier.getName() : null, // optional
                 savedBooking.getBookingStatus().name(),
                 savedBooking.getReservedDatetime(), // optional
-                isReservation
+                isReservation,
+                requestDTO.getPaymentMethod(),
+                savedBooking.getPackageid().getId()
         );
     }
 
@@ -184,7 +186,9 @@ public class BookingService {
                 isNewTier ? customerTier.getName() : null,
                 booking.getBookingStatus().name(),
                 null,
-                false
+                false,
+                paymentMethod,
+                booking.getPackageid().getId()
         );
     }
 

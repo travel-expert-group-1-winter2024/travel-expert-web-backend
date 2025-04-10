@@ -1,6 +1,7 @@
 package org.example.travelexpertwebbackend.dto.booking;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.example.travelexpertwebbackend.service.BookingService;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -20,8 +21,8 @@ public class BookingCreateResponseDTO {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Instant reservedUntil; // optional
     private Boolean paymentDue;
-
-
+    private BookingService.PaymentMethod paymentMethod;
+    private Integer packageId;
 
     public BookingCreateResponseDTO() {
     }
@@ -36,7 +37,7 @@ public class BookingCreateResponseDTO {
         this.newCustomerTier = newCustomerTier;
     }
 
-    public BookingCreateResponseDTO(int bookingId, String bookingNo, BigDecimal discount, BigDecimal finalPrice, BigDecimal newBalance, int pointsEarned, String newCustomerTier, String status, Instant reservedUntil, Boolean paymentDue) {
+    public BookingCreateResponseDTO(int bookingId, String bookingNo, BigDecimal discount, BigDecimal finalPrice, BigDecimal newBalance, int pointsEarned, String newCustomerTier, String status, Instant reservedUntil, Boolean paymentDue, BookingService.PaymentMethod paymentMethod, Integer packageId) {
         this.bookingId = bookingId;
         this.bookingNo = bookingNo;
         this.discount = discount;
@@ -47,6 +48,8 @@ public class BookingCreateResponseDTO {
         this.status = status;
         this.reservedUntil = reservedUntil;
         this.paymentDue = paymentDue;
+        this.paymentMethod = paymentMethod;
+        this.packageId = packageId;
     }
 
     public int getBookingId() {
@@ -87,5 +90,13 @@ public class BookingCreateResponseDTO {
 
     public Boolean getPaymentDue() {
         return paymentDue;
+    }
+
+    public BookingService.PaymentMethod getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public Integer getPackageId() {
+        return packageId;
     }
 }
