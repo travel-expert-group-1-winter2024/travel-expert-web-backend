@@ -55,9 +55,10 @@ public class BookingService {
                 if (booking.getReservedDatetime().isBefore(Instant.now())) { // more than 24 hours
                     booking.setBookingStatus(Booking.BookingStatus.EXPIRED);
                     bookingRepository.save(booking);
-                } else { // less than 24 hours
-                    throw new IllegalArgumentException("Package is already reserved");
                 }
+//                else { // less than 24 hours
+//                    throw new IllegalArgumentException("Package is already reserved");
+//                }
             }
         }
 
@@ -258,16 +259,6 @@ public class BookingService {
         return null;
     }
 
-    public enum PaymentMethod {
-        WALLET,
-        STRIPE,
-    }
-
-    public enum BookingMode {
-        NORMAL,
-        RESERVE
-    }
-
     @Transactional
     public CostSummaryResponseDTO getCostSummary(Customer customer, BookingCreateRequestDTO requestDTO) {
         Package aPackage = packageRepository.findById(requestDTO.getPackageId())
@@ -313,13 +304,23 @@ public class BookingService {
         return response;
     }
 
-
-    public BigDecimal getfinalPriceWithoutTax(BigDecimal packageSubtotal, BigDecimal charges, BigDecimal agencyFees){
+    public BigDecimal getfinalPriceWithoutTax(BigDecimal packageSubtotal, BigDecimal charges, BigDecimal agencyFees) {
         return packageSubtotal.add(charges).add(agencyFees);
     }
 
-    public BigDecimal getTax(BigDecimal withoutTaxPrice){
+    public BigDecimal getTax(BigDecimal withoutTaxPrice) {
         return withoutTaxPrice.multiply(BigDecimal.valueOf(5)).divide(BigDecimal.valueOf(100));
+    }
+
+
+    public enum PaymentMethod {
+        WALLET,
+        STRIPE,
+    }
+
+    public enum BookingMode {
+        NORMAL,
+        RESERVE
     }
 
 }
