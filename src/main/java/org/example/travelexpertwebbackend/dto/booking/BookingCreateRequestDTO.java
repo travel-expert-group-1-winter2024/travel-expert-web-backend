@@ -19,6 +19,7 @@ public class BookingCreateRequestDTO {
     private BookingService.BookingMode bookingMode = BookingService.BookingMode.NORMAL;
     @NotNull(message = "Payment method cannot be null")
     private BookingService.PaymentMethod paymentMethod;
+    private String paymentId; // for Stripe
 
     public BookingCreateRequestDTO() {
     }
@@ -63,5 +64,11 @@ public class BookingCreateRequestDTO {
         this.paymentMethod = paymentMethod;
     }
 
+    public String getPaymentId() {
+        return paymentId;
+    }
 
+    public void setPaymentId(String paymentId) {
+        this.paymentId = paymentId;
+    }
 }

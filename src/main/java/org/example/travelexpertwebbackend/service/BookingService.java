@@ -1,5 +1,7 @@
 package org.example.travelexpertwebbackend.service;
 
+import com.stripe.exception.StripeException;
+import com.stripe.model.PaymentIntent;
 import jakarta.transaction.Transactional;
 import org.example.travelexpertwebbackend.dto.booking.BookingCreateRequestDTO;
 import org.example.travelexpertwebbackend.dto.booking.BookingCreateResponseDTO;
@@ -11,6 +13,7 @@ import org.example.travelexpertwebbackend.repository.PackageRepository;
 import org.example.travelexpertwebbackend.repository.TransactionRepository;
 import org.example.travelexpertwebbackend.repository.TripTypesRepository;
 import org.springframework.stereotype.Service;
+import org.tinylog.Logger;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -23,19 +26,22 @@ public class BookingService {
     private final TripTypesRepository tripTypesRepository;
     private final TransactionRepository transactionRepository;
     private final CustomerTierService customerTierService;
+    private final StripeService stripeService;
 
     public BookingService(
             BookingRepository bookingRepository,
             PackageRepository packageRepository,
             TripTypesRepository tripTypesRepository,
             TransactionRepository transactionRepository,
-            CustomerTierService customerTierService) {
+            CustomerTierService customerTierService, StripeService stripeService) {
         this.bookingRepository = bookingRepository;
         this.packageRepository = packageRepository;
         this.tripTypesRepository = tripTypesRepository;
         this.transactionRepository = transactionRepository;
         this.customerTierService = customerTierService;
+        this.stripeService = stripeService;
     }
+
 
     // Create a new booking
     @Transactional
@@ -62,6 +68,9 @@ public class BookingService {
         TripType tripType = tripTypesRepository.findById(requestDTO.getTripTypeId())
                 .orElseThrow(() -> new IllegalArgumentException("Trip Type not found with ID: " + requestDTO.getTripTypeId()));
 
+        // check Stripe payment method's requirement
+        checkStripePaymentRequirement(requestDTO.getPaymentMethod(), requestDTO.getPaymentId());
+
         // create a new booking
         BigDecimal totalPrice = calculateTotalPrice(aPackage.getPkgbaseprice(), aPackage.getPkgagencycommission(), requestDTO.getTravelerCount());
         String bookingNo = generateBookingNumber();
@@ -72,7 +81,13 @@ public class BookingService {
 
         boolean isReservation = isReservationMode(requestDTO.getBookingMode());
         Instant reservedUntil = isReservation ? getReservationExpiry() : null;
-        BigDecimal newBalance = isReservation ? null : processPayment(requestDTO.getPaymentMethod(), customer, finalPrice, aPackage.getPkgname(), bookingNo);
+        BigDecimal newBalance = null;
+        try {
+            newBalance = isReservation ? null : processPayment(requestDTO.getPaymentMethod(), customer, finalPrice, aPackage.getPkgname(), bookingNo, requestDTO.getPaymentId());
+        } catch (StripeException e) {
+            Logger.error(e, "Error processing payment");
+            throw new RuntimeException(e);
+        }
 
         Booking booking = new Booking();
         booking.setBookingDate(Instant.now());
@@ -135,7 +150,7 @@ public class BookingService {
     }
 
     @Transactional
-    public BookingCreateResponseDTO confirmBooking(Integer bookingId, PaymentMethod paymentMethod) {
+    public BookingCreateResponseDTO confirmBooking(Integer bookingId, PaymentMethod paymentMethod, String paymentId) {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new IllegalArgumentException("Booking not found with ID: " + bookingId));
 
@@ -149,13 +164,21 @@ public class BookingService {
             throw new IllegalStateException("Reservation has expired and cannot be confirmed.");
         }
 
+        checkStripePaymentRequirement(paymentMethod, paymentId);
+
         Customer customer = booking.getCustomer();
         BigDecimal finalPrice = booking.getFinalPrice();
         BigDecimal discount = booking.getTotalDiscount();
         Package aPackage = booking.getPackageid();
 
         // Perform payment
-        BigDecimal newBalance = processPayment(paymentMethod, customer, finalPrice, aPackage.getPkgname(), booking.getBookingNo());
+        BigDecimal newBalance = null;
+        try {
+            newBalance = processPayment(paymentMethod, customer, finalPrice, aPackage.getPkgname(), booking.getBookingNo(), paymentId);
+        } catch (StripeException e) {
+            Logger.error(e, "Error processing payment");
+            throw new RuntimeException(e);
+        }
 
         // checking and upgrading customer tier
         BigDecimal priceBeforeDiscount = finalPrice.subtract(discount);
@@ -188,7 +211,7 @@ public class BookingService {
         );
     }
 
-    private BigDecimal processPayment(PaymentMethod paymentMethod, Customer customer, BigDecimal finalPrice, String pkgName, String bookingNo) {
+    private BigDecimal processPayment(PaymentMethod paymentMethod, Customer customer, BigDecimal finalPrice, String pkgName, String bookingNo, String paymentId) throws StripeException {
         switch (paymentMethod) {
             case WALLET -> {
                 Wallet wallet = customer.getWallet();
@@ -211,6 +234,20 @@ public class BookingService {
                 return newBalance;
             }
             case STRIPE -> {
+
+                PaymentIntent paymentIntent = stripeService.getPaymentIntent(paymentId);
+                String status = paymentIntent.getStatus();
+
+                if (!"succeeded".equals(status)) {
+                    throw new IllegalArgumentException("Payment failed with status: " + status);
+                }
+                Transaction transaction = new Transaction();
+                transaction.setTransactionDate(Instant.now());
+                transaction.setAmount(finalPrice);
+                transaction.setTransactionType(Transaction.TransactionType.DEBIT);
+                transaction.setDescription("Booking for " + pkgName + " with booking number " + bookingNo);
+                transaction.setStripeReference(paymentId);
+                transactionRepository.save(transaction);
 
                 return null;
             }
@@ -246,6 +283,12 @@ public class BookingService {
 
     private Instant getReservationExpiry() {
         return Instant.now().plusSeconds(24 * 60 * 60); // 24 hours
+    }
+
+    private void checkStripePaymentRequirement(PaymentMethod paymentMethod, String paymentId) {
+        if (paymentMethod.equals(PaymentMethod.STRIPE) && paymentId.isEmpty()) {
+            throw new IllegalArgumentException("Payment ID is required for Stripe payment method");
+        }
     }
 
     private CustomerTier updateCustomerTierIfEligible(Customer customer) {
