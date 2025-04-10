@@ -1,19 +1,21 @@
+if (booking.getBookingStatus() == RESERVED &&
+Instant.now().isAfter(booking.getReservedDatetime())) {
+booking.setBookingStatus(EXPIRED);
+bookingRepository.save(booking);
+}
 spring.application.name=travel-expert-web-backend
-
 # db connection
 # db access
 spring.datasource.url=jdbc:postgresql://localhost:5432/travelexperts
-spring.datasource.username=postgres
-spring.datasource.password=P@ssw0rd
+spring.datasource.username=USERNAME_HERE
+spring.datasource.password=PASSWORD_HERE
 spring.datasource.driver-class-name=org.postgresql.Driver
-
 # db configuration
 spring.jpa.hibernate.ddl-auto=none
 
 # swagger
 springdoc.api-docs.enabled=true
 springdoc.swagger-ui.enabled=true
-
 logging.level.org.springframework.security=DEBUG
 
 
@@ -25,6 +27,8 @@ google.places.api.key=YOUR_API_KEY
 spring.mail.host=smtp.gmail.com
 spring.mail.port=587
 spring.mail.username=cluelessgamers7400@gmail.com
-spring.mail.password=mmmvqwmdlokgnfsk
+spring.mail.password=PASSWORD_HERE
 spring.mail.properties.mail.smtp.auth=true
 spring.mail.properties.mail.smtp.starttls.enable=true
+# Stripe Configuration
+stripe.secret-key=STRIPE_SECRET_KEY

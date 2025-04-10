@@ -9,6 +9,7 @@ import java.time.Instant;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+
 @Entity
 @Table(name = "bookings")
 public class Booking {
@@ -51,10 +52,34 @@ public class Booking {
     @Column(name = "final_price")
     private BigDecimal finalPrice;
 
-    @OneToMany(mappedBy = "booking")
+    @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL)
     private Set<BookingDetail> bookingDetails = new LinkedHashSet<>();
 
+    @Column(name = "reserved_datetime")
+    private Instant reservedDatetime;
+
+    @Enumerated(EnumType.STRING)
+    @ColumnDefault("'PENDING'")
+    @Column(name = "booking_status", length = 20)
+    private BookingStatus bookingStatus;
+
     public Booking() {
+    }
+
+    public BookingStatus getBookingStatus() {
+        return bookingStatus;
+    }
+
+    public void setBookingStatus(BookingStatus bookingStatus) {
+        this.bookingStatus = bookingStatus;
+    }
+
+    public Instant getReservedDatetime() {
+        return reservedDatetime;
+    }
+
+    public void setReservedDatetime(Instant reservedDatetime) {
+        this.reservedDatetime = reservedDatetime;
     }
 
     public Integer getId() {
@@ -143,6 +168,15 @@ public class Booking {
 
     public void setBookingDetails(Set<BookingDetail> bookingDetails) {
         this.bookingDetails = bookingDetails;
+    }
+
+    public enum BookingStatus {
+        PENDING, // for pending payment and old record
+        RESERVED, // for reserve mode
+        CONFIRMED, // for normal mode
+        CANCELLED, // future use
+        COMPLETED, // after complete transaction
+        EXPIRED // if not paid within 24 hours
     }
 
 }
