@@ -28,15 +28,16 @@ public class BookingService {
             PackageRepository packageRepository,
             TripTypesRepository tripTypesRepository,
             TransactionRepository transactionRepository,
+            BookingDetailRepository bookingDetailRepository,
             CustomerTierService customerTierService,
-            UserService userService, BookingDetailRepository bookingDetailRepository) {
+            UserService userService) {
         this.bookingRepository = bookingRepository;
         this.packageRepository = packageRepository;
         this.tripTypesRepository = tripTypesRepository;
-        this.customerTierService = customerTierService;
-        this.userService = userService;
         this.transactionRepository = transactionRepository;
         this.bookingDetailRepository = bookingDetailRepository;
+        this.customerTierService = customerTierService;
+        this.userService = userService;
     }
 
     // Create a new booking
