@@ -9,6 +9,7 @@ import java.time.Instant;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+
 @Entity
 @Table(name = "bookings")
 public class Booking {
@@ -54,7 +55,31 @@ public class Booking {
     @OneToMany(mappedBy = "booking")
     private Set<BookingDetail> bookingDetails = new LinkedHashSet<>();
 
+    @Column(name = "reserved_datetime")
+    private Instant reservedDatetime;
+
+    @Enumerated(EnumType.STRING)
+    @ColumnDefault("'PENDING'")
+    @Column(name = "booking_status", length = 20)
+    private BookingStatus bookingStatus;
+
     public Booking() {
+    }
+
+    public BookingStatus getBookingStatus() {
+        return bookingStatus;
+    }
+
+    public void setBookingStatus(BookingStatus bookingStatus) {
+        this.bookingStatus = bookingStatus;
+    }
+
+    public Instant getReservedDatetime() {
+        return reservedDatetime;
+    }
+
+    public void setReservedDatetime(Instant reservedDatetime) {
+        this.reservedDatetime = reservedDatetime;
     }
 
     public Integer getId() {
@@ -143,6 +168,14 @@ public class Booking {
 
     public void setBookingDetails(Set<BookingDetail> bookingDetails) {
         this.bookingDetails = bookingDetails;
+    }
+
+    public enum BookingStatus {
+        PENDING,
+        CONFIRMED,
+        CANCELLED,
+        COMPLETED,
+        EXPIRED
     }
 
 }
