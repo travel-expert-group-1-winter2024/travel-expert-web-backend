@@ -51,7 +51,6 @@ public class BookingService {
         TripType tripType = tripTypesRepository.findById(requestDTO.getTripTypeId())
                 .orElseThrow(() -> new IllegalArgumentException("Trip Type not found with ID: " + requestDTO.getTripTypeId()));
 
-
         // create a new booking
         BigDecimal totalPrice = calculateTotalPrice(aPackage.getPkgbaseprice(), aPackage.getPkgagencycommission(), requestDTO.getTravelerCount());
         String bookingNo = generateBookingNumber();
@@ -60,27 +59,7 @@ public class BookingService {
         int pointsEarned = calculatePointToEarn(totalPrice);
         BigDecimal finalPrice = calculateFinalPrice(totalPrice, discount);
 
-        // check money in wallet
-        Wallet wallet = customer.getWallet();
-        if (wallet.getBalance().compareTo(finalPrice) < 0) {
-            throw new IllegalArgumentException("Insufficient balance in wallet");
-        }
-        // deduct money from wallet
-        BigDecimal newBalance = wallet.getBalance().subtract(finalPrice);
-        wallet.setBalance(newBalance);
-
-        // add record in transaction
-        Transaction transaction = new Transaction();
-        transaction.setTransactionDate(Instant.now());
-        transaction.setAmount(finalPrice);
-        transaction.setTransactionType(Transaction.TransactionType.DEBIT);
-        transaction.setDescription("Booking for " + aPackage.getPkgname() + " with booking number " + bookingNo);
-        transaction.setWallet(wallet);
-        Transaction savedTransaction = transactionRepository.save(transaction);
-
-        // add transaction to wallet
-        wallet.getTransactions().add(savedTransaction);
-        customer.setWallet(wallet);
+        BigDecimal newBalance = processPayment(requestDTO.getPaymentMethod(), customer, finalPrice, aPackage.getPkgname(), bookingNo);
 
         Booking booking = new Booking();
         booking.setBookingDate(Instant.now());
@@ -131,10 +110,43 @@ public class BookingService {
                 savedBooking.getBookingNo(),
                 discount,
                 savedBooking.getFinalPrice(),
-                newBalance,
+                newBalance, // optional
                 pointsEarned,
-                isNewTier ? customerTier.getName() : null
+                isNewTier ? customerTier.getName() : null, // optional
+                savedBooking.getBookingStatus().name(),
+                savedBooking.getReservedDatetime(), // optional
+                false // TODO: implement payment due logic
         );
+    }
+
+    private BigDecimal processPayment(PaymentMethod paymentMethod, Customer customer, BigDecimal finalPrice, String pkgName, String bookingNo) {
+        switch (paymentMethod) {
+            case WALLET -> {
+                Wallet wallet = customer.getWallet();
+                if (wallet.getBalance().compareTo(finalPrice) < 0) {
+                    throw new IllegalArgumentException("Insufficient balance in wallet");
+                }
+                BigDecimal newBalance = wallet.getBalance().subtract(finalPrice);
+                wallet.setBalance(newBalance);
+
+                Transaction transaction = new Transaction();
+                transaction.setTransactionDate(Instant.now());
+                transaction.setAmount(finalPrice);
+                transaction.setTransactionType(Transaction.TransactionType.DEBIT);
+                transaction.setDescription("Booking for " + pkgName + " with booking number " + bookingNo);
+                transaction.setWallet(wallet);
+
+                Transaction savedTransaction = transactionRepository.save(transaction);
+                wallet.getTransactions().add(savedTransaction);
+                customer.setWallet(wallet);
+                return newBalance;
+            }
+            case STRIPE -> {
+
+                return null;
+            }
+            default -> throw new UnsupportedOperationException("Unsupported payment method: " + paymentMethod);
+        }
     }
 
     private String generateBookingNumber() {
@@ -157,6 +169,11 @@ public class BookingService {
 
     private BigDecimal calculateFinalPrice(BigDecimal totalPrice, BigDecimal discount) {
         return totalPrice.subtract(discount);
+    }
+
+    public enum PaymentMethod {
+        WALLET,
+        STRIPE,
     }
 
 }

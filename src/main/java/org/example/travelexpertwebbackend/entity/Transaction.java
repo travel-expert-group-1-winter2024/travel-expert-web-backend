@@ -2,6 +2,7 @@ package org.example.travelexpertwebbackend.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.math.BigDecimal;
@@ -17,10 +18,9 @@ public class Transaction {
     @Column(name = "transaction_id", nullable = false)
     private UUID id;
 
-    @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "wallet_id", nullable = false)
-    private Wallet wallet;
+    private Wallet wallet; // nullable for Stripe
     @NotNull
     @Enumerated(EnumType.STRING)
     @Column(name = "transaction_type", nullable = false)
@@ -34,7 +34,19 @@ public class Transaction {
     @Column(name = "transaction_date")
     private Instant transactionDate;
 
+    @Size(max = 255)
+    @Column(name = "stripe_reference")
+    private String stripeReference; // nullable for wallet
+
     public Transaction() {
+    }
+
+    public String getStripeReference() {
+        return stripeReference;
+    }
+
+    public void setStripeReference(String stripeReference) {
+        this.stripeReference = stripeReference;
     }
 
     public UUID getId() {

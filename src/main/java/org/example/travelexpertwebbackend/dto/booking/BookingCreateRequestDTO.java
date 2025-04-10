@@ -3,6 +3,7 @@ package org.example.travelexpertwebbackend.dto.booking;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import org.example.travelexpertwebbackend.service.BookingService;
 
 public class BookingCreateRequestDTO {
     @Min(0)
@@ -16,6 +17,8 @@ public class BookingCreateRequestDTO {
     private int travelerCount;
     @NotNull(message = "Booking mode cannot be null")
     private BookingMode bookingMode = BookingMode.NORMAL;
+    @NotNull(message = "Payment method cannot be null")
+    private BookingService.PaymentMethod paymentMethod;
 
     public BookingCreateRequestDTO() {
     }
@@ -48,8 +51,13 @@ public class BookingCreateRequestDTO {
         return bookingMode;
     }
 
+    public BookingService.PaymentMethod getPaymentMethod() {
+        return paymentMethod;
+    }
+
     public enum BookingMode {
         NORMAL,
         RESERVE
     }
+
 }
