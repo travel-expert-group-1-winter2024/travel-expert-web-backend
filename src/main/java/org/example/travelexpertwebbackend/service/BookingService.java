@@ -71,21 +71,16 @@ public class BookingService {
         int pointsEarned = calculatePointToEarn(totalPrice);
         BigDecimal finalPrice = calculateFinalPrice(totalPrice, discount);
 
-        BigDecimal newBalance = null;
-        boolean isReservation = requestDTO.getBookingMode() == BookingCreateRequestDTO.BookingMode.RESERVE;
-        Instant reservedUntil = null;
-        if (isReservation) {
-            reservedUntil = Instant.now().plusSeconds(24 * 60 * 60); // 24 hours
-        } else {
-            newBalance = processPayment(requestDTO.getPaymentMethod(), customer, finalPrice, aPackage.getPkgname(), bookingNo);
-        }
+        boolean isReservation = isReservationMode(requestDTO.getBookingMode());
+        Instant reservedUntil = isReservation ? getReservationExpiry() : null;
+        BigDecimal newBalance = isReservation ? null : processPayment(requestDTO.getPaymentMethod(), customer, finalPrice, aPackage.getPkgname(), bookingNo);
 
         Booking booking = new Booking();
         booking.setBookingDate(Instant.now());
         booking.setBookingNo(bookingNo);
         booking.setTravelerCount(travelerCount);
         booking.setTotalDiscount(discount);
-        booking.setPointsEarned(pointsEarned);
+        booking.setPointsEarned(isReservation ? 0 : pointsEarned);
         booking.setFinalPrice(finalPrice);
         booking.setBookingStatus(isReservation ? Booking.BookingStatus.RESERVED : Booking.BookingStatus.COMPLETED);
         booking.setReservedDatetime(reservedUntil);
@@ -111,15 +106,13 @@ public class BookingService {
             booking.getBookingDetails().add(bookingDetail);
         }
 
-        // update customer points
-        customer.setPoints(customer.getPoints() + pointsEarned);
-
-        // check customer tier
-        CustomerTier customerTier = customerTierService.getTierByPoint(customer.getPoints());
+        CustomerTier customerTier = null;
         boolean isNewTier = false;
-        if (!customerTier.getName().equals(customer.getCustomerTier().getName())) {
-            customer.setCustomerTier(customerTier);
-            isNewTier = true;
+
+        if (!isReservation) {
+            customer.setPoints(customer.getPoints() + pointsEarned);
+            customerTier = updateCustomerTierIfEligible(customer);
+            isNewTier = customerTier != null;
         }
 
         booking.setCustomer(customer);
@@ -230,6 +223,25 @@ public class BookingService {
 
     private BigDecimal calculateFinalPrice(BigDecimal totalPrice, BigDecimal discount) {
         return totalPrice.subtract(discount);
+    }
+
+    private boolean isReservationMode(BookingCreateRequestDTO.BookingMode mode) {
+        return BookingCreateRequestDTO.BookingMode.RESERVE.equals(mode);
+    }
+
+    private Instant getReservationExpiry() {
+        return Instant.now().plusSeconds(24 * 60 * 60); // 24 hours
+    }
+
+    private CustomerTier updateCustomerTierIfEligible(Customer customer) {
+        CustomerTier currentTier = customer.getCustomerTier();
+        CustomerTier newTier = customerTierService.getTierByPoint(customer.getPoints());
+
+        if (!newTier.getName().equals(currentTier.getName())) {
+            customer.setCustomerTier(newTier);
+            return newTier;
+        }
+        return null;
     }
 
     public enum PaymentMethod {
