@@ -22,6 +22,7 @@ public class BookingCreateResponseDTO {
     private Boolean paymentDue;
 
 
+
     public BookingCreateResponseDTO() {
     }
 
