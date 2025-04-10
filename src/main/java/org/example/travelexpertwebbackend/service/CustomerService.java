@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.tinylog.Logger;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -78,11 +79,14 @@ public class CustomerService {
         boolean isAgent = existingUser
                 .map(user -> Role.AGENT.name().equalsIgnoreCase(user.getRole()) || Role.MANAGER.name().equalsIgnoreCase(user.getRole()))
                 .orElse(false);
-        System.out.println("isAgent: " + isAgent);
+        if (isAgent) {
+            Logger.info("Agent registering as a new Customer: " + email + ", " + customerDTO.getCustfirstname() + " " + customerDTO.getCustlastname());
+        }
 
         //* If the email exists, and DOES NOT belong to an AGENT/MANAGER, throw an exception.
         if (existingUser.isPresent() && !isAgent) {
-            throw new IllegalStateException("User already exists in our records");
+            Logger.info("Already registered Customer, attempting to register again" + email + ", " + customerDTO.getCustfirstname() + " " + customerDTO.getCustlastname());
+            throw new IllegalStateException("User already exists in our records: " + email);
         }
 
         //* Assigns a random agent to each new customer
