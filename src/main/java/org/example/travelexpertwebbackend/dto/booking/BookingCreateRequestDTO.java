@@ -14,6 +14,8 @@ public class BookingCreateRequestDTO {
     @Min(1)
     @Max(8)
     private int travelerCount;
+    @NotNull(message = "Booking mode cannot be null")
+    private BookingMode bookingMode = BookingMode.NORMAL;
 
     public BookingCreateRequestDTO() {
     }
@@ -40,5 +42,10 @@ public class BookingCreateRequestDTO {
 
     public void setTravelerCount(int travelerCount) {
         this.travelerCount = travelerCount;
+    }
+
+    public enum BookingMode {
+        NORMAL,
+        RESERVE
     }
 }
