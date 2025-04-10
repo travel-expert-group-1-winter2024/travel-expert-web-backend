@@ -3,6 +3,7 @@ package org.example.travelexpertwebbackend.service;
 import jakarta.transaction.Transactional;
 import org.example.travelexpertwebbackend.dto.booking.BookingCreateRequestDTO;
 import org.example.travelexpertwebbackend.dto.booking.BookingCreateResponseDTO;
+import org.example.travelexpertwebbackend.dto.booking.CostSummaryResponseDTO;
 import org.example.travelexpertwebbackend.entity.*;
 import org.example.travelexpertwebbackend.entity.Package;
 import org.example.travelexpertwebbackend.repository.BookingRepository;
@@ -63,9 +64,9 @@ public class BookingService {
 
         // check money in wallet
         Wallet wallet = customer.getWallet();
-        if (wallet.getBalance().compareTo(finalPrice) < 0) {
-            throw new IllegalArgumentException("Insufficient balance in wallet");
-        }
+//        if (wallet.getBalance().compareTo(finalPrice) < 0) {
+//            throw new IllegalArgumentException("Insufficient balance in wallet");
+//        }
         // deduct money from wallet
         BigDecimal newBalance = wallet.getBalance().subtract(finalPrice);
         wallet.setBalance(newBalance);
@@ -158,6 +159,60 @@ public class BookingService {
 
     private BigDecimal calculateFinalPrice(BigDecimal totalPrice, BigDecimal discount) {
         return totalPrice.subtract(discount);
+    }
+
+    @Transactional
+    public CostSummaryResponseDTO getCostSummary(Customer customer, BookingCreateRequestDTO requestDTO) {
+        Package aPackage = packageRepository.findById(requestDTO.getPackageId())
+                .orElseThrow(() -> new IllegalArgumentException("Package not found with ID: " + requestDTO.getPackageId()));
+
+        TripType tripType = tripTypesRepository.findById(requestDTO.getTripTypeId())
+                .orElseThrow(() -> new IllegalArgumentException("Trip Type not found with ID: " + requestDTO.getTripTypeId()));
+
+        BigDecimal totalPackagePrice = calculateTotalPrice(
+                aPackage.getPkgbaseprice(),
+                aPackage.getPkgagencycommission(),
+                requestDTO.getTravelerCount());
+
+        BigDecimal discount = customerTierService.calculateDiscount(customer, customer.getCustomerTier(), totalPackagePrice);
+        BigDecimal packageSubtotal = calculateFinalPrice(totalPackagePrice, discount);
+
+        BigDecimal charges;
+        switch (tripType.getId()) {
+            case "B":
+            case "L":
+                charges = BigDecimal.valueOf(25);
+                break;
+            case "G":
+                charges = BigDecimal.valueOf(100);
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown trip type ID: " + tripType.getId());
+        }
+
+        BigDecimal agencyFees = aPackage.getPkgagencycommission();
+        BigDecimal finalPriceWithoutTax = getfinalPriceWithoutTax(packageSubtotal, charges, agencyFees);
+        BigDecimal tax = getTax(finalPriceWithoutTax);
+        BigDecimal totalPrice = finalPriceWithoutTax.add(tax);
+
+        CostSummaryResponseDTO response = new CostSummaryResponseDTO();
+        response.setPackagePrice(totalPackagePrice);
+        response.setDiscount(discount);
+        response.setCharges(charges);
+        response.setAgencyFees(agencyFees);
+        response.setTax(tax);
+        response.setTotal(totalPrice);
+
+        return response;
+    }
+
+
+    public BigDecimal getfinalPriceWithoutTax(BigDecimal packageSubtotal, BigDecimal charges, BigDecimal agencyFees){
+        return packageSubtotal.add(charges).add(agencyFees);
+    }
+
+    public BigDecimal getTax(BigDecimal withoutTaxPrice){
+        return withoutTaxPrice.multiply(BigDecimal.valueOf(5)).divide(BigDecimal.valueOf(100));
     }
 
 }
