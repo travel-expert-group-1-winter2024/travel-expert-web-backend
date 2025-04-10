@@ -234,8 +234,8 @@ public class BookingService {
         return totalPrice.subtract(discount);
     }
 
-    private boolean isReservationMode(BookingCreateRequestDTO.BookingMode mode) {
-        return BookingCreateRequestDTO.BookingMode.RESERVE.equals(mode);
+    private boolean isReservationMode(BookingMode mode) {
+        return BookingMode.RESERVE.equals(mode);
     }
 
     private Instant getReservationExpiry() {
@@ -256,6 +256,11 @@ public class BookingService {
     public enum PaymentMethod {
         WALLET,
         STRIPE,
+    }
+
+    public enum BookingMode {
+        NORMAL,
+        RESERVE
     }
 
 }

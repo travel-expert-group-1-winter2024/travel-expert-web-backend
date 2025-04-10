@@ -16,7 +16,7 @@ public class BookingCreateRequestDTO {
     @Max(8)
     private int travelerCount;
     @NotNull(message = "Booking mode cannot be null")
-    private BookingMode bookingMode = BookingMode.NORMAL;
+    private BookingService.BookingMode bookingMode = BookingService.BookingMode.NORMAL;
     @NotNull(message = "Payment method cannot be null")
     private BookingService.PaymentMethod paymentMethod;
 
@@ -47,11 +47,11 @@ public class BookingCreateRequestDTO {
         this.travelerCount = travelerCount;
     }
 
-    public BookingMode getBookingMode() {
+    public BookingService.BookingMode getBookingMode() {
         return bookingMode;
     }
 
-    public void setBookingMode(BookingMode bookingMode) {
+    public void setBookingMode(BookingService.BookingMode bookingMode) {
         this.bookingMode = bookingMode;
     }
 
@@ -63,9 +63,5 @@ public class BookingCreateRequestDTO {
         this.paymentMethod = paymentMethod;
     }
 
-    public enum BookingMode {
-        NORMAL,
-        RESERVE
-    }
 
 }
