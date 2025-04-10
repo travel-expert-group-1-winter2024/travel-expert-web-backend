@@ -5,7 +5,7 @@ import org.example.travelexpertwebbackend.service.BookingService;
 
 public class BookingConfirmRequestDTO {
     @NotNull(message = "Booking ID cannot be null")
-    private int bookingId;
+    private Integer bookingId;
     @NotNull(message = "Payment method cannot be null")
     private BookingService.PaymentMethod paymentMethod;
 
