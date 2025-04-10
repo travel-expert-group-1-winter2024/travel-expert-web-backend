@@ -165,6 +165,9 @@ public class BookingService {
         CustomerTier customerTier = updateCustomerTierIfEligible(customer);
         boolean isNewTier = customerTier != null;
 
+        // Update booking status
+        booking.setCustomer(customer);
+        booking.setPointsEarned(pointsEarned);
         booking.setBookingStatus(Booking.BookingStatus.COMPLETED);
         booking.setReservedDatetime(null); // Clear reservation time
         bookingRepository.save(booking);
@@ -172,7 +175,7 @@ public class BookingService {
         return new BookingCreateResponseDTO(
                 booking.getId(),
                 booking.getBookingNo(),
-                BigDecimal.ZERO, // discount already applied earlier
+                null, // discount already applied earlier
                 booking.getFinalPrice(),
                 newBalance,
                 booking.getPointsEarned(),
