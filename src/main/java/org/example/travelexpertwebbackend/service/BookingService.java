@@ -47,6 +47,18 @@ public class BookingService {
                 .orElseThrow(() -> new IllegalArgumentException("Package not found with ID: " + requestDTO.getPackageId())
                 );
 
+        // check if package is available
+        for (Booking booking : aPackage.getBookings()) {
+            if (booking.getBookingStatus() == Booking.BookingStatus.RESERVED) {
+                if (booking.getReservedDatetime().isBefore(Instant.now())) { // more than 24 hours
+                    booking.setBookingStatus(Booking.BookingStatus.EXPIRED);
+                    bookingRepository.save(booking);
+                } else { // less than 24 hours
+                    throw new IllegalArgumentException("Package is already reserved");
+                }
+            }
+        }
+
         // check if the tripTypeId is valid
         TripType tripType = tripTypesRepository.findById(requestDTO.getTripTypeId())
                 .orElseThrow(() -> new IllegalArgumentException("Trip Type not found with ID: " + requestDTO.getTripTypeId()));
