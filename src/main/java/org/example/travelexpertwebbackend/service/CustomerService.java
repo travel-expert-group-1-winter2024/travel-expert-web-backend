@@ -150,36 +150,33 @@ public class CustomerService {
     }
 
     public CustomerDTO registerCustomer(CustomerDTO customerDTO) {
-        //* Method to check the email is an agent email.
-        boolean isAgent = isAgentEmail(customerDTO.getCustemail());
-        //* Checking to see if the email exists, if it does, does it belong to an agent?
-        validateEmailExistence(customerDTO);
+        //* Grabbing the email from the request
+        String email = customerDTO.getCustemail();
+        //* Checking if a user with this email already exists in our records
+        Optional<User> existingUser = userRepository.findByUsername(email);
+
+        //* If AGENT or MANAGER, return TRUE, otherwise return FALSE
+        boolean isAgent = existingUser
+                .map(user -> Role.AGENT.name().equalsIgnoreCase(user.getRole()) || Role.MANAGER.name().equalsIgnoreCase(user.getRole()))
+                .orElse(false);
+        if (isAgent) {
+            Logger.info("Agent registering as a new Customer: " + email + ", " + customerDTO.getCustfirstname() + " " + customerDTO.getCustlastname());
+        }
+
+        //* If the email exists, and DOES NOT belong to an AGENT/MANAGER, throw an exception.
+        if (existingUser.isPresent() && !isAgent) {
+            Logger.info("Already registered Customer, attempting to register again" + email + ", " + customerDTO.getCustfirstname() + " " + customerDTO.getCustlastname());
+            throw new IllegalStateException("User already exists in our records: " + email);
+        }
+
         //* Assigns a random agent to each new customer
         Agent assignedAgent = assignRandomAgent();
         //* Creates and save the new Customer Object
         Customer customer = createAndSaveCustomer(customerDTO, assignedAgent, isAgent);
         // create wallet for customer
         Wallet wallet = createAndAssignWallet(customer);
-//        //* If the new Customer is not an Agent, creates a new User Account.
-//        if (!isAgent) {
-//            createUserAccount(customerDTO, customer);
-//        }
-        return new CustomerDTO(customer);
-    }
 
-    /**
-     * This method creates a new user account based on the data being recieved in the CustomerDTO
-     * @param customerDTO The data transfer object containing the user data, email & password
-     * @param customer The customer object, of which the new user will be associated with.
-     */
-    private void createUserAccount(CustomerDTO customerDTO, Customer customer) {
-        User user = new User();
-        user.setUsername(customerDTO.getCustemail());
-        user.setPasswordHash(passwordEncoder.encode(customerDTO.getPassword()));
-        user.setRole(Role.CUSTOMER.name());
-        Customer registeringCustomer = customerRepository.findByCustemail(customerDTO.getCustemail()).orElseThrow(() -> new IllegalStateException("Customer not found"));
-        user.setCustomer(registeringCustomer);
-        userRepository.save(user);
+        return new CustomerDTO(customer);
     }
 
     /**
