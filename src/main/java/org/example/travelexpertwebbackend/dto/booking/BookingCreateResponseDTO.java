@@ -15,6 +15,7 @@ public class BookingCreateResponseDTO {
     private String newCustomerTier;
 
 
+
     public BookingCreateResponseDTO() {
     }
 
