@@ -171,11 +171,11 @@ public class Booking {
     }
 
     public enum BookingStatus {
-        PENDING,
-        CONFIRMED,
-        CANCELLED,
-        COMPLETED,
-        EXPIRED
+        RESERVED, // for reserve mode
+        CONFIRMED, // for normal mode
+        CANCELLED, // future use
+        COMPLETED, // after complete transaction
+        EXPIRED // if not paid within 24 hours
     }
 
 }
