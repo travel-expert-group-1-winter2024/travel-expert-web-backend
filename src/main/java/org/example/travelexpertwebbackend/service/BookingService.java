@@ -140,6 +140,46 @@ public class BookingService {
         );
     }
 
+    @Transactional
+    public BookingCreateResponseDTO confirmBooking(Integer bookingId, PaymentMethod paymentMethod) {
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new IllegalArgumentException("Booking not found with ID: " + bookingId));
+
+        if (booking.getBookingStatus() != Booking.BookingStatus.RESERVED) {
+            throw new IllegalStateException("Only reserved bookings can be confirmed.");
+        }
+
+        if (booking.getReservedDatetime() == null || booking.getReservedDatetime().isBefore(Instant.now())) {
+            booking.setBookingStatus(Booking.BookingStatus.EXPIRED);
+            bookingRepository.save(booking);
+            throw new IllegalStateException("Reservation has expired and cannot be confirmed.");
+        }
+
+        Customer customer = booking.getCustomer();
+        BigDecimal finalPrice = booking.getFinalPrice();
+        Package aPackage = booking.getPackageid();
+
+        // Perform payment
+        BigDecimal newBalance = processPayment(paymentMethod, customer, finalPrice, aPackage.getPkgname(), booking.getBookingNo());
+
+        booking.setBookingStatus(Booking.BookingStatus.COMPLETED);
+        booking.setReservedDatetime(null); // Clear reservation time
+        bookingRepository.save(booking);
+
+        return new BookingCreateResponseDTO(
+                booking.getId(),
+                booking.getBookingNo(),
+                BigDecimal.ZERO, // discount already applied earlier
+                booking.getFinalPrice(),
+                newBalance,
+                booking.getPointsEarned(),
+                null,
+                booking.getBookingStatus().name(),
+                null,
+                false
+        );
+    }
+
     private BigDecimal processPayment(PaymentMethod paymentMethod, Customer customer, BigDecimal finalPrice, String pkgName, String bookingNo) {
         switch (paymentMethod) {
             case WALLET -> {
