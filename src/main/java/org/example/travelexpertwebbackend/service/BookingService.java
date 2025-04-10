@@ -6,8 +6,10 @@ import org.example.travelexpertwebbackend.dto.booking.BookingCreateResponseDTO;
 import org.example.travelexpertwebbackend.dto.booking.CostSummaryResponseDTO;
 import org.example.travelexpertwebbackend.entity.*;
 import org.example.travelexpertwebbackend.entity.Package;
-import org.example.travelexpertwebbackend.repository.*;
-import org.example.travelexpertwebbackend.service.auth.UserService;
+import org.example.travelexpertwebbackend.repository.BookingRepository;
+import org.example.travelexpertwebbackend.repository.PackageRepository;
+import org.example.travelexpertwebbackend.repository.TransactionRepository;
+import org.example.travelexpertwebbackend.repository.TripTypesRepository;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -21,24 +23,18 @@ public class BookingService {
     private final TripTypesRepository tripTypesRepository;
     private final TransactionRepository transactionRepository;
     private final CustomerTierService customerTierService;
-    private final UserService userService;
-    private final BookingDetailRepository bookingDetailRepository;
 
     public BookingService(
             BookingRepository bookingRepository,
             PackageRepository packageRepository,
             TripTypesRepository tripTypesRepository,
             TransactionRepository transactionRepository,
-            BookingDetailRepository bookingDetailRepository,
-            CustomerTierService customerTierService,
-            UserService userService) {
+            CustomerTierService customerTierService) {
         this.bookingRepository = bookingRepository;
         this.packageRepository = packageRepository;
         this.tripTypesRepository = tripTypesRepository;
         this.transactionRepository = transactionRepository;
-        this.bookingDetailRepository = bookingDetailRepository;
         this.customerTierService = customerTierService;
-        this.userService = userService;
     }
 
     // Create a new booking
