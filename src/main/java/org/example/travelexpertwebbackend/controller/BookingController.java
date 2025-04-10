@@ -12,7 +12,6 @@ import org.example.travelexpertwebbackend.dto.booking.BookingCreateResponseDTO;
 import org.example.travelexpertwebbackend.dto.booking.CostSummaryResponseDTO;
 import org.example.travelexpertwebbackend.entity.Customer;
 import org.example.travelexpertwebbackend.service.BookingService;
-import org.example.travelexpertwebbackend.service.StripeService;
 import org.example.travelexpertwebbackend.service.auth.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -33,7 +32,7 @@ public class BookingController {
     static {
         Stripe.apiKey = "sk_test_51RC3awBOTKXX5G8ladKciV4ZeOkJB1Rig1pAgUu3Dl7pfv9b0KDaLrpmnYtTQNxjBMxmeAu8NUdAwy6AyxSndhtb004grNkBb2";
     }
-    public BookingController(BookingService bookingService, UserService userService,StripeService stripeService) {
+    public BookingController(BookingService bookingService, UserService userService) {
         this.bookingService = bookingService;
         this.userService = userService;
     }
