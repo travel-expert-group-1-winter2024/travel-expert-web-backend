@@ -51,8 +51,16 @@ public class BookingCreateRequestDTO {
         return bookingMode;
     }
 
+    public void setBookingMode(BookingMode bookingMode) {
+        this.bookingMode = bookingMode;
+    }
+
     public BookingService.PaymentMethod getPaymentMethod() {
         return paymentMethod;
+    }
+
+    public void setPaymentMethod(BookingService.PaymentMethod paymentMethod) {
+        this.paymentMethod = paymentMethod;
     }
 
     public enum BookingMode {
