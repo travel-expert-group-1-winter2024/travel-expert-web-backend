@@ -13,10 +13,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.tinylog.Logger;
 
 import java.util.List;
@@ -85,6 +82,24 @@ public class UserController {
             String username = (String) authentication.getPrincipal();
             UserInfoDTO userInfo = userService.getUserInfo(username);
             return ResponseEntity.ok(new GenericApiResponse<>(userInfo));
+        } catch (IllegalArgumentException e) {
+            Logger.error(e, "Error retrieving user info");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new GenericApiResponse<>(List.of(new ErrorInfo("User not found"))));
+        } catch (Exception e) {
+            Logger.error(e, "Error retrieving user info");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new GenericApiResponse<>(List.of(new ErrorInfo("Failed to retrieve user info"))));
+        }
+    }
+
+    @GetMapping("/api/users/by-reference")
+    public ResponseEntity<GenericApiResponse<GetUserByIdResponseDTO>> getUserByReference(
+            @RequestParam(required = false) Integer customerId,
+            @RequestParam(required = false) Integer agentId) {
+        try {
+            GetUserByIdResponseDTO user = userService.getUserIdByReference(customerId, agentId);
+            return ResponseEntity.ok(new GenericApiResponse<>(user));
         } catch (IllegalArgumentException e) {
             Logger.error(e, "Error retrieving user info");
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
