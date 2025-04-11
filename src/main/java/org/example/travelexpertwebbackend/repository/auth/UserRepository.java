@@ -13,4 +13,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByUsername(String username);
 
     boolean existsByUsernameContaining(@Size(max = 50) @NotNull String username);
+
+    Optional<User> findByAgentId(Integer agentId);
+
+    Optional<User> findByCustomer_Id(Integer customerId);
 }
