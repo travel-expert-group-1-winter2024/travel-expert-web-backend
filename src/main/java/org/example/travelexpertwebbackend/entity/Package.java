@@ -64,6 +64,29 @@ public class Package {
     @JsonIgnore
     private Set<ProductsSupplier> productsSuppliers = new LinkedHashSet<>();
 
+    @Size(max = 255)
+    @Column(name = "photo_url")
+    private String photoUrl;
+
+    @Column(name = "tags", length = Integer.MAX_VALUE)
+    private String tags;
+
+    public String getTags() {
+        return tags;
+    }
+
+    public void setTags(String tags) {
+        this.tags = tags;
+    }
+
+    public String getPhotoUrl() {
+        return photoUrl;
+    }
+
+    public void setPhotoUrl(String photoUrl) {
+        this.photoUrl = photoUrl;
+    }
+
     public Integer getId() {
         return id;
     }
