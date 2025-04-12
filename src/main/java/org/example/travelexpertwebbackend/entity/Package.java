@@ -68,6 +68,17 @@ public class Package {
     @Column(name = "photo_url")
     private String photoUrl;
 
+    @Column(name = "tags", length = Integer.MAX_VALUE)
+    private String tags;
+
+    public String getTags() {
+        return tags;
+    }
+
+    public void setTags(String tags) {
+        this.tags = tags;
+    }
+
     public String getPhotoUrl() {
         return photoUrl;
     }

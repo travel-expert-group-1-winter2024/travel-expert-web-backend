@@ -15,7 +15,7 @@ public class PackageDetailsDTO {
     private Set<ProductSupplierDTO> productsSuppliers;
     private String destination;
     private String photoURL;
-
+    private String tags;
 
     // Getters and Setters
     public Integer getPackageid() {
@@ -96,5 +96,13 @@ public class PackageDetailsDTO {
 
     public void setPhotoURL(String photoURL) {
         this.photoURL = photoURL;
+    }
+
+    public String getTags() {
+        return tags;
+    }
+
+    public void setTags(String tags) {
+        this.tags = tags;
     }
 }

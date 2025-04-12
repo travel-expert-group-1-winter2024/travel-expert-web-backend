@@ -129,6 +129,7 @@ public class PackageService {
         dto.setPkgagencycommission(pkg.getPkgagencycommission());
         dto.setDestination(pkg.getDestination());
         dto.setPhotoURL(pkg.getPhotoUrl());
+        dto.setTags(pkg.getTags());
         // Map the associated productsSuppliers to ProductSupplierDTO
         Set<ProductSupplierDTO> productSupplierDTOs = pkg.getProductsSuppliers().stream()
                 .map(this::mapToProductSupplierDTO)
