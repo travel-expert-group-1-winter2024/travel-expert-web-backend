@@ -14,6 +14,8 @@ public class PackageDetailsDTO {
     private BigDecimal pkgagencycommission;
     private Set<ProductSupplierDTO> productsSuppliers;
     private String destination;
+    private String photoURL;
+
 
     // Getters and Setters
     public Integer getPackageid() {
@@ -86,5 +88,13 @@ public class PackageDetailsDTO {
 
     public void setDestination(String destination) {
         this.destination = destination;
+    }
+
+    public String getPhotoURL() {
+        return photoURL;
+    }
+
+    public void setPhotoURL(String photoURL) {
+        this.photoURL = photoURL;
     }
 }
