@@ -2,6 +2,7 @@ package org.example.travelexpertwebbackend.dto;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.List;
 import java.util.Set;
 
 public class PackageDetailsDTO {
@@ -15,7 +16,7 @@ public class PackageDetailsDTO {
     private Set<ProductSupplierDTO> productsSuppliers;
     private String destination;
     private String photoURL;
-    private String tags;
+    private List<String> tags;
 
     // Getters and Setters
     public Integer getPackageid() {
@@ -98,11 +99,11 @@ public class PackageDetailsDTO {
         this.photoURL = photoURL;
     }
 
-    public String getTags() {
+    public List<String> getTags() {
         return tags;
     }
 
-    public void setTags(String tags) {
+    public void setTags(List<String> tags) {
         this.tags = tags;
     }
 }
