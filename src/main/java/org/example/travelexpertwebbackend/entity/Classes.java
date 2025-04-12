@@ -1,12 +1,12 @@
 package org.example.travelexpertwebbackend.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @Entity
-@Table(name="classes")
+@Table(name = "classes")
 public class Classes {
     @Id
     @Column(name = "classid")
@@ -17,6 +17,17 @@ public class Classes {
 
     @Column(name = "classdesc")
     private String classdesc;
+
+    @OneToMany(mappedBy = "classid")
+    private Set<BookingDetail> bookingdetails = new LinkedHashSet<>();
+
+    public Set<BookingDetail> getBookingdetails() {
+        return bookingdetails;
+    }
+
+    public void setBookingdetails(Set<BookingDetail> bookingdetails) {
+        this.bookingdetails = bookingdetails;
+    }
 
     public String getClassdesc() {
         return classdesc;

@@ -45,7 +45,46 @@ public class BookingDetail {
     @Column(name = "productsupplierid")
     private Integer productsupplierid;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @ColumnDefault("NULL")
+    @JoinColumn(name = "regionid")
+    private Region regionid;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @ColumnDefault("NULL")
+    @JoinColumn(name = "classid")
+    private Classes classid;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @ColumnDefault("NULL")
+    @JoinColumn(name = "feeid")
+    private Fee feeid;
+
     public BookingDetail() {
+    }
+
+    public Fee getFeeid() {
+        return feeid;
+    }
+
+    public void setFeeid(Fee feeid) {
+        this.feeid = feeid;
+    }
+
+    public Classes getClassid() {
+        return classid;
+    }
+
+    public void setClassid(Classes classid) {
+        this.classid = classid;
+    }
+
+    public Region getRegionid() {
+        return regionid;
+    }
+
+    public void setRegionid(Region regionid) {
+        this.regionid = regionid;
     }
 
     public Integer getId() {
