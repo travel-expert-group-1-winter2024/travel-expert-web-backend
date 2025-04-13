@@ -26,6 +26,8 @@ import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static org.example.travelexpertwebbackend.utils.RestUtil.buildPhotoUrl;
+
 @Service
 public class CustomerService {
     private static final String UPLOAD_DIR = "uploads/";
@@ -110,9 +112,7 @@ public class CustomerService {
             throw new IllegalArgumentException("Customer photo not found");
         }
 
-        // Construct full URL
-        String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
-        return baseUrl + "/uploads/" + photoPath;
+        return buildPhotoUrl(photoPath, request);
     }
 
     private String generateUniqueFilename(int customerId, String originalFilename) {
