@@ -17,7 +17,6 @@ public class BookingCreateRequestDTO {
     private int travelerCount;
     @NotNull(message = "Booking mode cannot be null")
     private BookingService.BookingMode bookingMode = BookingService.BookingMode.NORMAL;
-    @NotNull(message = "Payment method cannot be null")
     private BookingService.PaymentMethod paymentMethod;
     private String paymentId; // for Stripe
 
