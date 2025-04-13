@@ -1,8 +1,7 @@
 package org.example.travelexpertwebbackend.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.validation.constraints.Size;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -75,11 +74,49 @@ public class BookingDetailsView {
     @JoinColumn(name = "supplier", referencedColumnName = "supname")
     private Supplier supplier;
 
-    public Integer  getBookingDetailId() {
+    @Size(max = 50)
+    @Column(name = "bookingno", length = 50)
+    private String bookingNo;
+
+    @Size(max = 20)
+    @Column(name = "booking_status", length = 20)
+    private String bookingStatus;
+
+    @Column(name = "packageid")
+    private Integer packageId;
+
+    @Column(name = "travelercount")
+    private Double travelerCount;
+
+    @Size(max = 1)
+    @Column(name = "triptypeid", length = 1)
+    private String tripTypeId;
+
+    public String getTripTypeId() {
+        return tripTypeId;
+    }
+
+    public Double getTravelerCount() {
+        return travelerCount;
+    }
+
+    public Integer getPackageId() {
+        return packageId;
+    }
+
+    public String getBookingStatus() {
+        return bookingStatus;
+    }
+
+    public String getBookingNo() {
+        return bookingNo;
+    }
+
+    public Integer getBookingDetailId() {
         return bookingDetailId;
     }
 
-    public void setBookingDetailId(Integer  bookingDetailId) {
+    public void setBookingDetailId(Integer bookingDetailId) {
         this.bookingDetailId = bookingDetailId;
     }
 
@@ -187,32 +224,32 @@ public class BookingDetailsView {
         this.supplier = supplier;
     }
 
-    public Integer getAgentid(){
+    public Integer getAgentid() {
         return agentid;
-    }
-
-    public Integer getCustomerid(){
-        return customerid;
-    }
-
-    public String getFirstname(){
-        return firstname;
-    }
-
-    public String getLastname(){
-        return lastname;
     }
 
     public void setAgentid(Integer agentid) {
         this.agentid = agentid;
     }
 
+    public Integer getCustomerid() {
+        return customerid;
+    }
+
     public void setCustomerid(Integer customerid) {
         this.customerid = customerid;
     }
 
+    public String getFirstname() {
+        return firstname;
+    }
+
     public void setFirstname(String firstname) {
         this.firstname = firstname;
+    }
+
+    public String getLastname() {
+        return lastname;
     }
 
     public void setLastname(String lastname) {
