@@ -74,8 +74,10 @@ public class BookingService {
         TripType tripType = tripTypesRepository.findById(requestDTO.getTripTypeId())
                 .orElseThrow(() -> new IllegalArgumentException("Trip Type not found with ID: " + requestDTO.getTripTypeId()));
 
+        boolean isReservation = isReservationMode(requestDTO.getBookingMode());
+
         // check Stripe payment method's requirement
-        checkStripePaymentRequirement(requestDTO.getPaymentMethod(), requestDTO.getPaymentId());
+        if (!isReservation) checkStripePaymentRequirement(requestDTO.getPaymentMethod(), requestDTO.getPaymentId());
 
         // create a new booking
         BigDecimal totalPrice = calculateTotalPrice(aPackage.getPkgbaseprice(), aPackage.getPkgagencycommission(), requestDTO.getTravelerCount());
@@ -85,7 +87,7 @@ public class BookingService {
         Integer pointsEarned = calculatePointToEarn(totalPrice);
         BigDecimal finalPrice = calculateFinalPrice(totalPrice, discount);
 
-        boolean isReservation = isReservationMode(requestDTO.getBookingMode());
+
         Instant reservedUntil = isReservation ? getReservationExpiry() : null;
         BigDecimal newBalance = null;
         try {
