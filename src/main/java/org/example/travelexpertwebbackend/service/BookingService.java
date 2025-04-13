@@ -8,16 +8,14 @@ import org.example.travelexpertwebbackend.dto.booking.BookingCreateResponseDTO;
 import org.example.travelexpertwebbackend.dto.booking.CostSummaryResponseDTO;
 import org.example.travelexpertwebbackend.entity.*;
 import org.example.travelexpertwebbackend.entity.Package;
-import org.example.travelexpertwebbackend.repository.BookingRepository;
-import org.example.travelexpertwebbackend.repository.PackageRepository;
-import org.example.travelexpertwebbackend.repository.TransactionRepository;
-import org.example.travelexpertwebbackend.repository.TripTypesRepository;
+import org.example.travelexpertwebbackend.repository.*;
 import org.springframework.stereotype.Service;
 import org.tinylog.Logger;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Instant;
+import java.util.List;
 
 @Service
 public class BookingService {
@@ -27,19 +25,27 @@ public class BookingService {
     private final TransactionRepository transactionRepository;
     private final CustomerTierService customerTierService;
     private final StripeService stripeService;
+    private final RegionRepository regionRepository;
+    private final ClassRepository classRepository;
+    private final FeeRepository feeRepository;
+    private final PackagesProductsSupplierRepository packagesProductsSupplierRepository;
 
     public BookingService(
             BookingRepository bookingRepository,
             PackageRepository packageRepository,
             TripTypesRepository tripTypesRepository,
             TransactionRepository transactionRepository,
-            CustomerTierService customerTierService, StripeService stripeService) {
+            CustomerTierService customerTierService, StripeService stripeService, RegionRepository regionRepository, ClassRepository classRepository, FeeRepository feeRepository, PackagesProductsSupplierRepository packagesProductsSupplierRepository) {
         this.bookingRepository = bookingRepository;
         this.packageRepository = packageRepository;
         this.tripTypesRepository = tripTypesRepository;
         this.transactionRepository = transactionRepository;
         this.customerTierService = customerTierService;
         this.stripeService = stripeService;
+        this.regionRepository = regionRepository;
+        this.classRepository = classRepository;
+        this.feeRepository = feeRepository;
+        this.packagesProductsSupplierRepository = packagesProductsSupplierRepository;
     }
 
 
@@ -68,8 +74,10 @@ public class BookingService {
         TripType tripType = tripTypesRepository.findById(requestDTO.getTripTypeId())
                 .orElseThrow(() -> new IllegalArgumentException("Trip Type not found with ID: " + requestDTO.getTripTypeId()));
 
+        boolean isReservation = isReservationMode(requestDTO.getBookingMode());
+
         // check Stripe payment method's requirement
-        checkStripePaymentRequirement(requestDTO.getPaymentMethod(), requestDTO.getPaymentId());
+        if (!isReservation) checkStripePaymentRequirement(requestDTO.getPaymentMethod(), requestDTO.getPaymentId());
 
         // create a new booking
         BigDecimal totalPrice = calculateTotalPrice(aPackage.getPkgbaseprice(), aPackage.getPkgagencycommission(), requestDTO.getTravelerCount());
@@ -79,7 +87,7 @@ public class BookingService {
         Integer pointsEarned = calculatePointToEarn(totalPrice);
         BigDecimal finalPrice = calculateFinalPrice(totalPrice, discount);
 
-        boolean isReservation = isReservationMode(requestDTO.getBookingMode());
+
         Instant reservedUntil = isReservation ? getReservationExpiry() : null;
         BigDecimal newBalance = null;
         try {
@@ -104,6 +112,15 @@ public class BookingService {
         booking.setPackageid(aPackage);
 
         // create booking details
+        Region region = regionRepository.findById("OTHR").orElseThrow(() -> new IllegalArgumentException("Region not found with ID: OTHR"));
+        Classes classes = classRepository.findById("ECN").orElseThrow(() -> new IllegalArgumentException("Class not found with ID: ECN"));
+        Fee fee = feeRepository.findById("BK").orElseThrow(() -> new IllegalArgumentException("Fee not found with ID: BK"));
+        List<PackagesProductsSupplier> ppsList = packagesProductsSupplierRepository.findByPackageid_Id(aPackage.getId());
+        if (ppsList.isEmpty()) {
+            throw new IllegalArgumentException("No products found for the package");
+        }
+        PackagesProductsSupplier selectedProduct = ppsList.get((int) (Math.random() * ppsList.size()));
+
         String[] packageDestinations = aPackage.getDestination().replaceAll(" ", "").split(",");
         int destinationCount = packageDestinations.length;
         for (String destination : packageDestinations) {
@@ -115,6 +132,10 @@ public class BookingService {
             bookingDetail.setDestination(destination);
             bookingDetail.setBaseprice(aPackage.getPkgbaseprice().divide(new BigDecimal(destinationCount), 2, RoundingMode.HALF_UP));
             bookingDetail.setAgencycommission(aPackage.getPkgagencycommission().divide(new BigDecimal(destinationCount), 2, RoundingMode.HALF_UP));
+            bookingDetail.setRegionid(region);
+            bookingDetail.setClassid(classes);
+            bookingDetail.setFeeid(fee);
+            bookingDetail.setProductsupplierid(selectedProduct.getProductsupplierid().getId());
             // set booking detail to booking
             bookingDetail.setBooking(booking);
             booking.getBookingDetails().add(bookingDetail);

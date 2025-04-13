@@ -2,6 +2,7 @@ package org.example.travelexpertwebbackend.service.auth;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.example.travelexpertwebbackend.dto.CustomerDTO;
+import org.example.travelexpertwebbackend.dto.auth.GetUserByIdResponseDTO;
 import org.example.travelexpertwebbackend.dto.auth.SignUpResponseDTO;
 import org.example.travelexpertwebbackend.dto.auth.UserInfoDTO;
 import org.example.travelexpertwebbackend.entity.Agent;
@@ -178,5 +179,27 @@ public class UserService implements UserDetailsService {
 
     private String getAgentFullName(User user) {
         return user.getAgent().getAgtFirstName() + " " + user.getAgent().getAgtLastName();
+    }
+
+    public GetUserByIdResponseDTO getUserIdByReference(Integer customerId, Integer agentId) {
+
+        if (customerId == null && agentId == null) {
+            throw new IllegalArgumentException("Either customerId or agentId must be provided");
+        }
+
+        if (customerId != null && agentId != null) {
+            throw new IllegalArgumentException("Both customerId and agentId cannot be provided at the same time");
+        }
+
+        User user = null;
+        if (customerId != null) {
+            user = userRepository.findByCustomer_Id(customerId)
+                    .orElseThrow(() -> new EntityNotFoundException("Customer not found with ID: " + customerId));
+        } else {
+            user = userRepository.findByAgentId(agentId)
+                    .orElseThrow(() -> new EntityNotFoundException("Agent not found with ID: " + agentId));
+        }
+
+        return new GetUserByIdResponseDTO(user.getId());
     }
 }
