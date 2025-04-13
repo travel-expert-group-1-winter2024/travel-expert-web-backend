@@ -1,5 +1,8 @@
 package org.example.travelexpertwebbackend.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class PaymentRequest {
         private String tripType;
         private int travellers;

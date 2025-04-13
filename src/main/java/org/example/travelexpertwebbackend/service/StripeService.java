@@ -31,7 +31,6 @@ public class StripeService {
                 new HashMap<String, Object>() {{
                     put("amount", amount);
                     put("currency", currency);
-                    // you can add metadata here if needed, e.g. put("metadata", ...)
                 }}
         );
 
