@@ -88,9 +88,11 @@ public class BookingController {
             BookingCreateResponseDTO response = bookingService.confirmBooking(responseDTO.getBookingId(), responseDTO.getPaymentMethod(), responseDTO.getPaymentId());
             return ResponseEntity.ok(new GenericApiResponse<>(response));
         } catch (IllegalArgumentException | IllegalStateException e) {
+            Logger.error(e, "Failed to confirm booking");
             return ResponseEntity.badRequest()
                     .body(new GenericApiResponse<>(List.of(new ErrorInfo(e.getMessage()))));
         } catch (Exception e) {
+            Logger.error(e, "Failed to confirm booking");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new GenericApiResponse<>(List.of(new ErrorInfo("An internal error occurred."))));
         }
