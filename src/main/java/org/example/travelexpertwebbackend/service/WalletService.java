@@ -1,5 +1,6 @@
 package org.example.travelexpertwebbackend.service;
 
+import org.example.travelexpertwebbackend.dto.WalletDTO;
 import org.example.travelexpertwebbackend.dto.wallet.WalletTopUpRequestDTO;
 import org.example.travelexpertwebbackend.dto.wallet.WalletTopUpResponseDTO;
 import org.example.travelexpertwebbackend.entity.Customer;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.Optional;
 
 @Service
 public class WalletService {
@@ -48,4 +50,15 @@ public class WalletService {
                 savedWallet.getBalance()
         );
     }
+
+    public Optional<WalletDTO> getWalletDetails(Integer customerId) {
+        return walletRepository.getWalletByCustomerId(customerId)
+                .map(wallet -> new WalletDTO(
+                        wallet.getId(),
+                        wallet.getCustomer().getId(),
+                        wallet.getBalance(),
+                        wallet.getLastUpdated()
+                ));
+    }
+
 }
