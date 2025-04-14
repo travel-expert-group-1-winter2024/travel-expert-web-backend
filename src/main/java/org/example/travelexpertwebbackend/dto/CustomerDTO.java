@@ -1,7 +1,6 @@
 package org.example.travelexpertwebbackend.dto;
 
 import jakarta.validation.constraints.NotNull;
-import org.example.travelexpertwebbackend.entity.Agent;
 import org.example.travelexpertwebbackend.entity.Customer;
 
 public class CustomerDTO {
@@ -21,9 +20,13 @@ public class CustomerDTO {
 
     @NotNull(message = "Password is required")
     private String password;
-    @NotNull(message = "Confirm Password is required")
+    //    @NotNull(message = "Confirm Password is required")
+    private Integer points;
 
-    public CustomerDTO() {}
+    private String tier;
+
+    public CustomerDTO() {
+    }
 
     public CustomerDTO(Integer id, String custfirstname, String custlastname, String custaddress,
                        String custcity, String custprov, String custpostal, String custcountry,
@@ -57,46 +60,108 @@ public class CustomerDTO {
         this.custhomephone = customer.getCusthomephone();
         this.custbusphone = customer.getCustbusphone();
         this.custemail = customer.getCustemail();
-        this.agentId= customer.getAgent().getId();
+        this.agentId = customer.getAgent().getId();
         this.isAgent = customer.isAgent();
+        this.points = customer.getPoints();
+        this.tier = customer.getCustomerTier().getName();
     }
 
     // Getters and Setters
-    public Integer getCustomerid() { return customerid; }
-    public void setCustomerid(Integer customerid) { this.customerid = customerid; }
+    public Integer getCustomerid() {
+        return customerid;
+    }
 
-    public String getCustfirstname() { return custfirstname; }
-    public void setCustfirstname(String custfirstname) { this.custfirstname = custfirstname; }
+    public void setCustomerid(Integer customerid) {
+        this.customerid = customerid;
+    }
 
-    public String getCustlastname() { return custlastname; }
-    public void setCustlastname(String custlastname) { this.custlastname = custlastname; }
+    public String getCustfirstname() {
+        return custfirstname;
+    }
 
-    public String getCustaddress() { return custaddress; }
-    public void setCustaddress(String custaddress) { this.custaddress = custaddress; }
+    public void setCustfirstname(String custfirstname) {
+        this.custfirstname = custfirstname;
+    }
 
-    public String getCustcity() { return custcity; }
-    public void setCustcity(String custcity) { this.custcity = custcity; }
+    public String getCustlastname() {
+        return custlastname;
+    }
 
-    public String getCustprov() { return custprov; }
-    public void setCustprov(String custprov) { this.custprov = custprov; }
+    public void setCustlastname(String custlastname) {
+        this.custlastname = custlastname;
+    }
 
-    public String getCustpostal() { return custpostal; }
-    public void setCustpostal(String custpostal) { this.custpostal = custpostal; }
+    public String getCustaddress() {
+        return custaddress;
+    }
 
-    public String getCustcountry() { return custcountry; }
-    public void setCustcountry(String custcountry) { this.custcountry = custcountry; }
+    public void setCustaddress(String custaddress) {
+        this.custaddress = custaddress;
+    }
 
-    public String getCusthomephone() { return custhomephone; }
-    public void setCusthomephone(String custhomephone) { this.custhomephone = custhomephone; }
+    public String getCustcity() {
+        return custcity;
+    }
 
-    public String getCustbusphone() { return custbusphone; }
-    public void setCustbusphone(String custbusphone) { this.custbusphone = custbusphone; }
+    public void setCustcity(String custcity) {
+        this.custcity = custcity;
+    }
 
-    public String getCustemail() { return custemail; }
-    public void setCustemail(String custemail) { this.custemail = custemail; }
+    public String getCustprov() {
+        return custprov;
+    }
 
-    public Integer getAgentId() { return agentId; }
-    public void setAgentId(Integer agentId) { this.agentId = agentId; }
+    public void setCustprov(String custprov) {
+        this.custprov = custprov;
+    }
+
+    public String getCustpostal() {
+        return custpostal;
+    }
+
+    public void setCustpostal(String custpostal) {
+        this.custpostal = custpostal;
+    }
+
+    public String getCustcountry() {
+        return custcountry;
+    }
+
+    public void setCustcountry(String custcountry) {
+        this.custcountry = custcountry;
+    }
+
+    public String getCusthomephone() {
+        return custhomephone;
+    }
+
+    public void setCusthomephone(String custhomephone) {
+        this.custhomephone = custhomephone;
+    }
+
+    public String getCustbusphone() {
+        return custbusphone;
+    }
+
+    public void setCustbusphone(String custbusphone) {
+        this.custbusphone = custbusphone;
+    }
+
+    public String getCustemail() {
+        return custemail;
+    }
+
+    public void setCustemail(String custemail) {
+        this.custemail = custemail;
+    }
+
+    public Integer getAgentId() {
+        return agentId;
+    }
+
+    public void setAgentId(Integer agentId) {
+        this.agentId = agentId;
+    }
 
     public String getPassword() {
         return password;
@@ -112,5 +177,21 @@ public class CustomerDTO {
 
     public void setAgent(boolean agent) {
         isAgent = agent;
+    }
+
+    public Integer getPoints() {
+        return points;
+    }
+
+    public void setPoints(Integer points) {
+        this.points = points;
+    }
+
+    public String getTier() {
+        return tier;
+    }
+
+    public void setTier(String tier) {
+        this.tier = tier;
     }
 }
