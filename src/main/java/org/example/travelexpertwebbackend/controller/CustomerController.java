@@ -42,18 +42,20 @@ public class CustomerController {
     }
 
     @PostMapping("/{id}/upload")
-    public ResponseEntity<String> uploadCustomerPhoto(
+    public ResponseEntity<GenericApiResponse<Map<String, String>>> uploadCustomerPhoto(
             @PathVariable int id,
-            @RequestParam("image") MultipartFile image) {
+            @RequestParam("image") MultipartFile image,
+            HttpServletRequest request) {
         try {
-            String savedFilename = customerService.uploadCustomerPhoto(id, image);
-            return ResponseEntity.ok("Image uploaded successfully: " + savedFilename);
+            String photoUrl = customerService.uploadCustomerPhoto(id, image, request);
+            return ResponseEntity.ok()
+                    .body(new GenericApiResponse<>(Map.of("imageURL", photoUrl)));
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+            Logger.error(e, "Error uploading customer photo");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new GenericApiResponse<>(List.of(new ErrorInfo("Customer not found"))));
         } catch (Exception e) {
             Logger.error(e, "Error uploading customer photo");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Failed to upload image.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new GenericApiResponse<>(List.of(new ErrorInfo("An unexpected error occurred"))));
         }
     }
 

@@ -56,7 +56,7 @@ public class CustomerService {
         return customers.stream().map(CustomerDTO::new).collect(Collectors.toList());
     }
 
-    public String uploadCustomerPhoto(int customerId, MultipartFile image) throws IOException {
+    public String uploadCustomerPhoto(int customerId, MultipartFile image, HttpServletRequest request) throws IOException {
         Optional<Customer> optionalCustomer = customerRepository.findById(customerId);
         // Validate customer exists
         if (optionalCustomer.isEmpty()) {
@@ -84,7 +84,7 @@ public class CustomerService {
         customer.setPhotoPath(filename);
         customerRepository.save(customer);
 
-        return filename;
+        return buildPhotoUrl(filename, request);
     }
 
     private void validateImageFile(MultipartFile file) {
