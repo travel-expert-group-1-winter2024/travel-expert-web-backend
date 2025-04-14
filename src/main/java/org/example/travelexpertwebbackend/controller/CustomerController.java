@@ -1,5 +1,6 @@
 package org.example.travelexpertwebbackend.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.example.travelexpertwebbackend.dto.CustomerDTO;
 import org.example.travelexpertwebbackend.dto.ErrorInfo;
 import org.example.travelexpertwebbackend.dto.GenericApiResponse;
@@ -15,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.tinylog.Logger;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -40,28 +42,29 @@ public class CustomerController {
     }
 
     @PostMapping("/{id}/upload")
-    public ResponseEntity<String> uploadCustomerPhoto(
+    public ResponseEntity<GenericApiResponse<Map<String, String>>> uploadCustomerPhoto(
             @PathVariable int id,
-            @RequestParam("image") MultipartFile image) {
+            @RequestParam("image") MultipartFile image,
+            HttpServletRequest request) {
         try {
-            String savedFilename = customerService.uploadCustomerPhoto(id, image);
-            return ResponseEntity.ok("Image uploaded successfully: " + savedFilename);
+            String photoUrl = customerService.uploadCustomerPhoto(id, image, request);
+            return ResponseEntity.ok()
+                    .body(new GenericApiResponse<>(Map.of("imageURL", photoUrl)));
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+            Logger.error(e, "Error uploading customer photo");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new GenericApiResponse<>(List.of(new ErrorInfo("Customer not found"))));
         } catch (Exception e) {
             Logger.error(e, "Error uploading customer photo");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Failed to upload image.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new GenericApiResponse<>(List.of(new ErrorInfo("An unexpected error occurred"))));
         }
     }
 
     @GetMapping("/{id}/photo")
-    public ResponseEntity<byte[]> downloadCustomerPhoto(@PathVariable int id) {
+    public ResponseEntity<GenericApiResponse<Map<String, String>>> downloadCustomerPhoto(@PathVariable int id, HttpServletRequest request) {
         try {
-            byte[] imageData = customerService.getCustomerPhoto(id);
+            String imageURL = customerService.getCustomerPhoto(id, request);
             return ResponseEntity.ok()
-                    .header("Content-Type", "image/jpeg")
-                    .body(imageData);
+                    .body(new GenericApiResponse<>(Map.of("imageURL", imageURL)));
         } catch (IllegalArgumentException e) {
             Logger.error(e, "Error retrieving customer photo");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -82,7 +85,6 @@ public class CustomerController {
         Optional<CustomerDTO> updatedCustomer = customerService.updateCustomerMobile(id, customerDTO);
         return updatedCustomer.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
-
 
 
     @PostMapping("/register")
@@ -134,8 +136,6 @@ public class CustomerController {
 //        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new GenericApiResponse<>(List.of(new ErrorInfo("An unexpected error occurred."))));
 //    }
 //}
-
-
 
 
     @PostMapping("/updatecustomer/{id}")

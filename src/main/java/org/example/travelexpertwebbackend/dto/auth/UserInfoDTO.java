@@ -12,17 +12,19 @@ public class UserInfoDTO {
     private String[] role;
     private Integer customerId;
     private Integer agentId;
+    private String photoUrl; // optional
 
     public UserInfoDTO() {
     }
 
-    public UserInfoDTO(UUID id, String name, String email, String[] role, Integer customerId, Integer agentId) {
+    public UserInfoDTO(UUID id, String name, String email, String[] role, Integer customerId, Integer agentId, String photoUrl) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.role = role;
         this.customerId = customerId;
         this.agentId = agentId;
+        this.photoUrl = photoUrl;
     }
 
     public UUID getId() {
@@ -47,5 +49,9 @@ public class UserInfoDTO {
 
     public Integer getAgentId() {
         return agentId;
+    }
+
+    public String getPhotoUrl() {
+        return photoUrl;
     }
 }

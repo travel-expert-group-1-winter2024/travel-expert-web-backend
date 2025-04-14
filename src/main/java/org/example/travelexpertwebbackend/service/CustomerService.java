@@ -1,5 +1,6 @@
 package org.example.travelexpertwebbackend.service;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.example.travelexpertwebbackend.dto.CustomerDTO;
 import org.example.travelexpertwebbackend.entity.*;
 import org.example.travelexpertwebbackend.entity.auth.Role;
@@ -10,11 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import org.tinylog.Logger;
-
 import org.springframework.web.multipart.MultipartFile;
-
+import org.tinylog.Logger;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -22,17 +20,21 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.Random;
+import java.util.Set;
 import java.util.stream.Collectors;
+
+import static org.example.travelexpertwebbackend.utils.RestUtil.buildPhotoUrl;
 
 @Service
 public class CustomerService {
+    private static final String UPLOAD_DIR = "uploads/";
     @Autowired
     private final CustomerRepository customerRepository;
     private final AgentRepository agentRepository;
-
-    private static final String UPLOAD_DIR = "customer-uploads/";
-
+    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     @Autowired
     private CustomerTierService customerTierService;
     @Autowired
@@ -44,8 +46,6 @@ public class CustomerService {
     @Autowired
     private BookingRepository bookingRepository;
 
-    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-
     public CustomerService(CustomerRepository customerRepository, AgentRepository agentRepository) {
         this.customerRepository = customerRepository;
         this.agentRepository = agentRepository;
@@ -56,7 +56,7 @@ public class CustomerService {
         return customers.stream().map(CustomerDTO::new).collect(Collectors.toList());
     }
 
-    public String uploadCustomerPhoto(int customerId, MultipartFile image) throws IOException {
+    public String uploadCustomerPhoto(int customerId, MultipartFile image, HttpServletRequest request) throws IOException {
         Optional<Customer> optionalCustomer = customerRepository.findById(customerId);
         // Validate customer exists
         if (optionalCustomer.isEmpty()) {
@@ -84,7 +84,7 @@ public class CustomerService {
         customer.setPhotoPath(filename);
         customerRepository.save(customer);
 
-        return filename;
+        return buildPhotoUrl(filename, request);
     }
 
     private void validateImageFile(MultipartFile file) {
@@ -100,7 +100,7 @@ public class CustomerService {
         }
     }
 
-    public byte[] getCustomerPhoto(int id) {
+    public String getCustomerPhoto(int id, HttpServletRequest request) {
         Optional<Customer> optionalCustomer = customerRepository.findById(id);
         if (optionalCustomer.isEmpty()) {
             throw new IllegalArgumentException("Customer not found");
@@ -112,12 +112,7 @@ public class CustomerService {
             throw new IllegalArgumentException("Customer photo not found");
         }
 
-        Path path = Paths.get(UPLOAD_DIR).resolve(photoPath);
-        try {
-            return Files.readAllBytes(path);
-        } catch (IOException e) {
-            throw new RuntimeException("Error reading photo file", e);
-        }
+        return buildPhotoUrl(photoPath, request);
     }
 
     private String generateUniqueFilename(int customerId, String originalFilename) {
@@ -181,6 +176,7 @@ public class CustomerService {
 
     /**
      * This method is responsible for creating a wallet and assigning it to the customer
+     *
      * @param customer The customer object, of which will be associated with the wallet being created
      * @return The newly created wallet object assigned to the customer.
      */
@@ -200,9 +196,10 @@ public class CustomerService {
 
     /**
      * The method responsible for first creating, and then saving the new Customer Object
-     * @param customerDTO The data transfer object containing all the data in regards to our user, the customer.
+     *
+     * @param customerDTO   The data transfer object containing all the data in regards to our user, the customer.
      * @param assignedAgent A randomly selected agent, from the roster of agents is assigned to this customer as their liaison.
-     * @param isAgent A boolean value assigned at creation to determine if the new customer record, belongs to an already existing agent
+     * @param isAgent       A boolean value assigned at creation to determine if the new customer record, belongs to an already existing agent
      * @return The newly created Customer object, saved to the repository.
      */
     private Customer createAndSaveCustomer(CustomerDTO customerDTO, Agent assignedAgent, boolean isAgent) {
@@ -230,13 +227,14 @@ public class CustomerService {
 
     /**
      * This method picks a random agent from the full roster of agents, to be assigned to the created Customer Object.
+     *
      * @return The selected agent, to be assigned.
      */
     private Agent assignRandomAgent() {
         //* Grabbing all Agents from Agents db.
         List<Agent> existingAgents = agentRepository.findAll();
         //* Handling potential errors, such as error grabbing all Agents
-        if(existingAgents.isEmpty()){
+        if (existingAgents.isEmpty()) {
             throw new IllegalStateException("No available agents to assign");
         }
         //* Assigning a random numbered agent based on the length of the list
@@ -244,8 +242,6 @@ public class CustomerService {
         Random random = new Random();
         return existingAgents.get(random.nextInt(existingAgents.size()));
     }
-
-
 
     // Update an existing customer
     public Optional<CustomerDTO> updateCustomer(Integer id, CustomerDTO customerDTO) {

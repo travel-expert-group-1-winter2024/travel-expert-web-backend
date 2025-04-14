@@ -1,5 +1,6 @@
 package org.example.travelexpertwebbackend.controller.auth;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.example.travelexpertwebbackend.dto.ErrorInfo;
 import org.example.travelexpertwebbackend.dto.GenericApiResponse;
@@ -48,7 +49,7 @@ public class UserController {
     }
 
     @PostMapping("/api/login")
-    public ResponseEntity<AuthResponse<UserInfoDTO>> loginUser(@Valid @RequestBody LoginRequestDTO user) {
+    public ResponseEntity<AuthResponse<UserInfoDTO>> loginUser(@Valid @RequestBody LoginRequestDTO user, HttpServletRequest request) {
         try {
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
             if (authentication.isAuthenticated()) {
@@ -57,7 +58,7 @@ public class UserController {
                 String jwt = jwtService.generateToken(userDetails);
 
                 // Get user info
-                UserInfoDTO userInfo = userService.getUserInfo(user.getUsername());
+                UserInfoDTO userInfo = userService.getUserInfo(user.getUsername(), request);
 
                 return ResponseEntity.ok(new AuthResponse<>(userInfo, jwt));
             }
@@ -73,14 +74,14 @@ public class UserController {
     }
 
     @GetMapping("/api/auth/me")
-    public ResponseEntity<GenericApiResponse<UserInfoDTO>> getCurrentUser(Authentication authentication) {
+    public ResponseEntity<GenericApiResponse<UserInfoDTO>> getCurrentUser(Authentication authentication, HttpServletRequest request) {
         try {
             if (authentication == null || !authentication.isAuthenticated()) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body(new GenericApiResponse<>(List.of(new ErrorInfo("User not authenticated"))));
             }
             String username = (String) authentication.getPrincipal();
-            UserInfoDTO userInfo = userService.getUserInfo(username);
+            UserInfoDTO userInfo = userService.getUserInfo(username, request);
             return ResponseEntity.ok(new GenericApiResponse<>(userInfo));
         } catch (IllegalArgumentException e) {
             Logger.error(e, "Error retrieving user info");

@@ -1,6 +1,7 @@
 package org.example.travelexpertwebbackend.service.auth;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
 import org.example.travelexpertwebbackend.dto.CustomerDTO;
 import org.example.travelexpertwebbackend.dto.auth.GetUserByIdResponseDTO;
 import org.example.travelexpertwebbackend.dto.auth.SignUpResponseDTO;
@@ -21,6 +22,8 @@ import org.tinylog.Logger;
 
 import java.time.Instant;
 import java.util.Optional;
+
+import static org.example.travelexpertwebbackend.utils.RestUtil.buildPhotoUrl;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -137,7 +140,7 @@ public class UserService implements UserDetailsService {
         return user.getCustomer();
     }
 
-    public UserInfoDTO getUserInfo(String username) {
+    public UserInfoDTO getUserInfo(String username, HttpServletRequest request) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
@@ -154,13 +157,16 @@ public class UserService implements UserDetailsService {
         String fullName = null;
         Integer customerId = null;
         Integer agentId = null;
+        String photoUrl = null;
 
         if (user.getCustomer() != null) {
             customerId = user.getCustomer().getId();
             fullName = getCustomerFullName(user);
+            photoUrl = buildPhotoUrl(user.getCustomer().getPhotoPath(), request);
         } else if (user.getAgent() != null) {
             agentId = user.getAgent().getId();
             fullName = getAgentFullName(user);
+            photoUrl = buildPhotoUrl(user.getAgent().getPhotoPath(), request);
         }
 
         return new UserInfoDTO(
@@ -169,7 +175,8 @@ public class UserService implements UserDetailsService {
                 user.getUsername(),
                 user.getRoles(),
                 customerId,
-                agentId
+                agentId,
+                photoUrl
         );
     }
 
