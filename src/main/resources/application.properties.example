@@ -1,8 +1,3 @@
-if (booking.getBookingStatus() == RESERVED &&
-Instant.now().isAfter(booking.getReservedDatetime())) {
-booking.setBookingStatus(EXPIRED);
-bookingRepository.save(booking);
-}
 spring.application.name=travel-expert-web-backend
 # db connection
 # db access
@@ -32,3 +27,6 @@ spring.mail.properties.mail.smtp.auth=true
 spring.mail.properties.mail.smtp.starttls.enable=true
 # Stripe Configuration
 stripe.secret-key=STRIPE_SECRET_KEY
+# File Upload Configuration
+spring.servlet.multipart.max-file-size=5MB
+spring.servlet.multipart.max-request-size=10MB
