@@ -63,6 +63,12 @@ public class Booking {
     @Column(name = "booking_status", length = 20)
     private BookingStatus bookingStatus;
 
+    @Size(max = 255)
+    @Column(name = "travellername")
+    private String travellerName;
+
+
+
     public Booking() {
     }
 
@@ -168,6 +174,14 @@ public class Booking {
 
     public void setBookingDetails(Set<BookingDetail> bookingDetails) {
         this.bookingDetails = bookingDetails;
+    }
+
+    public String getTravellerName() {
+        return travellerName;
+    }
+
+    public void setTravellerName(String travellerName) {
+        this.travellerName = travellerName;
     }
 
     public enum BookingStatus {
