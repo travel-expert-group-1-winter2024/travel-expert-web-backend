@@ -101,7 +101,7 @@ public class CustomerController {
                             .body(new GenericApiResponse<>(List.of(new ErrorInfo("User Already Exists"))));
                 } else if ("AGENT".equals(existingUser.getRole())) {
                     Logger.info("User Already Exists as Agent: " + customerDTO.getCustemail());
-                    CustomerDTO registeredAgentCustomer = customerService.registerCustomer(customerDTO);
+                    CustomerDTO registeredAgentCustomer = customerService.registerCustomer(customerDTO, false);
                     customerDTO.setCustomerid(registeredAgentCustomer.getCustomerid());
                     Logger.info("Successfully registered agent - customer: " + customerDTO.getCustemail());
                     return ResponseEntity.ok(new GenericApiResponse<>(registeredAgentCustomer));
@@ -109,7 +109,7 @@ public class CustomerController {
             }
 
             Logger.debug("Registering customer: " + customerDTO.getCustemail());
-            CustomerDTO registeredCustomer = customerService.registerCustomer(customerDTO);
+            CustomerDTO registeredCustomer = customerService.registerCustomer(customerDTO, false);
             customerDTO.setCustomerid(registeredCustomer.getCustomerid());
             Logger.info("Successfully registered customer: " + customerDTO.getCustemail());
 

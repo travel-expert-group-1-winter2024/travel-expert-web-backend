@@ -144,7 +144,7 @@ public class CustomerService {
         });
     }
 
-    public CustomerDTO registerCustomer(CustomerDTO customerDTO) {
+    public CustomerDTO registerCustomer(CustomerDTO customerDTO, boolean isSkipRandomAgent) {
         //* Grabbing the email from the request
         String email = customerDTO.getCustemail();
         //* Checking if a user with this email already exists in our records
@@ -165,7 +165,10 @@ public class CustomerService {
         }
 
         //* Assigns a random agent to each new customer
-        Agent assignedAgent = assignRandomAgent();
+        Agent assignedAgent = null;
+        if (!isSkipRandomAgent) {
+            assignedAgent = assignRandomAgent();
+        }
         //* Creates and save the new Customer Object
         Customer customer = createAndSaveCustomer(customerDTO, assignedAgent, isAgent);
         // create wallet for customer
