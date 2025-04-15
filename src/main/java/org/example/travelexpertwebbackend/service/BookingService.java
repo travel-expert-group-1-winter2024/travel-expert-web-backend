@@ -151,7 +151,13 @@ public class BookingService {
         }
 
         booking.setCustomer(customer);
+        List<String> travellerNamesList = requestDTO.getTravellerNames();
+        if (travellerNamesList == null || travellerNamesList.isEmpty()) {
+            throw new IllegalArgumentException("Traveller names cannot be empty");
+        }
 
+        String travellerNameCsv = String.join(",", travellerNamesList);
+        booking.setTravellerName(travellerNameCsv);
         // save booking
         Booking savedBooking = bookingRepository.save(booking);
         return new BookingCreateResponseDTO(

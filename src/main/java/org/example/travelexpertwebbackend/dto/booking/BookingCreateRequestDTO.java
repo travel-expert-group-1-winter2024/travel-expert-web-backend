@@ -5,6 +5,8 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import org.example.travelexpertwebbackend.service.BookingService;
 
+import java.util.List;
+
 public class BookingCreateRequestDTO {
     @Min(0)
     @NotNull(message = "Package ID cannot be null")
@@ -19,6 +21,9 @@ public class BookingCreateRequestDTO {
     private BookingService.BookingMode bookingMode = BookingService.BookingMode.NORMAL;
     private BookingService.PaymentMethod paymentMethod;
     private String paymentId; // for Stripe
+    @NotNull(message = "Traveller names cannot be null")
+    private List<String> travellerNames;
+
 
     public BookingCreateRequestDTO() {
     }
@@ -69,5 +74,13 @@ public class BookingCreateRequestDTO {
 
     public void setPaymentId(String paymentId) {
         this.paymentId = paymentId;
+    }
+
+    public List<String> getTravellerNames() {
+        return travellerNames;
+    }
+
+    public void setTravellerNames(List<String> travellerNames) {
+        this.travellerNames = travellerNames;
     }
 }
