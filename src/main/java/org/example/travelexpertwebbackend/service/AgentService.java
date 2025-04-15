@@ -9,9 +9,11 @@ import org.example.travelexpertwebbackend.dto.agent.AgentUpdateRequestDTO;
 import org.example.travelexpertwebbackend.dto.agent.AgentUpdateResponseDTO;
 import org.example.travelexpertwebbackend.entity.Agency;
 import org.example.travelexpertwebbackend.entity.Agent;
+import org.example.travelexpertwebbackend.entity.Customer;
 import org.example.travelexpertwebbackend.entity.auth.User;
 import org.example.travelexpertwebbackend.repository.AgencyRepository;
 import org.example.travelexpertwebbackend.repository.AgentRepository;
+import org.example.travelexpertwebbackend.repository.CustomerRepository;
 import org.example.travelexpertwebbackend.repository.auth.UserRepository;
 import org.example.travelexpertwebbackend.service.auth.UserService;
 import org.springframework.stereotype.Service;
@@ -32,13 +34,15 @@ public class AgentService {
     private final UserService userService;
     private final CustomerService customerService;
     private final UserRepository userRepository;
+    private final CustomerRepository customerRepository;
 
-    public AgentService(AgentRepository agentRepository, AgencyRepository agencyRepository, UserService userService, CustomerService customerService, UserRepository userRepository) {
+    public AgentService(AgentRepository agentRepository, AgencyRepository agencyRepository, UserService userService, CustomerService customerService, UserRepository userRepository, CustomerRepository customerRepository) {
         this.agentRepository = agentRepository;
         this.agencyRepository = agencyRepository;
         this.userService = userService;
         this.customerService = customerService;
         this.userRepository = userRepository;
+        this.customerRepository = customerRepository;
     }
 
     private static CustomerDTO getCustomerDTO(Agent savedAgent) {
@@ -82,7 +86,13 @@ public class AgentService {
         Files.write(filePath, image.getBytes());
 
         agent.setPhotoPath(filename);
-        agentRepository.save(agent);
+        Agent savedAgent = agentRepository.save(agent);
+
+        // find agent record in customer table
+        Customer customer = customerRepository.findByCustemail(savedAgent.getAgtEmail())
+                .orElseThrow(() -> new IllegalArgumentException("Customer not found"));
+        customer.setPhotoPath(filename);
+        customerRepository.save(customer);
 
         return filename;
     }
@@ -207,6 +217,14 @@ public class AgentService {
         CustomerDTO customerDTO = getCustomerDTO(savedAgent);
 
         CustomerDTO savedCustomerDTO = customerService.registerCustomer(customerDTO, true);
+
+        // set customer to user table
+        // TODO: this should be done in different way
+        Customer customer = customerRepository.findById(savedCustomerDTO.getCustomerid())
+                .orElseThrow(() -> new IllegalArgumentException("Customer not found"));
+
+        savedUser.setCustomer(customer);
+        savedUser = userRepository.save(savedUser);
 
         return new AgentCreationResponseDTO(
                 savedAgent.getId(),
