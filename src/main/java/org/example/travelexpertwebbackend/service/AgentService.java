@@ -1,12 +1,19 @@
 package org.example.travelexpertwebbackend.service;
 
+import jakarta.transaction.Transactional;
 import org.example.travelexpertwebbackend.dto.AgentDetailResponseDTO;
+import org.example.travelexpertwebbackend.dto.CustomerDTO;
+import org.example.travelexpertwebbackend.dto.agent.AgentCreationRequestDTO;
+import org.example.travelexpertwebbackend.dto.agent.AgentCreationResponseDTO;
 import org.example.travelexpertwebbackend.dto.agent.AgentUpdateRequestDTO;
 import org.example.travelexpertwebbackend.dto.agent.AgentUpdateResponseDTO;
 import org.example.travelexpertwebbackend.entity.Agency;
 import org.example.travelexpertwebbackend.entity.Agent;
+import org.example.travelexpertwebbackend.entity.auth.User;
 import org.example.travelexpertwebbackend.repository.AgencyRepository;
 import org.example.travelexpertwebbackend.repository.AgentRepository;
+import org.example.travelexpertwebbackend.repository.auth.UserRepository;
+import org.example.travelexpertwebbackend.service.auth.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.tinylog.Logger;
@@ -22,10 +29,32 @@ public class AgentService {
 
     private final AgentRepository agentRepository;
     private final AgencyRepository agencyRepository;
+    private final UserService userService;
+    private final CustomerService customerService;
+    private final UserRepository userRepository;
 
-    public AgentService(AgentRepository agentRepository, AgencyRepository agencyRepository) {
+    public AgentService(AgentRepository agentRepository, AgencyRepository agencyRepository, UserService userService, CustomerService customerService, UserRepository userRepository) {
         this.agentRepository = agentRepository;
         this.agencyRepository = agencyRepository;
+        this.userService = userService;
+        this.customerService = customerService;
+        this.userRepository = userRepository;
+    }
+
+    private static CustomerDTO getCustomerDTO(Agent savedAgent) {
+        CustomerDTO customerDTO = new CustomerDTO();
+        customerDTO.setCustfirstname(savedAgent.getAgtFirstName());
+        customerDTO.setCustlastname(savedAgent.getAgtLastName());
+        customerDTO.setCustbusphone(savedAgent.getAgtBusPhone());
+        customerDTO.setCustemail(savedAgent.getAgtEmail());
+        customerDTO.setAgentId(savedAgent.getId());
+
+        // set empty address
+        customerDTO.setCustaddress("");
+        customerDTO.setCustcity("");
+        customerDTO.setCustprov("");
+        customerDTO.setCustpostal("");
+        return customerDTO;
     }
 
     public String uploadAgentPhoto(int agentId, MultipartFile image) throws IOException {
@@ -142,6 +171,60 @@ public class AgentService {
                 savedAgent.getAgtEmail(),
                 savedAgent.getAgtPosition(),
                 savedAgent.getAgency().getId()
+        );
+    }
+
+    @Transactional
+    public AgentCreationResponseDTO createAgent(AgentCreationRequestDTO request) {
+
+        // find agency by id
+        Agency agency = agencyRepository.findById(request.getAgencyId())
+                .orElseThrow(() -> new IllegalArgumentException("Agency not found"));
+
+        // create new agent
+        Agent agent = new Agent();
+        agent.setAgtFirstName(request.getAgtFirstName());
+        agent.setAgtMiddleInitial(request.getAgtMiddleInitial());
+        agent.setAgtLastName(request.getAgtLastName());
+        agent.setAgtBusPhone(request.getAgtBusPhone());
+        agent.setAgtEmail(request.getAgtEmail());
+        agent.setAgtPosition("Agent"); // default position`
+        agent.setAgency(agency);
+
+        // save agent
+        Agent savedAgent = agentRepository.save(agent);
+
+        // create user
+        User user = userService.createAgentUser(
+                savedAgent.getAgtEmail(),
+                request.getPassword(),
+                savedAgent
+        );
+        // save user
+        User savedUser = userRepository.save(user);
+
+        // create customer record
+        CustomerDTO customerDTO = getCustomerDTO(savedAgent);
+
+        CustomerDTO savedCustomerDTO = customerService.registerCustomer(customerDTO, true);
+
+        return new AgentCreationResponseDTO(
+                savedAgent.getId(),
+                savedAgent.getAgtFirstName(),
+                savedAgent.getAgtMiddleInitial(),
+                savedAgent.getAgtLastName(),
+                savedAgent.getAgtBusPhone(),
+                savedAgent.getAgtEmail(),
+                savedAgent.getAgtPosition(),
+                savedAgent.getAgency().getAgencyCity(),
+                savedUser.getId().toString(),
+                savedUser.getUsername(),
+                savedUser.getRole(),
+                savedCustomerDTO.getCustomerid(),
+                savedCustomerDTO.getCustfirstname(),
+                savedCustomerDTO.getCustlastname(),
+                savedCustomerDTO.getCustbusphone(),
+                savedCustomerDTO.getCustemail()
         );
     }
 }
