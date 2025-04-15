@@ -85,11 +85,7 @@ public class UserService implements UserDetailsService {
         Agent agent = agentRepository.findById(agentId)
                 .orElseThrow(() -> new EntityNotFoundException("Agent not found with id: " + agentId));
 
-        User user = new User();
-        user.setUsername(username);
-        user.setPasswordHash(new BCryptPasswordEncoder().encode(password));
-        user.setAgent(agent);
-        user.setRole(Role.AGENT.name()); // default role
+        User user = createAgentUser(username, password, agent);
 
         User savedUser = userRepository.save(user);
         return new SignUpResponseDTO(
@@ -97,6 +93,15 @@ public class UserService implements UserDetailsService {
                 savedUser.getUsername(),
                 savedUser.getRole()
         );
+    }
+
+    public User createAgentUser(String username, String password, Agent agent) {
+        User user = new User();
+        user.setUsername(username);
+        user.setPasswordHash(new BCryptPasswordEncoder().encode(password));
+        user.setAgent(agent);
+        user.setRole(Role.AGENT.name()); // default role
+        return user;
     }
 
     public SignUpResponseDTO updateUser(CustomerDTO customerData) {

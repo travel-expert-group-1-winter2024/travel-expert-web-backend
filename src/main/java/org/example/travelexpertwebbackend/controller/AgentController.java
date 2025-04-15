@@ -1,8 +1,11 @@
 package org.example.travelexpertwebbackend.controller;
 
+import jakarta.validation.Valid;
 import org.example.travelexpertwebbackend.dto.AgentDetailResponseDTO;
 import org.example.travelexpertwebbackend.dto.ErrorInfo;
 import org.example.travelexpertwebbackend.dto.GenericApiResponse;
+import org.example.travelexpertwebbackend.dto.agent.AgentCreationRequestDTO;
+import org.example.travelexpertwebbackend.dto.agent.AgentCreationResponseDTO;
 import org.example.travelexpertwebbackend.dto.agent.AgentUpdateRequestDTO;
 import org.example.travelexpertwebbackend.dto.agent.AgentUpdateResponseDTO;
 import org.example.travelexpertwebbackend.service.AgentService;
@@ -23,6 +26,21 @@ public class AgentController {
 
     public AgentController(AgentService agentService) {
         this.agentService = agentService;
+    }
+
+    @PostMapping
+    public ResponseEntity<GenericApiResponse<AgentCreationResponseDTO>> createAgent(
+            @Valid @RequestBody AgentCreationRequestDTO request) {
+        try {
+            AgentCreationResponseDTO createdAgent = agentService.createAgent(request);
+            return ResponseEntity.status(HttpStatus.CREATED).body(new GenericApiResponse<>(createdAgent));
+        } catch (IllegalArgumentException e) {
+            Logger.error(e, "Error creating agent");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new GenericApiResponse<>(List.of(new ErrorInfo("Invalid input"))));
+        } catch (Exception e) {
+            Logger.error(e, "Error creating agent");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new GenericApiResponse<>(List.of(new ErrorInfo("Failed to create agent"))));
+        }
     }
 
     @PostMapping("/{id}/upload")

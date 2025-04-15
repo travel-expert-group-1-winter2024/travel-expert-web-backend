@@ -60,7 +60,9 @@ public class CustomerDTO {
         this.custhomephone = customer.getCusthomephone();
         this.custbusphone = customer.getCustbusphone();
         this.custemail = customer.getCustemail();
-        this.agentId = customer.getAgent().getId();
+        if (customer.getAgent() != null) {
+            this.agentId = customer.getAgent().getId();
+        }
         this.isAgent = customer.isAgent();
         this.points = customer.getPoints();
         this.tier = customer.getCustomerTier().getName();
