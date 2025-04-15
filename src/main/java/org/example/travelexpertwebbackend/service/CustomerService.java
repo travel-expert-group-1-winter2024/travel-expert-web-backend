@@ -128,7 +128,8 @@ public class CustomerService {
 
     // Update an existing customer
     public Optional<CustomerDTO> updateCustomerMobile(Integer id, CustomerDTO customerDTO) {
-        return customerRepository.findById(id).map(customer -> {
+
+        Optional<CustomerDTO> optionalCustomerDTO = customerRepository.findById(id).map(customer -> {
             customer.setCustfirstname(customerDTO.getCustfirstname());
             customer.setCustlastname(customerDTO.getCustlastname());
             customer.setCustaddress(customerDTO.getCustaddress());
@@ -138,10 +139,24 @@ public class CustomerService {
             customer.setCustcountry(customerDTO.getCustcountry());
             customer.setCusthomephone(customerDTO.getCusthomephone());
             customer.setCustbusphone(customerDTO.getCustbusphone());
-            customer.setCustemail(customerDTO.getCustemail());
+            customer.setCustemail(customerDTO.getCustemail()); // James: should we allow they change email?
             customerRepository.save(customer);
             return new CustomerDTO(customer);
         });
+
+        // find agent record
+        Optional<Agent> agent = agentRepository.findByAgtEmail(customerDTO.getCustemail());
+        if (agent.isPresent()) {
+            // update agent detail as well
+            Agent agentRecord = agent.get();
+            agentRecord.setAgtFirstName(customerDTO.getCustfirstname());
+            agentRecord.setAgtLastName(customerDTO.getCustlastname());
+            agentRecord.setAgtBusPhone(customerDTO.getCustbusphone());
+            agentRecord.setAgtEmail(customerDTO.getCustemail()); // James: should we allow they change email?
+            agentRepository.save(agentRecord);
+        }
+
+        return optionalCustomerDTO;
     }
 
     public CustomerDTO registerCustomer(CustomerDTO customerDTO, boolean isSkipRandomAgent) {
