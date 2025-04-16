@@ -45,9 +45,16 @@ public class CustomerTierService {
             return BigDecimal.ZERO;
         }
 
-        return totalAmount
-                .multiply(customerTier.getDiscountPercentage())
+        BigDecimal discount = totalAmount.multiply(customerTier.getDiscountPercentage())
                 .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+
+        if (customer.isAgent()) {
+            // Agents receive an additional 10% discount
+            BigDecimal agentBonus = totalAmount.multiply(BigDecimal.valueOf(10))
+                    .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+            discount = discount.add(agentBonus);
+        }
+        return discount;
     }
 
     public CustomerTier getTierByPoint(Integer point) {
