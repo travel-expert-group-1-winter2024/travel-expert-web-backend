@@ -88,7 +88,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/packages/*/details").permitAll()
                         .requestMatchers(HttpMethod.POST, "/packages").hasAnyRole(agentManagerRoles)
                         .requestMatchers(HttpMethod.PUT, "/packages/*").hasAnyRole(agentManagerRoles)
-                        .requestMatchers(HttpMethod.DELETE, "/packages").hasAnyRole(agentManagerRoles)
+                        .requestMatchers(HttpMethod.DELETE, "/packages/*").hasAnyRole(agentManagerRoles)
                         .requestMatchers(HttpMethod.GET, "/packages/product-supplier").hasAnyRole(agentManagerRoles)
                         .requestMatchers(HttpMethod.GET, "/packages/search").permitAll()
                         // places
