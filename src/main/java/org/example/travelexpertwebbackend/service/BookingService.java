@@ -6,6 +6,7 @@ import jakarta.transaction.Transactional;
 import org.example.travelexpertwebbackend.dto.booking.BookingCreateRequestDTO;
 import org.example.travelexpertwebbackend.dto.booking.BookingCreateResponseDTO;
 import org.example.travelexpertwebbackend.dto.booking.CostSummaryResponseDTO;
+import org.example.travelexpertwebbackend.dto.wallet.CostSummaryRequestDTO;
 import org.example.travelexpertwebbackend.entity.*;
 import org.example.travelexpertwebbackend.entity.Package;
 import org.example.travelexpertwebbackend.repository.*;
@@ -219,7 +220,7 @@ public class BookingService {
         booking.setCustomer(customer);
         booking.setPointsEarned(pointsEarned);
         booking.setBookingStatus(Booking.BookingStatus.COMPLETED);
-        booking.setReservedDatetime(null); // Clear reservation time
+        booking.setReservedDatetime(null);
         bookingRepository.save(booking);
 
         return new BookingCreateResponseDTO(
@@ -330,7 +331,7 @@ public class BookingService {
     }
 
     @Transactional
-    public CostSummaryResponseDTO getCostSummary(Customer customer, BookingCreateRequestDTO requestDTO) {
+    public CostSummaryResponseDTO getCostSummary(Customer customer, CostSummaryRequestDTO requestDTO) {
         Package aPackage = packageRepository.findById(requestDTO.getPackageId())
                 .orElseThrow(() -> new IllegalArgumentException("Package not found with ID: " + requestDTO.getPackageId()));
 
