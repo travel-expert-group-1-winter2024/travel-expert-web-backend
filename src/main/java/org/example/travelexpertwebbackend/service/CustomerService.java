@@ -20,10 +20,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.example.travelexpertwebbackend.utils.RestUtil.buildPhotoUrl;
@@ -167,7 +164,10 @@ public class CustomerService {
 
         //* If AGENT or MANAGER, return TRUE, otherwise return FALSE
         boolean isAgent = existingUser
-                .map(user -> Role.AGENT.name().equalsIgnoreCase(user.getRole()) || Role.MANAGER.name().equalsIgnoreCase(user.getRole()))
+                .map(user -> {
+                    List<String> roles = Arrays.asList(user.getRoles());
+                    return roles.contains(Role.AGENT.name()) || roles.contains(Role.MANAGER.name());
+                })
                 .orElse(false);
         if (isAgent) {
             Logger.info("Agent registering as a new Customer: " + email + ", " + customerDTO.getCustfirstname() + " " + customerDTO.getCustlastname());
