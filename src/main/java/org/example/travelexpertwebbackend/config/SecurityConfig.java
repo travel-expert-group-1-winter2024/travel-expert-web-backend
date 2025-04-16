@@ -51,8 +51,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/customers/register").permitAll()
                         .requestMatchers("/api/signup/agent").permitAll()
                         .requestMatchers("/api/login").permitAll()
-                        .requestMatchers("/chat/**").permitAll()
-                        .requestMatchers("/uploads/**").permitAll()
+                        .requestMatchers("/chat/**").permitAll() // for web socket
+                        .requestMatchers("/uploads/**").permitAll() // for file hosting
                         // auth
                         .requestMatchers(HttpMethod.GET, "/api/auth/me").hasAnyRole(everyRoles)
                         .requestMatchers(HttpMethod.GET, "/api/users/by-reference").hasAnyRole(everyRoles)
