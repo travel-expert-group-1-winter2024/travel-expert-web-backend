@@ -1,6 +1,7 @@
 package org.example.travelexpertwebbackend.service;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.transaction.Transactional;
 import org.example.travelexpertwebbackend.dto.CustomerDTO;
 import org.example.travelexpertwebbackend.entity.*;
 import org.example.travelexpertwebbackend.entity.auth.Role;
@@ -283,6 +284,7 @@ public class CustomerService {
     }
 
     //Delete Customer
+    @Transactional
     public void deleteCustomer(Integer id) {
         Customer customer = customerRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Customer not found"));
@@ -290,25 +292,31 @@ public class CustomerService {
         // Unlink wallet if needed
         Wallet wallet = customer.getWallet();
         if (wallet != null) {
+            customer.setWallet(null);
             wallet.setCustomer(null);
+            walletRepository.delete(wallet);
         }
 
         // Unlink agent if needed
         Agent agent = customer.getAgent();
         if (agent != null) {
+            customer.setAgent(null);
             agent.getCustomers().remove(customer);
+            agentRepository.save(agent);
         }
 
         // Unlink customer tier if needed
         CustomerTier customerTier = customer.getCustomerTier();
         if (customerTier != null) {
             customerTier.getCustomers().remove(customer);
+            customerTierRepository.save(customerTier);
         }
 
         // Unlink user if needed
         User user = customer.getUser();
         if (user != null) {
             user.setCustomer(null);
+            userRepository.save(user);
         }
 
         // Unlink bookings if needed
@@ -316,9 +324,10 @@ public class CustomerService {
         if (bookings != null && !bookings.isEmpty()) {
             for (Booking booking : bookings) {
                 booking.setCustomer(null);
+                bookingRepository.save(booking);
             }
         }
 
-        customerRepository.deleteById(id);
+        customerRepository.delete(customer);
     }
 }
