@@ -1,6 +1,7 @@
 package org.example.travelexpertwebbackend.service;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.transaction.Transactional;
 import org.example.travelexpertwebbackend.dto.CustomerDTO;
 import org.example.travelexpertwebbackend.entity.*;
 import org.example.travelexpertwebbackend.entity.auth.Role;
@@ -283,6 +284,7 @@ public class CustomerService {
     }
 
     //Delete Customer
+    @Transactional
     public void deleteCustomer(Integer id) {
         Customer customer = customerRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Customer not found"));
@@ -320,5 +322,13 @@ public class CustomerService {
         }
 
         customerRepository.deleteById(id);
+
+        // check that customer is agent or not
+        if (customer.isAgent()) {
+            // delete agent
+            Agent agentCustomer = agentRepository.findByAgtEmail(customer.getCustemail())
+                    .orElseThrow(() -> new IllegalArgumentException("Agent not found"));
+            agentRepository.delete(agentCustomer);
+        }
     }
 }

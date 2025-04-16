@@ -164,22 +164,14 @@ public class CustomerController {
     @DeleteMapping("/{id}")
     public ResponseEntity<GenericApiResponse<String>> deleteCustomer(@PathVariable Integer id) {
         try {
-            Optional<CustomerDTO> customerDetails = customerService.getCustomerDetails(id);
-
-            if (customerDetails.isPresent()) {
-                CustomerDTO customer = customerDetails.get();
-                userService.deleteUserByEmail(customer.getCustemail());
-                customerService.deleteCustomer(id);  // Call the delete method in service
-                Logger.info("Successfully deleted customer with id: " + id);
-                return ResponseEntity.ok(new GenericApiResponse<>("Customer deleted successfully"));
-            } else {
-                Logger.warn("Customer not found with id: " + id);
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(new GenericApiResponse<>(List.of(new ErrorInfo("Customer not found"))));
-            }
-
+            customerService.deleteCustomer(id);
+            return ResponseEntity.ok(new GenericApiResponse<>("Customer deleted successfully"));
+        } catch (IllegalArgumentException e) {
+            Logger.error(e, "Customer not found with id: " + id);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new GenericApiResponse<>(List.of(new ErrorInfo("Customer not found"))));
         } catch (Exception e) {
-            Logger.error("Unexpected Error while deleting customer with id: " + id, e);
+            Logger.error(e, "Unexpected Error while deleting customer with id: " + id, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new GenericApiResponse<>(List.of(new ErrorInfo("An unexpected error occurred"))));
         }
