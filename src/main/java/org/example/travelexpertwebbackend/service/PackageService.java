@@ -58,6 +58,8 @@ public class PackageService {
         pkg.setPkgdesc(request.getPkgdesc());
         pkg.setPkgbaseprice(request.getPkgbaseprice());
         pkg.setPkgagencycommission(request.getPkgagencycommission());
+        pkg.setDestination(request.getDestination());
+        pkg.setTags(request.getTags());
 
         Package savedPackage = packageRepository.save(pkg);
 
@@ -85,6 +87,8 @@ public class PackageService {
         pkg.setPkgdesc(request.getPkgdesc());
         pkg.setPkgbaseprice(request.getPkgbaseprice());
         pkg.setPkgagencycommission(request.getPkgagencycommission());
+        pkg.setDestination(request.getDestination());
+        pkg.setTags(request.getTags());
 
         // Clear existing associations and add new ones
         pkg.getProductsSuppliers().clear();

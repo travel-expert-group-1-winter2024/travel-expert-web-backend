@@ -12,6 +12,8 @@ public class PackageRequestDTO {
     private BigDecimal pkgbaseprice;
     private BigDecimal pkgagencycommission;
     private List<Integer> productsupplierids; // List of productsupplierid
+    private String destination;
+    private String tags;
 
     // Getters and Setters
     public String getPkgname() {
@@ -60,6 +62,22 @@ public class PackageRequestDTO {
 
     public void setPkgagencycommission(BigDecimal pkgagencycommission) {
         this.pkgagencycommission = pkgagencycommission;
+    }
+
+    public String getTags() {
+        return tags;
+    }
+
+    public void setTags(String tags) {
+        this.tags = tags;
+    }
+
+    public String getDestination() {
+        return destination;
+    }
+
+    public void setDestination(String destination) {
+        this.destination = destination;
     }
 
     public List<Integer> getProductsupplierids() {
