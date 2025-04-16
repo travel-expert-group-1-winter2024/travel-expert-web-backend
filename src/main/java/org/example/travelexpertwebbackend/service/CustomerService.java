@@ -292,25 +292,31 @@ public class CustomerService {
         // Unlink wallet if needed
         Wallet wallet = customer.getWallet();
         if (wallet != null) {
+            customer.setWallet(null);
             wallet.setCustomer(null);
+            walletRepository.delete(wallet);
         }
 
         // Unlink agent if needed
         Agent agent = customer.getAgent();
         if (agent != null) {
+            customer.setAgent(null);
             agent.getCustomers().remove(customer);
+            agentRepository.save(agent);
         }
 
         // Unlink customer tier if needed
         CustomerTier customerTier = customer.getCustomerTier();
         if (customerTier != null) {
             customerTier.getCustomers().remove(customer);
+            customerTierRepository.save(customerTier);
         }
 
         // Unlink user if needed
         User user = customer.getUser();
         if (user != null) {
             user.setCustomer(null);
+            userRepository.save(user);
         }
 
         // Unlink bookings if needed
@@ -318,17 +324,10 @@ public class CustomerService {
         if (bookings != null && !bookings.isEmpty()) {
             for (Booking booking : bookings) {
                 booking.setCustomer(null);
+                bookingRepository.save(booking);
             }
         }
 
-        customerRepository.deleteById(id);
-
-        // check that customer is agent or not
-        if (customer.isAgent()) {
-            // delete agent
-            Agent agentCustomer = agentRepository.findByAgtEmail(customer.getCustemail())
-                    .orElseThrow(() -> new IllegalArgumentException("Agent not found"));
-            agentRepository.delete(agentCustomer);
-        }
+        customerRepository.delete(customer);
     }
 }
