@@ -9,6 +9,7 @@ import org.example.travelexpertwebbackend.dto.booking.BookingConfirmRequestDTO;
 import org.example.travelexpertwebbackend.dto.booking.BookingCreateRequestDTO;
 import org.example.travelexpertwebbackend.dto.booking.BookingCreateResponseDTO;
 import org.example.travelexpertwebbackend.dto.booking.CostSummaryResponseDTO;
+import org.example.travelexpertwebbackend.dto.wallet.CostSummaryRequestDTO;
 import org.example.travelexpertwebbackend.entity.Customer;
 import org.example.travelexpertwebbackend.service.BookingService;
 import org.example.travelexpertwebbackend.service.StripeService;
@@ -73,7 +74,7 @@ public class BookingController {
 
     @PostMapping("/cost-summary")
     public ResponseEntity<GenericApiResponse<CostSummaryResponseDTO>>
-    getPackageCostSummary(Authentication authentication, @Valid @RequestBody BookingCreateRequestDTO responseDTO) {
+    getPackageCostSummary(Authentication authentication, @Valid @RequestBody CostSummaryRequestDTO responseDTO) {
         String username = "";
         username = (String) authentication.getPrincipal();
         // find customer by username
