@@ -74,7 +74,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/bookingdetails/*").hasAnyRole(everyRoles)
                         // customers
                         .requestMatchers(HttpMethod.GET, "/api/customers").hasAnyRole(agentManagerRoles)
-                        .requestMatchers(HttpMethod.POST, "api/customers/*/upload").hasAnyRole(everyRoles)
+                        .requestMatchers(HttpMethod.POST, "/api/customers/*/upload").hasAnyRole(everyRoles)
                         .requestMatchers(HttpMethod.GET, "/api/customers/*/photo").hasAnyRole(everyRoles)
                         .requestMatchers(HttpMethod.GET, "/api/customers/*").hasAnyRole(everyRoles)
                         .requestMatchers(HttpMethod.PUT, "/api/customers/*").hasAnyRole(everyRoles)
