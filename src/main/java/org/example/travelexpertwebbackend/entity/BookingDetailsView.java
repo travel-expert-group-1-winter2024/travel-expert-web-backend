@@ -92,6 +92,9 @@ public class BookingDetailsView {
     @Column(name = "triptypeid", length = 1)
     private String tripTypeId;
 
+    @Column(name = "travellername")
+    private String travellername;
+
     public String getTripTypeId() {
         return tripTypeId;
     }
@@ -254,5 +257,13 @@ public class BookingDetailsView {
 
     public void setLastname(String lastname) {
         this.lastname = lastname;
+    }
+
+    public String getTravellername() {
+        return travellername;
+    }
+
+    public void setTravellername(String travellername) {
+        this.travellername = travellername;
     }
 }
