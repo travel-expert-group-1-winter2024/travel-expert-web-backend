@@ -98,7 +98,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/products/*").hasAnyRole(agentManagerRoles)
                         .requestMatchers(HttpMethod.PUT, "/api/products/*").hasAnyRole(agentManagerRoles)
                         // ratings
-                        .requestMatchers(HttpMethod.GET, "/api/ratings/*").hasAnyRole(everyRoles)
+                        .requestMatchers(HttpMethod.GET, "/api/ratings/*").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/ratings").hasAnyRole(everyRoles)
                         // supplier contact
                         .requestMatchers(HttpMethod.GET, "/api/suppliercontacts").hasAnyRole(agentManagerRoles)
