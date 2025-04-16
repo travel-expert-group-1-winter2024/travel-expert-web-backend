@@ -51,6 +51,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/customers/register").permitAll()
                         .requestMatchers("/api/signup/agent").permitAll()
                         .requestMatchers("/api/login").permitAll()
+                        .requestMatchers("/chat/**").permitAll()
+                        .requestMatchers("/uploads/**").permitAll()
                         // auth
                         .requestMatchers(HttpMethod.GET, "/api/auth/me").hasAnyRole(everyRoles)
                         .requestMatchers(HttpMethod.GET, "/api/users/by-reference").hasAnyRole(everyRoles) // TODO: frontend don't have token
