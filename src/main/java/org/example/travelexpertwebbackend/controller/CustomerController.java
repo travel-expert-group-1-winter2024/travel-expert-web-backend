@@ -161,7 +161,7 @@ public class CustomerController {
         }
     }
 
-    @DeleteMapping("delete/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<GenericApiResponse<String>> deleteCustomer(@PathVariable Integer id) {
         try {
             Optional<CustomerDTO> customerDetails = customerService.getCustomerDetails(id);
