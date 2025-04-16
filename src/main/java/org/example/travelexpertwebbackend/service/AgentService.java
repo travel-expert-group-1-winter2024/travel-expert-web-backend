@@ -10,15 +10,16 @@ import org.example.travelexpertwebbackend.dto.agent.AgentUpdateResponseDTO;
 import org.example.travelexpertwebbackend.entity.Agency;
 import org.example.travelexpertwebbackend.entity.Agent;
 import org.example.travelexpertwebbackend.entity.Customer;
+import org.example.travelexpertwebbackend.entity.auth.Role;
 import org.example.travelexpertwebbackend.entity.auth.User;
 import org.example.travelexpertwebbackend.repository.AgencyRepository;
 import org.example.travelexpertwebbackend.repository.AgentRepository;
 import org.example.travelexpertwebbackend.repository.CustomerRepository;
 import org.example.travelexpertwebbackend.repository.auth.UserRepository;
 import org.example.travelexpertwebbackend.service.auth.UserService;
+import org.example.travelexpertwebbackend.utils.RoleUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import org.tinylog.Logger;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -160,7 +161,6 @@ public class AgentService {
         }
 
         // update agent details
-        Logger.debug("Saving agent with ID: " + agent.getId());
         agent.setAgtFirstName(request.getAgtFirstName());
         agent.setAgtMiddleInitial(request.getAgtMiddleInitial());
         agent.setAgtLastName(request.getAgtLastName());
@@ -210,6 +210,7 @@ public class AgentService {
                 request.getPassword(),
                 savedAgent
         );
+        user.setRole(RoleUtil.combineRoles(Role.AGENT.name(), Role.CUSTOMER.name())); // set role to agent and customer
         // save user
         User savedUser = userRepository.save(user);
 

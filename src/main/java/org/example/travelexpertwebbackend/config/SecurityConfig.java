@@ -43,44 +43,70 @@ public class SecurityConfig {
     // configure roles
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity, CustomCorsConfiguration customCorsConfiguration) throws Exception {
-//         grant authorization to users based on roles
+        // grant authorization to users based on roles
+        String[] everyRoles = {"AGENT", "MANAGER", "CUSTOMER"};
+        String[] agentManagerRoles = {"AGENT", "MANAGER"};
         httpSecurity.authorizeHttpRequests(securityConfigurer ->
                 securityConfigurer
-         
-                        // TODO: This is for development period
-                        // Added Agent requestMatchers
-                        .anyRequest().permitAll()
-//                         .requestMatchers("/api/signup").permitAll()
-//                         .requestMatchers("/api/signup/agent").permitAll() //TODO: change to admin or manager later
-//                         .requestMatchers("/api/login").permitAll()
-//                         // agencies
-//                         .requestMatchers(HttpMethod.GET, "/agencies").permitAll()
-//                         // agents
-//                         // TODO: change to admin or manager later
-//                         .requestMatchers(HttpMethod.GET, "/agents/me").authenticated()
-//                         .requestMatchers(HttpMethod.POST, "/agents").permitAll()
-//                         .requestMatchers(HttpMethod.PUT, "/agents/{id}").authenticated()
-//                         // customers
-//                         .requestMatchers(HttpMethod.GET, "/api/customers").permitAll()
-//                         .requestMatchers(HttpMethod.GET, "/api/customers/me").hasRole("CUSTOMER")
-//                         // packages
-//                         // TODO: change to agent later
-//                         .requestMatchers(HttpMethod.GET, "/packages").permitAll()
-//                         .requestMatchers(HttpMethod.POST, "/packages").permitAll()
-//                         .requestMatchers(HttpMethod.GET, "/packages/product-supplier").permitAll()
-//                         .requestMatchers(HttpMethod.PUT, "/packages/*").permitAll()
-//                         .requestMatchers(HttpMethod.GET, "/packages/search/**").permitAll()
-//                         .requestMatchers(HttpMethod.GET, "/packages/search").permitAll()
-                           // product
-//                         // TODO: change to agent later
-//                         .requestMatchers(HttpMethod.GET, "/api/products").permitAll()
-//
-//                         // supplier contact
-//                         // TODO: change to agent later
-//                         .requestMatchers(HttpMethod.GET, "/api/suppliercontacts").permitAll()
-//                         .requestMatchers(HttpMethod.PUT, "/api/suppliercontacts/*").permitAll()
-
-
+                        .requestMatchers("/api/customers/register").permitAll()
+                        .requestMatchers("/api/signup/agent").permitAll()
+                        .requestMatchers("/api/login").permitAll()
+                        .requestMatchers("/chat/**").permitAll() // for web socket
+                        .requestMatchers("/uploads/**").permitAll() // for file hosting
+                        // auth
+                        .requestMatchers(HttpMethod.GET, "/api/auth/me").hasAnyRole(everyRoles)
+                        .requestMatchers(HttpMethod.GET, "/api/users/by-reference").hasAnyRole(everyRoles)
+                        // agencies
+                        .requestMatchers(HttpMethod.GET, "/agencies", "/api/agencies").permitAll()
+                        // agents
+                        .requestMatchers(HttpMethod.POST, "/agents").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/agents/*/upload").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/agents/*/photo").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/agents/me").hasAnyRole(agentManagerRoles)
+                        .requestMatchers(HttpMethod.PUT, "/agents/*").hasAnyRole(agentManagerRoles)
+                        // booking
+                        .requestMatchers(HttpMethod.POST, "/api/bookings").hasAnyRole(everyRoles)
+                        .requestMatchers(HttpMethod.POST, "/api/bookings/create-payment-intent").hasAnyRole(everyRoles)
+                        .requestMatchers(HttpMethod.POST, "/api/bookings/cost-summary").hasAnyRole(everyRoles)
+                        .requestMatchers(HttpMethod.POST, "/api/bookings/confirm").hasAnyRole(everyRoles)
+                        // booking details
+                        .requestMatchers(HttpMethod.GET, "/api/bookingdetails").hasAnyRole(everyRoles)
+                        .requestMatchers(HttpMethod.GET, "/api/bookingdetails/*").hasAnyRole(everyRoles)
+                        // customers
+                        .requestMatchers(HttpMethod.GET, "/api/customers").hasAnyRole(agentManagerRoles)
+                        .requestMatchers(HttpMethod.POST, "/api/customers/*/upload").hasAnyRole(everyRoles)
+                        .requestMatchers(HttpMethod.GET, "/api/customers/*/photo").hasAnyRole(everyRoles)
+                        .requestMatchers(HttpMethod.GET, "/api/customers/*").hasAnyRole(everyRoles)
+                        .requestMatchers(HttpMethod.PUT, "/api/customers/*").hasAnyRole(everyRoles)
+                        .requestMatchers(HttpMethod.POST, "/api/customers/updatecustomer/*").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/customers/delete/*").hasAnyRole(everyRoles)
+                        // email
+                        .requestMatchers(HttpMethod.POST, "/api/email/send").hasAnyRole(everyRoles)
+                        .requestMatchers(HttpMethod.POST, "/api/email/send-booking-confirmation").hasAnyRole(everyRoles)
+                        // packages
+                        .requestMatchers(HttpMethod.GET, "/packages").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/packages/*/details").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/packages").hasAnyRole(agentManagerRoles)
+                        .requestMatchers(HttpMethod.PUT, "/packages/*").hasAnyRole(agentManagerRoles)
+                        .requestMatchers(HttpMethod.DELETE, "/packages/*").hasAnyRole(agentManagerRoles)
+                        .requestMatchers(HttpMethod.GET, "/packages/product-supplier").hasAnyRole(agentManagerRoles)
+                        .requestMatchers(HttpMethod.GET, "/packages/search").permitAll()
+                        // places
+                        .requestMatchers(HttpMethod.GET, "/api/places/search", "/api/places/nearby").hasAnyRole(agentManagerRoles)
+                        // products
+                        .requestMatchers(HttpMethod.GET, "/api/products").hasAnyRole(agentManagerRoles)
+                        .requestMatchers(HttpMethod.GET, "/api/products/*").hasAnyRole(agentManagerRoles)
+                        .requestMatchers(HttpMethod.PUT, "/api/products/*").hasAnyRole(agentManagerRoles)
+                        // ratings
+                        .requestMatchers(HttpMethod.GET, "/api/ratings/*").hasAnyRole(everyRoles)
+                        .requestMatchers(HttpMethod.POST, "/api/ratings").hasAnyRole(everyRoles)
+                        // supplier contact
+                        .requestMatchers(HttpMethod.GET, "/api/suppliercontacts").hasAnyRole(agentManagerRoles)
+                        .requestMatchers(HttpMethod.GET, "/api/suppliercontacts/*").hasAnyRole(agentManagerRoles)
+                        .requestMatchers(HttpMethod.PUT, "/api/suppliercontacts/*").hasAnyRole(agentManagerRoles)
+                        // wallet
+                        .requestMatchers(HttpMethod.POST, "/api/wallet/topup").hasAnyRole(everyRoles)
+                        .requestMatchers(HttpMethod.GET, "/api/wallet-balance").hasAnyRole(everyRoles)
         );
 
         httpSecurity.cors(httpSecurityCorsConfigurer -> httpSecurityCorsConfigurer
