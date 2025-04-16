@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.tinylog.Logger;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.Instant;
 import java.util.List;
 
@@ -121,25 +120,22 @@ public class BookingService {
         }
         PackagesProductsSupplier selectedProduct = ppsList.get((int) (Math.random() * ppsList.size()));
 
-        String[] packageDestinations = aPackage.getDestination().replaceAll(" ", "").split(",");
-        int destinationCount = packageDestinations.length;
-        for (String destination : packageDestinations) {
-            BookingDetail bookingDetail = new BookingDetail();
-            bookingDetail.setItineraryno((double) (100 + (int) (Math.random() * 900))); // random itinerary number
-            bookingDetail.setTripstart(aPackage.getPkgstartdate());
-            bookingDetail.setTripend(aPackage.getPkgenddate());
-            bookingDetail.setDescription(aPackage.getPkgdesc());
-            bookingDetail.setDestination(destination);
-            bookingDetail.setBaseprice(aPackage.getPkgbaseprice().divide(new BigDecimal(destinationCount), 2, RoundingMode.HALF_UP));
-            bookingDetail.setAgencycommission(aPackage.getPkgagencycommission().divide(new BigDecimal(destinationCount), 2, RoundingMode.HALF_UP));
-            bookingDetail.setRegionid(region);
-            bookingDetail.setClassid(classes);
-            bookingDetail.setFeeid(fee);
-            bookingDetail.setProductsupplierid(selectedProduct.getProductsupplierid().getId());
-            // set booking detail to booking
-            bookingDetail.setBooking(booking);
-            booking.getBookingDetails().add(bookingDetail);
-        }
+        BookingDetail bookingDetail = new BookingDetail();
+        bookingDetail.setItineraryno((double) (100 + (int) (Math.random() * 900))); // random itinerary number
+        bookingDetail.setTripstart(aPackage.getPkgstartdate());
+        bookingDetail.setTripend(aPackage.getPkgenddate());
+        bookingDetail.setDescription(aPackage.getPkgdesc());
+        bookingDetail.setDestination(aPackage.getDestination());
+        bookingDetail.setBaseprice(aPackage.getPkgbaseprice());
+        bookingDetail.setAgencycommission(aPackage.getPkgagencycommission());
+        bookingDetail.setRegionid(region);
+        bookingDetail.setClassid(classes);
+        bookingDetail.setFeeid(fee);
+        bookingDetail.setProductsupplierid(selectedProduct.getProductsupplierid().getId());
+        
+        // set booking detail to booking
+        bookingDetail.setBooking(booking);
+        booking.getBookingDetails().add(bookingDetail);
 
         CustomerTier customerTier = null;
         boolean isNewTier = false;
