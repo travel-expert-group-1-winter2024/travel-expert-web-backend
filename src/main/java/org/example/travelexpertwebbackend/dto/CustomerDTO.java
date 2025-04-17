@@ -65,7 +65,11 @@ public class CustomerDTO {
         }
         this.isAgent = customer.isAgent();
         this.points = customer.getPoints();
-        this.tier = customer.getCustomerTier().getName();
+        if (customer.getCustomerTier() != null) {
+            this.tier = customer.getCustomerTier().getName();
+        } else {
+            this.tier = null;
+        }
     }
 
     // Getters and Setters
