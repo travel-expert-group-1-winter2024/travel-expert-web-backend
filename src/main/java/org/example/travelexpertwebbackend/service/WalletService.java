@@ -47,7 +47,8 @@ public class WalletService {
 
         return new WalletTopUpResponseDTO(
                 savedWallet.getId(),
-                savedWallet.getBalance()
+                savedWallet.getBalance(),
+                savedWallet.getLastUpdated()
         );
     }
 
