@@ -7,6 +7,7 @@ import jakarta.transaction.Transactional;
 import org.example.travelexpertwebbackend.dto.PackageDetailsDTO;
 import org.example.travelexpertwebbackend.dto.PackageRequestDTO;
 import org.example.travelexpertwebbackend.dto.ProductSupplierDTO;
+import org.example.travelexpertwebbackend.entity.Booking;
 import org.example.travelexpertwebbackend.entity.Package;
 import org.example.travelexpertwebbackend.entity.ProductsSupplier;
 import org.example.travelexpertwebbackend.entity.Ratings;
@@ -104,6 +105,14 @@ public class PackageService {
     public void deletePackage(Integer id) {
         Package pkg = packageRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Package not found with id: " + id));
+        // Remove associations with bookings
+        Set<Booking> bookings = pkg.getBookings();
+        if (bookings != null && !bookings.isEmpty()) {
+            for (Booking booking : bookings) {
+                booking.setPackageid(null); // Remove the association
+            }
+        }
+        pkg.getBookings().clear();
 
         pkg.getProductsSuppliers().clear(); // Clear associations
         packageRepository.delete(pkg); // Delete the package
