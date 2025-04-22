@@ -22,9 +22,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Optional;
 
 @Service
@@ -115,7 +112,7 @@ public class AgentService {
         );
     }
 
-    public byte[] getAgentPhoto(int id) {
+    public String getAgentPhoto(int id) {
         // find agent by id
         Optional<Agent> optionalAgent = agentRepository.findById(id);
         if (optionalAgent.isEmpty()) {
@@ -123,17 +120,7 @@ public class AgentService {
         }
 
         Agent agent = optionalAgent.get();
-        String photoPath = agent.getPhotoPath();
-        if (photoPath == null || photoPath.isEmpty()) {
-            throw new IllegalArgumentException("Agent photo not found");
-        }
-
-        Path path = Paths.get("uploads/").resolve(photoPath);
-        try {
-            return Files.readAllBytes(path);
-        } catch (IOException e) {
-            throw new RuntimeException("Error reading photo file", e);
-        }
+        return agent.getPhotoPath();
     }
 
     public AgentUpdateResponseDTO updateAgent(int id, AgentUpdateRequestDTO request) {

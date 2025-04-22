@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.tinylog.Logger;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/agents")
@@ -58,12 +59,11 @@ public class AgentController {
     }
 
     @GetMapping("/{id}/photo")
-    public ResponseEntity<byte[]> downloadAgentPhoto(@PathVariable int id) {
+    public ResponseEntity<GenericApiResponse<Map<String, String>>> downloadAgentPhoto(@PathVariable int id) {
         try {
-            byte[] imageData = agentService.getAgentPhoto(id);
+            String imageUrl = agentService.getAgentPhoto(id);
             return ResponseEntity.ok()
-                    .header("Content-Type", "image/jpeg")
-                    .body(imageData);
+                    .body(new GenericApiResponse<>(Map.of("imageURL", imageUrl)));
         } catch (IllegalArgumentException e) {
             Logger.error(e, "Error retrieving agent photo");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();

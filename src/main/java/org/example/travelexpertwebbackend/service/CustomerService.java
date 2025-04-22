@@ -21,8 +21,6 @@ import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.example.travelexpertwebbackend.utils.RestUtil.buildPhotoUrl;
-
 @Service
 public class CustomerService {
     @Autowired
@@ -99,12 +97,8 @@ public class CustomerService {
         }
 
         Customer customer = optionalCustomer.get();
-        String photoPath = customer.getPhotoPath();
-        if (photoPath == null || photoPath.isEmpty()) {
-            throw new IllegalArgumentException("Customer photo not found");
-        }
 
-        return buildPhotoUrl(photoPath, request);
+        return customer.getPhotoPath();
     }
 
     private String generateUniqueFilename(int customerId, String originalFilename) {
