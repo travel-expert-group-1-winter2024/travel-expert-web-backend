@@ -17,9 +17,6 @@ import org.tinylog.Logger;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -28,7 +25,6 @@ import static org.example.travelexpertwebbackend.utils.RestUtil.buildPhotoUrl;
 
 @Service
 public class CustomerService {
-    private static final String UPLOAD_DIR = "uploads/";
     @Autowired
     private final CustomerRepository customerRepository;
     private final AgentRepository agentRepository;
@@ -81,21 +77,6 @@ public class CustomerService {
         customerRepository.save(customer);
 
         return blobUrl;
-    }
-
-    private String uploadLocal(MultipartFile image, HttpServletRequest request, String filename, Customer customer) throws IOException {
-        Path dirPath = Paths.get(UPLOAD_DIR);
-        if (!Files.exists(dirPath)) {
-            Files.createDirectories(dirPath);
-        }
-
-        Path filePath = dirPath.resolve(filename);
-        Files.write(filePath, image.getBytes());
-
-        customer.setPhotoPath(filename);
-        customerRepository.save(customer);
-
-        return buildPhotoUrl(filename, request);
     }
 
     private void validateImageFile(MultipartFile file) {

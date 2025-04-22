@@ -74,18 +74,10 @@ public class AgentService {
             throw new IllegalArgumentException("File is empty");
         }
 
-        Agent agent = optionalAgent.get();
-        String uploadDir = "uploads/";
         String filename = image.getOriginalFilename();
 
-        Path dirPath = Paths.get(uploadDir);
-        if (!Files.exists(dirPath)) {
-            Files.createDirectories(dirPath);
-        }
-
-        Path filePath = dirPath.resolve(filename);
-        Files.write(filePath, image.getBytes());
-
+        // set filename to agent
+        Agent agent = optionalAgent.get();
         agent.setPhotoPath(filename);
         Agent savedAgent = agentRepository.save(agent);
 
