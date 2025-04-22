@@ -22,9 +22,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Optional;
 
 @Service
@@ -36,14 +33,16 @@ public class AgentService {
     private final CustomerService customerService;
     private final UserRepository userRepository;
     private final CustomerRepository customerRepository;
+    private final BlobStorageService blobStorageService;
 
-    public AgentService(AgentRepository agentRepository, AgencyRepository agencyRepository, UserService userService, CustomerService customerService, UserRepository userRepository, CustomerRepository customerRepository) {
+    public AgentService(AgentRepository agentRepository, AgencyRepository agencyRepository, UserService userService, CustomerService customerService, UserRepository userRepository, CustomerRepository customerRepository, BlobStorageService blobStorageService) {
         this.agentRepository = agentRepository;
         this.agencyRepository = agencyRepository;
         this.userService = userService;
         this.customerService = customerService;
         this.userRepository = userRepository;
         this.customerRepository = customerRepository;
+        this.blobStorageService = blobStorageService;
     }
 
     private static CustomerDTO getCustomerDTO(Agent savedAgent) {
@@ -74,28 +73,22 @@ public class AgentService {
             throw new IllegalArgumentException("File is empty");
         }
 
-        Agent agent = optionalAgent.get();
-        String uploadDir = "uploads/";
         String filename = image.getOriginalFilename();
 
-        Path dirPath = Paths.get(uploadDir);
-        if (!Files.exists(dirPath)) {
-            Files.createDirectories(dirPath);
-        }
+        String blobUrl = blobStorageService.uploadFile(image, filename);
 
-        Path filePath = dirPath.resolve(filename);
-        Files.write(filePath, image.getBytes());
-
-        agent.setPhotoPath(filename);
+        // set filename to agent
+        Agent agent = optionalAgent.get();
+        agent.setPhotoPath(blobUrl);
         Agent savedAgent = agentRepository.save(agent);
 
-        // find agent record in customer table
+        // find customer record in customer table
         Customer customer = customerRepository.findByCustemail(savedAgent.getAgtEmail())
                 .orElseThrow(() -> new IllegalArgumentException("Customer not found"));
-        customer.setPhotoPath(filename);
+        customer.setPhotoPath(blobUrl);
         customerRepository.save(customer);
 
-        return filename;
+        return blobUrl;
     }
 
     public AgentDetailResponseDTO getCurrentAgent(String username) {
@@ -119,7 +112,7 @@ public class AgentService {
         );
     }
 
-    public byte[] getAgentPhoto(int id) {
+    public String getAgentPhoto(int id) {
         // find agent by id
         Optional<Agent> optionalAgent = agentRepository.findById(id);
         if (optionalAgent.isEmpty()) {
@@ -127,17 +120,7 @@ public class AgentService {
         }
 
         Agent agent = optionalAgent.get();
-        String photoPath = agent.getPhotoPath();
-        if (photoPath == null || photoPath.isEmpty()) {
-            throw new IllegalArgumentException("Agent photo not found");
-        }
-
-        Path path = Paths.get("uploads/").resolve(photoPath);
-        try {
-            return Files.readAllBytes(path);
-        } catch (IOException e) {
-            throw new RuntimeException("Error reading photo file", e);
-        }
+        return agent.getPhotoPath();
     }
 
     public AgentUpdateResponseDTO updateAgent(int id, AgentUpdateRequestDTO request) {

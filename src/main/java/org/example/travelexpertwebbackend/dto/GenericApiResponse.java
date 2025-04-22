@@ -5,12 +5,13 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.ArrayList;
 import java.util.List;
 
-@JsonInclude(JsonInclude.Include.NON_NULL) // Exclude null fields from JSON serialization
 public class GenericApiResponse<T> {
     private T data;
-    private List<ErrorInfo> errors;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private List<ErrorInfo> errors; // optional
 
-    public GenericApiResponse() {}
+    public GenericApiResponse() {
+    }
 
     public GenericApiResponse(T data) {
         this.data = data;
