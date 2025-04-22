@@ -43,6 +43,8 @@ public class CustomerService {
     private UserRepository userRepository;
     @Autowired
     private BookingRepository bookingRepository;
+    @Autowired
+    private BlobStorageService blobStorageService;
 
     public CustomerService(CustomerRepository customerRepository, AgentRepository agentRepository) {
         this.customerRepository = customerRepository;
@@ -71,6 +73,10 @@ public class CustomerService {
         Customer customer = optionalCustomer.get();
         String filename = generateUniqueFilename(customerId, image.getOriginalFilename());
 
+        return blobStorageService.uploadFile(image, filename);
+    }
+
+    private String uploadLocal(MultipartFile image, HttpServletRequest request, String filename, Customer customer) throws IOException {
         Path dirPath = Paths.get(UPLOAD_DIR);
         if (!Files.exists(dirPath)) {
             Files.createDirectories(dirPath);
