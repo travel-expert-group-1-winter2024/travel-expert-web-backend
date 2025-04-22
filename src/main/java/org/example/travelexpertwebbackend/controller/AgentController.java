@@ -62,6 +62,9 @@ public class AgentController {
     public ResponseEntity<GenericApiResponse<Map<String, String>>> downloadAgentPhoto(@PathVariable int id) {
         try {
             String imageUrl = agentService.getAgentPhoto(id);
+            if (imageUrl == null) {
+                return ResponseEntity.ok().body(new GenericApiResponse<>(null));
+            }
             return ResponseEntity.ok()
                     .body(new GenericApiResponse<>(Map.of("imageURL", imageUrl)));
         } catch (IllegalArgumentException e) {
