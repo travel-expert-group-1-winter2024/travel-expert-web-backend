@@ -23,8 +23,6 @@ import org.tinylog.Logger;
 import java.time.Instant;
 import java.util.Optional;
 
-import static org.example.travelexpertwebbackend.utils.RestUtil.buildPhotoUrl;
-
 @Service
 public class UserService implements UserDetailsService {
 
@@ -167,11 +165,11 @@ public class UserService implements UserDetailsService {
         if (user.getCustomer() != null) {
             customerId = user.getCustomer().getId();
             fullName = getCustomerFullName(user);
-            photoUrl = buildPhotoUrl(user.getCustomer().getPhotoPath(), request);
+            photoUrl = user.getCustomer().getPhotoPath();
         } else if (user.getAgent() != null) {
             agentId = user.getAgent().getId();
             fullName = getAgentFullName(user);
-            photoUrl = buildPhotoUrl(user.getAgent().getPhotoPath(), request);
+            photoUrl = user.getAgent().getPhotoPath();
         }
 
         return new UserInfoDTO(
