@@ -36,14 +36,16 @@ public class AgentService {
     private final CustomerService customerService;
     private final UserRepository userRepository;
     private final CustomerRepository customerRepository;
+    private final BlobStorageService blobStorageService;
 
-    public AgentService(AgentRepository agentRepository, AgencyRepository agencyRepository, UserService userService, CustomerService customerService, UserRepository userRepository, CustomerRepository customerRepository) {
+    public AgentService(AgentRepository agentRepository, AgencyRepository agencyRepository, UserService userService, CustomerService customerService, UserRepository userRepository, CustomerRepository customerRepository, BlobStorageService blobStorageService) {
         this.agentRepository = agentRepository;
         this.agencyRepository = agencyRepository;
         this.userService = userService;
         this.customerService = customerService;
         this.userRepository = userRepository;
         this.customerRepository = customerRepository;
+        this.blobStorageService = blobStorageService;
     }
 
     private static CustomerDTO getCustomerDTO(Agent savedAgent) {
@@ -76,18 +78,20 @@ public class AgentService {
 
         String filename = image.getOriginalFilename();
 
+        String blobUrl = blobStorageService.uploadFile(image, filename);
+
         // set filename to agent
         Agent agent = optionalAgent.get();
-        agent.setPhotoPath(filename);
+        agent.setPhotoPath(blobUrl);
         Agent savedAgent = agentRepository.save(agent);
 
         // find agent record in customer table
         Customer customer = customerRepository.findByCustemail(savedAgent.getAgtEmail())
                 .orElseThrow(() -> new IllegalArgumentException("Customer not found"));
-        customer.setPhotoPath(filename);
+        customer.setPhotoPath(blobUrl);
         customerRepository.save(customer);
 
-        return filename;
+        return blobUrl;
     }
 
     public AgentDetailResponseDTO getCurrentAgent(String username) {
