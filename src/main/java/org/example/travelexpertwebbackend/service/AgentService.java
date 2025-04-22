@@ -82,7 +82,7 @@ public class AgentService {
         agent.setPhotoPath(blobUrl);
         Agent savedAgent = agentRepository.save(agent);
 
-        // find agent record in customer table
+        // find customer record in customer table
         Customer customer = customerRepository.findByCustemail(savedAgent.getAgtEmail())
                 .orElseThrow(() -> new IllegalArgumentException("Customer not found"));
         customer.setPhotoPath(blobUrl);
