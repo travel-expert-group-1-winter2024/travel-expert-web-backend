@@ -73,7 +73,14 @@ public class CustomerService {
         Customer customer = optionalCustomer.get();
         String filename = generateUniqueFilename(customerId, image.getOriginalFilename());
 
-        return blobStorageService.uploadFile(image, filename);
+        // upload file to blob storage
+        String blobUrl = blobStorageService.uploadFile(image, filename);
+
+        // set photo path in customer
+        customer.setPhotoPath(blobUrl);
+        customerRepository.save(customer);
+
+        return blobUrl;
     }
 
     private String uploadLocal(MultipartFile image, HttpServletRequest request, String filename, Customer customer) throws IOException {
