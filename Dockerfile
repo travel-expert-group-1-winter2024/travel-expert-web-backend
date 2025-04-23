@@ -1,18 +1,16 @@
-# Use OpenJDK as base image
+# Stage 1: Build with Maven
+FROM maven:3.9.4-eclipse-temurin-21 AS builder
+
+WORKDIR /app
+COPY . .
+RUN mvn clean package -DskipTests
+
+# Stage 2: Run the application
 FROM openjdk:21-jdk-slim
 
-
-# Set environment variable
-ENV JAVA_OPTS=""
-
-# Set the working directory
 WORKDIR /app
+COPY --from=builder /app/target/*.jar app.jar
 
-# Copy the jar file
-COPY target/travel-expert-web-backend-0.0.1-SNAPSHOT.jar app.jar
-
-# Expose port (optional, if your app listens on 8080)
 EXPOSE 8080
 
-# Run the jar file
-ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
+ENTRYPOINT ["java", "-jar", "app.jar"]
