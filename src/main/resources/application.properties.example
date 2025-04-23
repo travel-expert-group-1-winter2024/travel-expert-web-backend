@@ -1,4 +1,5 @@
 spring.application.name=travel-expert-web-backend
+server.port=${PORT:8080}
 # db connection
 # db access
 spring.datasource.url=jdbc:postgresql://localhost:5432/travelexperts
@@ -30,3 +31,5 @@ stripe.secret-key=STRIPE_SECRET_KEY
 # File Upload Configuration
 spring.servlet.multipart.max-file-size=5MB
 spring.servlet.multipart.max-request-size=10MB
+spring.cloud.azure.storage.blob.connection-string=CONNECTION_STRING_HERE
+spring.cloud.azure.storage.blob.container-name=user-profile
