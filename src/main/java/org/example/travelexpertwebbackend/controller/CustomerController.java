@@ -63,6 +63,9 @@ public class CustomerController {
     public ResponseEntity<GenericApiResponse<Map<String, String>>> downloadCustomerPhoto(@PathVariable int id, HttpServletRequest request) {
         try {
             String imageURL = customerService.getCustomerPhoto(id, request);
+            if (imageURL == null) {
+                return ResponseEntity.ok().body(new GenericApiResponse<>(null));
+            }
             return ResponseEntity.ok()
                     .body(new GenericApiResponse<>(Map.of("imageURL", imageURL)));
         } catch (IllegalArgumentException e) {

@@ -17,18 +17,12 @@ import org.tinylog.Logger;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.example.travelexpertwebbackend.utils.RestUtil.buildPhotoUrl;
-
 @Service
 public class CustomerService {
-    private static final String UPLOAD_DIR = "uploads/";
     @Autowired
     private final CustomerRepository customerRepository;
     private final AgentRepository agentRepository;
@@ -43,6 +37,8 @@ public class CustomerService {
     private UserRepository userRepository;
     @Autowired
     private BookingRepository bookingRepository;
+    @Autowired
+    private BlobStorageService blobStorageService;
 
     public CustomerService(CustomerRepository customerRepository, AgentRepository agentRepository) {
         this.customerRepository = customerRepository;
@@ -71,18 +67,20 @@ public class CustomerService {
         Customer customer = optionalCustomer.get();
         String filename = generateUniqueFilename(customerId, image.getOriginalFilename());
 
-        Path dirPath = Paths.get(UPLOAD_DIR);
-        if (!Files.exists(dirPath)) {
-            Files.createDirectories(dirPath);
-        }
+        // upload file to blob storage
+        String blobUrl = blobStorageService.uploadFile(image, filename);
 
-        Path filePath = dirPath.resolve(filename);
-        Files.write(filePath, image.getBytes());
+        // set photo path in customer
+        customer.setPhotoPath(blobUrl);
+        Customer savedCustomer = customerRepository.save(customer);
 
-        customer.setPhotoPath(filename);
-        customerRepository.save(customer);
+        // find agent record in customer table
+        Agent agent = agentRepository.findByAgtEmail(savedCustomer.getCustemail())
+                .orElseThrow(() -> new IllegalArgumentException("Customer not found"));
+        agent.setPhotoPath(blobUrl);
+        agentRepository.save(agent);
 
-        return buildPhotoUrl(filename, request);
+        return blobUrl;
     }
 
     private void validateImageFile(MultipartFile file) {
@@ -105,12 +103,8 @@ public class CustomerService {
         }
 
         Customer customer = optionalCustomer.get();
-        String photoPath = customer.getPhotoPath();
-        if (photoPath == null || photoPath.isEmpty()) {
-            throw new IllegalArgumentException("Customer photo not found");
-        }
 
-        return buildPhotoUrl(photoPath, request);
+        return customer.getPhotoPath();
     }
 
     private String generateUniqueFilename(int customerId, String originalFilename) {
